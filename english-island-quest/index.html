@@ -4,6 +4,20 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>英語アイランドクエスト</title>
+<meta name="description" content="中学1年英語 Unit 0〜5 の文法と単語を、島めぐりのボス戦・ならべかえ・リスニングで学ぶ無料のブラウザゲーム。">
+<meta name="theme-color" content="#1D5F8F">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png" type="image/png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="英語クエスト">
+<meta property="og:type" content="website">
+<meta property="og:title" content="英語アイランドクエスト">
+<meta property="og:description" content="中学1年英語 Unit 0〜5 を島めぐりゲームで。ボス戦・ならべかえ・リスニングで、遊びながら文法と単語が身につく。">
+<meta property="og:image" content="https://english-island-quest.vercel.app/og.png">
+<meta property="og:url" content="https://english-island-quest.vercel.app/">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Andika:wght@400;700&family=Dela+Gothic+One&family=M+PLUS+Rounded+1c:wght@400;700;800&display=swap">
@@ -79,6 +93,16 @@ h1,h2,h3{text-wrap:balance;margin:0}
 @media (max-width:520px){.quick{grid-template-columns:repeat(2,1fr)}.qbtn{grid-template-columns:auto 1fr;justify-items:start;text-align:left;column-gap:10px;padding:10px 12px}.qbtn .ic{grid-row:span 2;align-self:center}}
 @media (max-width:420px){.top{grid-template-columns:1fr}.player{justify-self:start}}
 
+.quick5{grid-template-columns:repeat(5,1fr)}
+@media (max-width:520px){.quick5 .qbtn:last-child{grid-column:1/-1}}
+.share{grid-template-columns:auto 1fr;align-items:start}
+@media (max-width:520px){.share{grid-template-columns:1fr}}
+.qr{background:#FFFFFF;padding:10px;border-radius:12px;border:2px solid var(--ink);width:max-content;max-width:100%;justify-self:center}
+.qr img,.qr canvas{display:block;width:160px;height:160px}
+.urlrow{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.urlrow input{flex:1 1 200px;min-width:0;font-family:var(--f-en);font-size:15px;border:2px solid var(--line);border-radius:10px;padding:8px 10px;background:var(--paper-2);color:var(--ink)}
+.howto{font-size:13px;color:var(--ink-soft);margin:0;line-height:1.7}
+.howto b{color:var(--ink)}
 .panel{background:var(--paper);border:2px solid var(--line);border-radius:var(--r);padding:16px;margin-block:8px;display:grid;gap:12px}
 .toggle{display:flex;justify-content:space-between;align-items:center;gap:12px}
 .switch{width:52px;height:30px;border-radius:99px;border:2px solid var(--ink);background:var(--paper-2);position:relative;padding:0;flex:none}
@@ -275,6 +299,7 @@ canvas#fx{position:fixed;inset:0;pointer-events:none;z-index:30}
 <div id="app" aria-live="polite"></div>
 <div id="sheet-root"></div>
 <canvas id="fx" hidden></canvas>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script>
 "use strict";
 /* ============ 教材データ（教科書 Unit 0〜5 の文法事項にそったオリジナル問題） ============ */
@@ -762,15 +787,18 @@ function renderHome(){
       <div class="pinfo"><b>${rankOf(lv)}</b><div class="xpbar"><i style="width:${into*100/XP_LV}%"></i></div><small>${into} / ${XP_LV} XP（合計 ${S.xp}）</small></div>
     </div>
   </header>
-  <nav class="quick" aria-label="メニュー">
+  <nav class="quick quick5" aria-label="メニュー">
     <button class="qbtn" data-act="attack"><span class="ic">⚡</span>タイムアタック<small>最高 ${S.best.attack} 問</small></button>
     <button class="qbtn" data-go="note"><span class="ic">📓</span>まちがいノート<small>${S.wrong.length} 問</small></button>
     <button class="qbtn" data-go="badges"><span class="ic">🏅</span>バッジ<small>${S.badges.length} / ${BADGES.length}</small></button>
+    <button class="qbtn" data-act="share" aria-expanded="${!!view.share}"><span class="ic">📣</span>友だちに教える<small>QR・リンク</small></button>
     <button class="qbtn" data-act="settings" aria-expanded="${!!view.settings}"><span class="ic">⚙️</span>設定<small>${S.settings.sound ? "音あり" : "音なし"}</small></button>
   </nav>
+  ${view.share ? sharePanel() : ""}
   ${view.settings ? settingsPanel() : ""}
   <section class="map" aria-label="島の地図">${isles}</section>
   <p class="foot">島をタップして冒険スタート。ポイント解説で文法を確認し、単語・文法・ならべかえ・リスニングで練習してから、ボスに挑戦しよう。ボスをたおした数 ${bossDone} / 6。<br>問題は教科書 Unit 0〜5 の文法事項にそって作ったオリジナルです。音声はブラウザの読み上げ機能を使います。記録はこの端末のブラウザに保存されます。</p>`;
+  if(view.share) drawQR();
 }
 function isleSA(r){
   const done = S.badges.includes("poster");
@@ -779,6 +807,32 @@ function isleSA(r){
     <span class="isle-t"><span class="en">"All about Me" Poster</span><span class="jp">Unit 1〜4 の英語で自己紹介ポスターを作る</span><span class="stars">${done ? "完成！" : '<span class="off">未完成</span>'}</span></span>
     <span class="mon-s" aria-hidden="true">🖼️</span>
   </button>`;
+}
+const APP_URL = /^https?:/.test(location.protocol) ? location.origin + location.pathname.replace(/index\.html$/, "") : "https://english-island-quest.vercel.app/";
+let installEvt = null;
+window.addEventListener("beforeinstallprompt", e => { e.preventDefault(); installEvt = e; if(view.share) render(); });
+const standalone = () => (window.matchMedia && matchMedia("(display-mode: standalone)").matches) || navigator.standalone === true;
+function sharePanel(){
+  return `<div class="panel share" id="share">
+    <div class="qr" id="qr" aria-label="このゲームのQRコード"></div>
+    <div style="display:grid;gap:10px;min-width:0">
+      <b>このQRコードかリンクで、だれでもすぐに遊べます</b>
+      <div class="urlrow"><input id="share-url" value="${esc(APP_URL)}" readonly aria-label="ゲームのリンク"><button class="btn small" data-act="copy">${view.copied ? "コピーしました" : "リンクをコピー"}</button></div>
+      <div class="btnrow" style="justify-content:flex-start">
+        ${navigator.share ? `<button class="btn small primary" data-act="webshare">LINE などで送る</button>` : ""}
+        ${installEvt && !standalone() ? `<button class="btn small gold" data-act="install">アプリとして入れる</button>` : ""}
+      </div>
+      <p class="howto"><b>ホーム画面に追加するとアプリのように使えます。</b>iPhone は Safari の共有ボタンから「ホーム画面に追加」。Android は Chrome のメニューから「アプリをインストール」か「ホーム画面に追加」。一度開けば電波がなくても遊べます。</p>
+      <p class="howto">登録やログインは不要です。記録はそれぞれの端末に保存され、ほかの人には送られません。</p>
+    </div>
+  </div>`;
+}
+function drawQR(){
+  const el = document.getElementById("qr");
+  if(!el) return;
+  if(typeof QRCode === "undefined"){ el.hidden = true; return; }
+  el.innerHTML = "";
+  try{ new QRCode(el, {text:APP_URL, width:160, height:160, colorDark:"#15314A", colorLight:"#FFFFFF", correctLevel:QRCode.CorrectLevel.M}); }catch(e){ el.hidden = true; }
 }
 function settingsPanel(){
   return `<div class="panel" id="settings">
@@ -1250,6 +1304,15 @@ document.addEventListener("click", e => {
   if(act === "start"){ SFX.tap(); startQuiz(a.dataset.m, +a.dataset.u); return; }
   if(act === "attack"){ SFX.tap(); startQuiz("attack", 0); return; }
   if(act === "settings"){ view.settings = !view.settings; view.resetArm = false; render(); return; }
+  if(act === "share"){ view.share = !view.share; view.copied = false; render(); if(view.share) drawQR(); return; }
+  if(act === "copy"){
+    const inp = document.getElementById("share-url");
+    const done = () => { view.copied = true; a.textContent = "コピーしました"; };
+    try{ navigator.clipboard.writeText(APP_URL).then(done, () => { inp.select(); }); }catch(e){ inp.select(); }
+    return;
+  }
+  if(act === "webshare"){ try{ navigator.share({title:"英語アイランドクエスト", text:"中1英語 Unit 0〜5 を島めぐりゲームで復習しよう！", url:APP_URL}).catch(() => {}); }catch(e){} return; }
+  if(act === "install"){ if(installEvt){ installEvt.prompt(); installEvt.userChoice.finally(() => { installEvt = null; render(); if(view.share) drawQR(); }); } return; }
   if(act === "t-sound"){ S.settings.sound = !S.settings.sound; save(); render(); SFX.tap(); return; }
   if(act === "t-slow"){ S.settings.slow = !S.settings.slow; save(); render(); speak("Nice to meet you."); return; }
   if(act === "reset"){
@@ -1303,6 +1366,9 @@ document.addEventListener("keydown", e => {
 });
 
 render();
+if("serviceWorker" in navigator && location.protocol === "https:"){
+  window.addEventListener("load", () => { navigator.serviceWorker.register("sw.js").catch(() => {}); });
+}
 </script>
 </body>
 </html>
