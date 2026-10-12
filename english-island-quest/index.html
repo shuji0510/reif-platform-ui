@@ -15,8 +15,8 @@
 <meta property="og:type" content="website">
 <meta property="og:title" content="英語アイランドクエスト">
 <meta property="og:description" content="中学1年英語 Unit 0〜5 を島めぐりゲームで。ボス戦・ならべかえ・リスニングで、遊びながら文法と単語が身につく。">
-<meta property="og:image" content="https://english-island-quest.vercel.app/og.png">
-<meta property="og:url" content="https://english-island-quest.vercel.app/">
+<meta property="og:image" content="https://shuji0510.github.io/reif-platform-ui/english-island-quest/og.png">
+<meta property="og:url" content="https://shuji0510.github.io/reif-platform-ui/english-island-quest/">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -94,11 +94,11 @@ h1,h2,h3{text-wrap:balance;margin:0}
 @media (max-width:420px){.top{grid-template-columns:1fr}.player{justify-self:start}}
 
 .quick5{grid-template-columns:repeat(5,1fr)}
-@media (max-width:520px){.quick5 .qbtn:last-child{grid-column:1/-1}}
+@media (max-width:520px){.quick.quick5{grid-template-columns:repeat(2,1fr)}.quick5 .qbtn:last-child{grid-column:1/-1}}
 .share{grid-template-columns:auto 1fr;align-items:start}
 @media (max-width:520px){.share{grid-template-columns:1fr}}
 .qr{background:#FFFFFF;padding:10px;border-radius:12px;border:2px solid var(--ink);width:max-content;max-width:100%;justify-self:center}
-.qr img,.qr canvas{display:block;width:160px;height:160px}
+.qr svg{display:block;width:160px;height:160px}
 .urlrow{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 .urlrow input{flex:1 1 200px;min-width:0;font-family:var(--f-en);font-size:15px;border:2px solid var(--line);border-radius:10px;padding:8px 10px;background:var(--paper-2);color:var(--ink)}
 .howto{font-size:13px;color:var(--ink-soft);margin:0;line-height:1.7}
@@ -299,7 +299,7 @@ canvas#fx{position:fixed;inset:0;pointer-events:none;z-index:30}
 <div id="app" aria-live="polite"></div>
 <div id="sheet-root"></div>
 <canvas id="fx" hidden></canvas>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="qrcode.js"></script>
 <script>
 "use strict";
 /* ============ 教材データ（教科書 Unit 0〜5 の文法事項にそったオリジナル問題） ============ */
@@ -808,7 +808,7 @@ function isleSA(r){
     <span class="mon-s" aria-hidden="true">🖼️</span>
   </button>`;
 }
-const APP_URL = /^https?:/.test(location.protocol) ? location.origin + location.pathname.replace(/index\.html$/, "") : "https://english-island-quest.vercel.app/";
+const APP_URL = /^https?:/.test(location.protocol) ? location.origin + location.pathname.replace(/index\.html$/, "") : "https://shuji0510.github.io/reif-platform-ui/english-island-quest/";
 let installEvt = null;
 window.addEventListener("beforeinstallprompt", e => { e.preventDefault(); installEvt = e; if(view.share) render(); });
 const standalone = () => (window.matchMedia && matchMedia("(display-mode: standalone)").matches) || navigator.standalone === true;
@@ -830,9 +830,12 @@ function sharePanel(){
 function drawQR(){
   const el = document.getElementById("qr");
   if(!el) return;
-  if(typeof QRCode === "undefined"){ el.hidden = true; return; }
-  el.innerHTML = "";
-  try{ new QRCode(el, {text:APP_URL, width:160, height:160, colorDark:"#15314A", colorLight:"#FFFFFF", correctLevel:QRCode.CorrectLevel.M}); }catch(e){ el.hidden = true; }
+  if(typeof qrcode === "undefined"){ el.hidden = true; return; }
+  try{
+    const q = qrcode(0, "M"); q.addData(APP_URL); q.make();
+    el.innerHTML = q.createSvgTag({cellSize:4, margin:0, scalable:true});
+    const svg = el.querySelector("svg"); if(svg){ svg.setAttribute("width", "160"); svg.setAttribute("height", "160"); svg.setAttribute("role", "img"); }
+  }catch(e){ el.hidden = true; }
 }
 function settingsPanel(){
   return `<div class="panel" id="settings">
