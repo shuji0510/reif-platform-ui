@@ -1,0 +1,1308 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>英語アイランドクエスト</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Andika:wght@400;700&family=Dela+Gothic+One&family=M+PLUS+Rounded+1c:wght@400;700;800&display=swap">
+<style>
+/* Layout: 海図のような縦長マップに Unit の島を航路でつなぐ。問題画面は1枚のカードと、下からせり上がる判定シート。英文は4線の上に書く */
+:root{
+  --sea:#E6F2F1; --paper:#FFFFFF; --paper-2:#F3F8F8; --ink:#15314A; --ink-soft:#52697C; --line:#C9DEDF;
+  --deep:#1D5F8F; --deep-ink:#FFFFFF; --accent:#F2A900; --accent-soft:#FFF0C4; --accent-ink:#5A3D00;
+  --ok:#1F8556; --ok-soft:#DCF2E6; --ng:#D44533; --ng-soft:#FBE2DD;
+  --rule:#A9C2CE; --rule-soft:#CFDDE4; --rule-base:#E0705F; --night:#15314A; --night-ink:#FFFFFF; --night-track:#3A5670;
+  --u0:#3C9A6C; --u1:#2C8A57; --u2:#4E9636; --u3:#25877A; --u4:#5E962A; --u5:#5060B9; --sa:#D9742A;
+  --on-c:#FFFFFF;
+  --f-display:"Dela Gothic One","Hiragino Sans","Yu Gothic",sans-serif;
+  --f-body:"M PLUS Rounded 1c","Hiragino Maru Gothic ProN","Hiragino Sans","Yu Gothic",sans-serif;
+  --f-en:"Andika","Segoe UI","Helvetica Neue",Arial,sans-serif;
+  --r:14px;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --sea:#0C1B27; --paper:#13283A; --paper-2:#183247; --ink:#E3EEF2; --ink-soft:#9AB2C1; --line:#24445C;
+    --deep:#4FA3DA; --deep-ink:#08202F; --accent:#F6BA2E; --accent-soft:#3A2F12; --accent-ink:#FFE7A6;
+    --ok:#46C487; --ok-soft:#123A2A; --ng:#FF7A66; --ng-soft:#41201C;
+    --rule:#36566C; --rule-soft:#29465A; --rule-base:#B65A4C; --night:#06131D; --night-ink:#E3EEF2; --night-track:#22394B; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --sea:#0C1B27; --paper:#13283A; --paper-2:#183247; --ink:#E3EEF2; --ink-soft:#9AB2C1; --line:#24445C;
+  --deep:#4FA3DA; --deep-ink:#08202F; --accent:#F6BA2E; --accent-soft:#3A2F12; --accent-ink:#FFE7A6;
+  --ok:#46C487; --ok-soft:#123A2A; --ng:#FF7A66; --ng-soft:#41201C;
+  --rule:#36566C; --rule-soft:#29465A; --rule-base:#B65A4C; --night:#06131D; --night-ink:#E3EEF2; --night-track:#22394B; color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--sea);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased;
+  background-image:radial-gradient(circle at 1px 1px, var(--line) 1px, transparent 0);background-size:22px 22px}
+#app{max-width:720px;margin:0 auto;padding-inline:16px;padding-block:16px 48px}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,input:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.en{font-family:var(--f-en);letter-spacing:.01em}
+h1,h2,h3{text-wrap:balance;margin:0}
+.muted{color:var(--ink-soft)}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+
+/* buttons */
+.btn{border:2px solid var(--ink);background:var(--paper);border-radius:999px;padding:10px 18px;font-weight:800;box-shadow:0 3px 0 var(--ink);transition:transform .08s}
+.btn:active{transform:translateY(3px);box-shadow:none}
+.btn.primary{background:var(--deep);color:var(--deep-ink);border-color:var(--deep);box-shadow:0 3px 0 var(--ink)}
+.btn.gold{background:var(--accent);color:#3A2800;border-color:var(--ink)}
+.btn:disabled{opacity:.45;cursor:not-allowed;transform:none}
+.btn.small{padding:6px 12px;font-size:14px}
+.link{background:none;border:0;padding:6px 2px;font-weight:700;color:var(--deep)}
+.say{border:2px solid var(--line);background:var(--paper);border-radius:999px;width:36px;height:36px;flex:none;display:inline-grid;place-items:center;font-size:16px;padding:0}
+.say:hover{border-color:var(--deep)}
+
+/* home header */
+.top{display:grid;grid-template-columns:1fr auto;gap:16px;align-items:end;padding-block:8px 16px}
+.eyebrow{font-size:12px;letter-spacing:.12em;font-weight:800;color:var(--ink-soft)}
+.brand h1{font-family:var(--f-display);font-weight:400;font-size:clamp(28px,7vw,40px);line-height:1.15;color:var(--ink)}
+.brand h1 span{color:var(--deep)}
+.player{display:flex;gap:10px;align-items:center;background:var(--paper);border:2px solid var(--ink);border-radius:var(--r);padding:8px 12px;min-width:0}
+.lv{width:48px;height:48px;border-radius:50%;background:var(--accent);color:#3A2800;display:grid;place-items:center;font-family:var(--f-display);font-size:20px;line-height:1;border:2px solid var(--ink);flex:none}
+.lv small{display:block;font-size:9px;font-family:var(--f-body);font-weight:800}
+.pinfo{min-width:0}
+.pinfo b{display:block;font-size:14px}
+.xpbar{height:8px;background:var(--paper-2);border-radius:99px;overflow:hidden;width:120px;max-width:100%;border:1px solid var(--line)}
+.xpbar i{display:block;height:100%;background:var(--accent)}
+.pinfo small{font-size:11px;color:var(--ink-soft);font-variant-numeric:tabular-nums}
+.quick{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:8px}
+.qbtn{background:var(--paper);border:2px solid var(--line);border-radius:var(--r);padding:10px 6px;font-weight:800;font-size:13px;display:grid;gap:2px;justify-items:center;text-align:center}
+.qbtn:hover{border-color:var(--ink)}
+.qbtn .ic{font-size:22px;line-height:1}
+.qbtn small{font-weight:700;color:var(--ink-soft);font-size:11px;font-variant-numeric:tabular-nums}
+@media (max-width:520px){.quick{grid-template-columns:repeat(2,1fr)}.qbtn{grid-template-columns:auto 1fr;justify-items:start;text-align:left;column-gap:10px;padding:10px 12px}.qbtn .ic{grid-row:span 2;align-self:center}}
+@media (max-width:420px){.top{grid-template-columns:1fr}.player{justify-self:start}}
+
+.panel{background:var(--paper);border:2px solid var(--line);border-radius:var(--r);padding:16px;margin-block:8px;display:grid;gap:12px}
+.toggle{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.switch{width:52px;height:30px;border-radius:99px;border:2px solid var(--ink);background:var(--paper-2);position:relative;padding:0;flex:none}
+.switch::after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:var(--ink-soft);transition:left .15s}
+.switch[aria-checked="true"]{background:var(--ok)}
+.switch[aria-checked="true"]::after{left:25px;background:var(--paper)}
+
+/* sea map */
+.map{position:relative;display:grid;gap:14px;padding-block:12px 8px}
+.map::before{content:"";position:absolute;left:50%;top:0;bottom:0;border-left:3px dashed var(--rule);transform:translateX(-50%)}
+.stage{position:relative;justify-self:center;background:var(--sea);padding:2px 12px;font-family:var(--f-display);font-size:14px;color:var(--ink-soft);letter-spacing:.06em}
+.isle{position:relative;width:min(88%,460px);display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;text-align:left;background:var(--paper);border:2px solid var(--ink);border-radius:20px;padding:10px 14px 10px 10px;box-shadow:0 4px 0 var(--ink);transition:transform .1s}
+.isle:hover{transform:translateY(-2px)}
+.isle:active{transform:translateY(3px);box-shadow:0 1px 0 var(--ink)}
+.isle.r{justify-self:end}
+.disc{width:64px;height:64px;border-radius:50%;background:var(--c);color:var(--on-c);display:grid;place-content:center;text-align:center;line-height:1;border:2px solid var(--ink)}
+.disc small{font-size:10px;font-weight:800;letter-spacing:.08em}
+.disc b{font-family:var(--f-display);font-weight:400;font-size:30px}
+.isle-t{min-width:0;display:grid;gap:2px}
+.isle-t .en{font-weight:700;font-size:18px;line-height:1.2}
+.isle-t .jp{font-size:12px;color:var(--ink-soft)}
+.stars{color:var(--accent);font-size:15px;letter-spacing:2px}
+.stars .off{color:var(--line)}
+.isle .mon-s{font-size:30px}
+.isle.sa .disc{border-radius:16px;background:var(--sa)}
+
+.foot{font-size:12px;color:var(--ink-soft);margin-top:24px;line-height:1.7}
+
+/* unit page */
+.bar{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:8px}
+.hero{background:var(--paper);border:2px solid var(--ink);border-radius:20px;padding:18px;display:grid;grid-template-columns:auto 1fr;gap:14px;align-items:center;box-shadow:0 4px 0 var(--ink)}
+.hero h2{font-family:var(--f-en);font-weight:700;font-size:clamp(22px,5vw,30px);line-height:1.15}
+.hero p{margin:4px 0 0;font-size:14px;color:var(--ink-soft)}
+.goal{grid-column:1/-1;background:var(--accent-soft);color:var(--accent-ink);border-radius:10px;padding:10px 12px;font-size:14px;font-weight:700}
+.sec-h{font-size:13px;font-weight:800;letter-spacing:.1em;color:var(--ink-soft);margin:22px 0 8px}
+.keys{display:grid;gap:8px}
+.ex{display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:center;background:var(--paper);border:2px solid var(--line);border-radius:12px;padding:8px 12px}
+.ex .en{font-size:18px;font-weight:700;line-height:1.35}
+.ex .jp{font-size:13px;color:var(--ink-soft)}
+.ex>div{min-width:0}
+.modes{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+@media (max-width:440px){.modes{grid-template-columns:1fr}}
+.mode{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;text-align:left;background:var(--paper);border:2px solid var(--ink);border-radius:var(--r);padding:12px;box-shadow:0 3px 0 var(--ink)}
+.mode:active{transform:translateY(3px);box-shadow:none}
+.mode .step{width:30px;height:30px;border-radius:50%;background:var(--c);color:var(--on-c);display:grid;place-items:center;font-family:var(--f-display);font-size:15px}
+.mode b{display:block;font-size:15px}
+.mode small{font-size:12px;color:var(--ink-soft)}
+.mode .st{font-size:12px;font-weight:800;color:var(--ok);font-variant-numeric:tabular-nums}
+.mode.boss{grid-column:1/-1;background:var(--night);color:var(--night-ink);border-color:var(--ink)}
+.mode.boss small{color:var(--night-ink);opacity:.75}
+.mode.boss .mon-s{font-size:30px}
+
+/* lesson */
+.lesson{background:var(--paper);border:2px solid var(--ink);border-radius:20px;padding:20px;display:grid;gap:14px;box-shadow:0 4px 0 var(--ink)}
+.lesson h3{font-size:22px;font-weight:800;line-height:1.35}
+.lesson p{margin:0;max-width:62ch}
+.tip{background:var(--accent-soft);color:var(--accent-ink);border-radius:10px;padding:10px 12px;font-size:14px}
+.tip b{display:block;font-size:12px;letter-spacing:.08em}
+.board{display:flex;flex-wrap:wrap;gap:6px}
+.cell{border:2px solid var(--ink);border-radius:10px;overflow:hidden;text-align:center;min-width:64px;background:var(--paper)}
+.cell small{display:block;background:var(--c, var(--deep));color:var(--on-c);font-size:11px;font-weight:800;padding:2px 6px}
+.cell span{display:block;padding:6px 10px;font-family:var(--f-en);font-weight:700;font-size:18px}
+.tbl{overflow-x:auto}
+.tbl table{border-collapse:collapse;width:100%;font-size:14px}
+.tbl th,.tbl td{border-bottom:1px solid var(--line);padding:8px;text-align:left;vertical-align:top}
+.tbl th{font-size:12px;color:var(--ink-soft)}
+.tbl td.en{font-weight:700;font-size:16px}
+.dots{display:flex;gap:6px;justify-content:center}
+.dots i{width:8px;height:8px;border-radius:50%;background:var(--line)}
+.dots i.on{background:var(--ink);width:20px;border-radius:99px}
+.navrow{display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap}
+
+/* quiz */
+.qtop{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;margin-bottom:12px}
+.x{border:2px solid var(--line);background:var(--paper);border-radius:999px;height:36px;padding:0 12px;font-weight:800;font-size:14px}
+.prog{height:14px;background:var(--paper);border:2px solid var(--ink);border-radius:99px;overflow:hidden}
+.prog i{display:block;height:100%;background:var(--ok);transition:width .3s}
+.hearts{font-size:20px;letter-spacing:2px;color:var(--ng)}
+.hearts .off{color:var(--line)}
+.timer{font-family:var(--f-display);font-size:20px;font-variant-numeric:tabular-nums;min-width:3ch;text-align:right}
+.timer.low{color:var(--ng)}
+.combo{justify-self:center;font-family:var(--f-display);font-size:14px;color:var(--accent-ink);background:var(--accent-soft);border-radius:99px;padding:2px 12px;margin-bottom:8px;display:inline-block}
+.bossbox{display:grid;grid-template-columns:auto 1fr;gap:14px;align-items:center;background:var(--night);color:var(--night-ink);border:2px solid var(--ink);border-radius:var(--r);padding:12px 16px;margin-bottom:12px;position:relative;overflow:hidden}
+.mon{font-size:56px;line-height:1;display:inline-block}
+.mon.hit{animation:hit .45s}
+.mon.atk{animation:atk .45s}
+@keyframes hit{0%{transform:none;filter:none}20%{transform:translateX(-8px) rotate(-8deg);filter:brightness(2)}50%{transform:translateX(8px) rotate(6deg)}100%{transform:none;filter:none}}
+@keyframes atk{0%{transform:none}40%{transform:scale(1.35) translateY(6px)}100%{transform:none}}
+.bossbox b{font-size:15px}
+.hp{height:12px;border-radius:99px;background:var(--night-track);overflow:hidden;margin-top:6px}
+.hp i{display:block;height:100%;background:var(--ng);transition:width .4s}
+.bossbox small{font-size:12px;opacity:.8;font-variant-numeric:tabular-nums}
+.dmg{position:absolute;left:44px;top:6px;font-family:var(--f-display);font-size:22px;color:var(--accent);animation:float .8s forwards;pointer-events:none}
+@keyframes float{from{opacity:1;transform:translateY(0)}to{opacity:0;transform:translateY(-30px)}}
+.shake{animation:shake .35s}
+@keyframes shake{25%{transform:translateX(-6px)}50%{transform:translateX(6px)}75%{transform:translateX(-3px)}}
+
+.qcard{background:var(--paper);border:2px solid var(--ink);border-radius:20px;padding:18px;display:grid;gap:14px;box-shadow:0 4px 0 var(--ink)}
+.tag{justify-self:start;font-size:12px;font-weight:800;letter-spacing:.06em;padding:3px 10px;border-radius:99px;background:var(--paper-2);border:1px solid var(--line);color:var(--ink-soft)}
+.prompt{font-size:22px;font-weight:800;line-height:1.45}
+.prompt.en{font-size:26px;font-weight:700}
+.prompt.big{font-size:40px;text-align:center}
+.sub{font-size:14px;color:var(--ink-soft);margin-top:-6px}
+.blank{display:inline-block;min-width:3.2em;border-bottom:3px solid var(--deep);margin-inline:4px;height:1em;vertical-align:-2px}
+.listen{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.bigsay{width:84px;height:84px;border-radius:50%;border:3px solid var(--ink);background:var(--deep);color:var(--deep-ink);font-size:34px;box-shadow:0 4px 0 var(--ink);display:grid;place-items:center;padding:0}
+.bigsay.slow{background:var(--paper);color:var(--ink);font-size:26px;width:64px;height:64px;align-self:center}
+.reveal{text-align:center;font-size:20px;font-weight:700;min-height:1.6em}
+.opts{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.opts.one{grid-template-columns:1fr}
+.opt{background:var(--paper);border:2px solid var(--ink);border-radius:12px;padding:12px 14px;text-align:left;font-weight:700;font-size:17px;box-shadow:0 3px 0 var(--ink);display:flex;gap:10px;align-items:center;min-height:54px}
+.opt .k{flex:none;width:22px;height:22px;border-radius:6px;border:1.5px solid var(--line);font-size:12px;display:grid;place-items:center;color:var(--ink-soft);font-family:var(--f-body)}
+.opt .t{min-width:0}
+.opt.en .t{font-family:var(--f-en);font-size:19px}
+.opt:active{transform:translateY(3px);box-shadow:none}
+.opt.is-ok{background:var(--ok-soft);border-color:var(--ok);box-shadow:0 3px 0 var(--ok)}
+.opt.is-ng{background:var(--ng-soft);border-color:var(--ng);box-shadow:0 3px 0 var(--ng)}
+.opt:disabled{cursor:default}
+
+/* four-line paper for ordering */
+.lines{min-height:64px;padding:0 6px;display:flex;flex-wrap:wrap;align-items:flex-start;column-gap:2px;border-radius:10px;background-color:var(--paper-2);
+  background-image:linear-gradient(to bottom,transparent 21px,var(--rule) 21px 22px,transparent 22px 33px,var(--rule-soft) 33px 34px,transparent 34px 45px,var(--rule-base) 45px 47px,transparent 47px 56px,var(--rule) 56px 57px,transparent 57px);
+  background-size:100% 64px;background-repeat:repeat-y}
+.lines .w{font-family:var(--f-en);font-size:26px;line-height:64px;height:64px;background:none;border:0;padding:0 4px;font-weight:400;border-radius:6px}
+.lines .w:hover{background:var(--ng-soft)}
+.lines .pt{font-family:var(--f-en);font-size:26px;line-height:64px;margin-left:-4px}
+.lines .hint{line-height:64px;font-size:13px;color:var(--ink-soft)}
+.pool{display:flex;flex-wrap:wrap;gap:8px;min-height:48px}
+.chip{font-family:var(--f-en);font-size:19px;font-weight:700;border:2px solid var(--ink);background:var(--paper);border-radius:10px;padding:6px 12px;box-shadow:0 3px 0 var(--ink)}
+.chip:active{transform:translateY(3px);box-shadow:none}
+.chip.used{visibility:hidden}
+.orow{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+
+/* feedback sheet */
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:20;padding:16px 16px calc(16px + env(safe-area-inset-bottom,0px));border-top:3px solid var(--ink);max-height:60vh;overflow:auto;animation:up .2s ease-out}
+.sheet.ok{background:var(--ok-soft)}
+.sheet.ng{background:var(--ng-soft)}
+.sheet-in{max-width:720px;margin:0 auto;display:grid;gap:8px}
+.sheet h3{font-family:var(--f-display);font-weight:400;font-size:24px}
+.sheet.ok h3{color:var(--ok)}
+.sheet.ng h3{color:var(--ng)}
+.ans{display:flex;gap:10px;align-items:center}
+.ans .en{font-size:20px;font-weight:700}
+.why{font-size:15px;margin:0}
+.why b{font-size:12px;letter-spacing:.06em;color:var(--ink-soft);margin-right:6px}
+@keyframes up{from{transform:translateY(100%)}to{transform:none}}
+
+/* result */
+.result{background:var(--paper);border:2px solid var(--ink);border-radius:20px;padding:22px;display:grid;gap:16px;text-align:center;box-shadow:0 4px 0 var(--ink)}
+.result h2{font-family:var(--f-display);font-weight:400;font-size:clamp(24px,6vw,32px);line-height:1.3}
+.bigstars{font-size:48px;letter-spacing:6px;color:var(--accent)}
+.bigstars .off{color:var(--line)}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.stat{background:var(--paper-2);border-radius:12px;padding:10px 6px}
+.stat b{display:block;font-family:var(--f-display);font-weight:400;font-size:24px;font-variant-numeric:tabular-nums}
+.stat small{font-size:12px;color:var(--ink-soft)}
+.news{display:grid;gap:6px}
+.new{background:var(--accent-soft);color:var(--accent-ink);border-radius:10px;padding:8px 12px;font-weight:800;font-size:14px}
+.mist{text-align:left;display:grid;gap:8px}
+.mist .row{border:2px solid var(--line);border-radius:12px;padding:8px 12px;display:grid;gap:2px}
+.mist .row small{color:var(--ink-soft);font-size:12px}
+.mist .row .en{font-weight:700}
+.btnrow{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+
+/* badges */
+.badges{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.badge{background:var(--paper);border:2px solid var(--ink);border-radius:var(--r);padding:12px;display:grid;gap:4px;justify-items:center;text-align:center}
+.badge .ic{font-size:34px;line-height:1.1}
+.badge b{font-size:14px}
+.badge small{font-size:12px;color:var(--ink-soft)}
+.badge.lock{border-style:dashed;border-color:var(--line)}
+.badge.lock .ic{filter:grayscale(1);opacity:.35}
+
+/* poster */
+.form{display:grid;gap:10px}
+.field{display:grid;gap:4px}
+.field label{font-size:13px;font-weight:800;color:var(--ink-soft)}
+.field .frame{display:flex;flex-wrap:wrap;align-items:center;gap:6px;font-family:var(--f-en);font-size:18px}
+.field input{font-family:var(--f-en);font-size:18px;border:2px solid var(--ink);border-radius:10px;padding:6px 10px;background:var(--paper);color:var(--ink);min-width:0;flex:1 1 140px}
+.warn{color:var(--ng);font-size:12px;font-weight:700}
+.poster{background:var(--paper);border:3px solid var(--ink);border-radius:20px;padding:20px;display:grid;gap:4px;box-shadow:0 5px 0 var(--ink)}
+.poster h3{font-family:var(--f-display);font-weight:400;font-size:28px;color:var(--sa)}
+.poster .lines{min-height:64px}
+.poster .lines span{font-family:var(--f-en);font-size:26px;line-height:64px;padding-inline:4px}
+.note-list{display:grid;gap:8px}
+
+canvas#fx{position:fixed;inset:0;pointer-events:none;z-index:30}
+@media (prefers-reduced-motion: reduce){
+  *{animation:none!important;transition:none!important}
+}
+</style>
+</head>
+<body>
+<div id="app" aria-live="polite"></div>
+<div id="sheet-root"></div>
+<canvas id="fx" hidden></canvas>
+<script>
+"use strict";
+/* ============ 教材データ（教科書 Unit 0〜5 の文法事項にそったオリジナル問題） ============ */
+const UNITS = [
+{ id:0, name:"Nice to Meet You", jp:"小学校のふり返り・あいさつ・アルファベット", c:"var(--u0)", stage:1,
+  goal:"クラスメートとあいさつし、好きなものをたずね合える",
+  boss:{e:"🐢", n:"ハローガメ"},
+  keys:[["Nice to meet you.","はじめまして。"],["What color do you like?","あなたは何色が好きですか。"],["I like blue.","わたしは青が好きです。"]],
+  lessons:[
+    {t:"初めて会ったら Nice to meet you.", b:"初めて会った人には Nice to meet you.（はじめまして）と言います。言われた側は、最後に too（〜も）をつけて返します。",
+     ex:[["Hello. I'm Mika.","こんにちは。わたしはミカです。"],["Nice to meet you.","はじめまして。"],["Nice to meet you, too.","こちらこそ、はじめまして。"]],
+     tip:"too をつけるのは返すときだけ。"},
+    {t:"毎日使うあいさつ", b:"時間や場面であいさつを使い分けます。",
+     ex:[["Good morning.","おはようございます。"],["How are you?","元気ですか。"],["I'm fine, thank you.","元気です、ありがとう。"],["See you.","またね。"]],
+     tip:"Good night. は夜の別れや寝る前のあいさつ。夜に会ったときは Good evening."},
+    {t:"好きなものを伝える・たずねる", b:"I like 〜. で好きなものを伝えます。What ＋名詞 で「何の〜」とたずねられます。",
+     ex:[["I like dogs.","わたしは犬が好きです。"],["What sport do you like?","あなたは何のスポーツが好きですか。"],["I like soccer.","わたしはサッカーが好きです。"]],
+     tip:"動物などを「〜が好き」と言うときは dogs, cats のように複数形にすることが多い。"},
+    {t:"アルファベットと音", b:"b と d、p と q は向きが反対なので注意します。sh（シュ）、ch（チ）、th（舌の先を軽くかむ音）のように、2文字で1つの音を表すことがあります。",
+     ex:[["fish","魚（sh）"],["chair","いす（ch）"],["three","3（th）"],["cake","ケーキ（a を「エイ」と読む）"]],
+     tip:"語の最後の e を読まないとき、その前の母音字はアルファベットの名前どおりに読むことが多い（cake, bike, home）。"}
+  ],
+  vocab:[["apple","りんご"],["dog","犬"],["cat","ねこ"],["red","赤"],["blue","青"],["yellow","黄色"],["green","緑"],["soccer","サッカー"],["baseball","野球"],["swimming","水泳"],["music","音楽"],["math","数学"],["science","理科"],["morning","朝"],["birthday","誕生日"],["summer","夏"],["winter","冬"],["friend","友だち"],["fish","魚"],["chair","いす"]],
+  grammar:[
+    {q:"初めて会った人へのあいさつは？", o:["Nice to meet you.","See you.","Good night.","Thank you."], why:"Nice to meet you. は「はじめまして」。See you. は別れるときのあいさつ。"},
+    {q:"Nice to meet you. と言われたら？", o:["Nice to meet you, too.","Nice to meet you, me.","Yes, I do.","I'm fine."], why:"返すときは最後に too（〜も）をつける。"},
+    {q:"朝、先生に会ったときのあいさつは？", o:["Good morning.","Good night.","Good evening.","Goodbye."], why:"morning は「朝」。Good night. は夜の別れのあいさつ。"},
+    {q:"How are you? への答えは？", o:["I'm fine, thank you.","I'm Ken.","I like dogs.","Nice to meet you."], why:"How are you? は「元気？」。調子を答える。"},
+    {q:"What sport do you like? — I like ( ).", o:["tennis","blue","apples","Monday"], why:"sport（スポーツ）をたずねているので tennis。"},
+    {q:"What color do you like? — I like ( ).", o:["green","soccer","cats","summer"], why:"color は「色」。green（緑）が色。"},
+    {q:"小文字 b の大文字は？", o:["B","D","P","R"], why:"b と d は向きが反対。b の大文字は B。"},
+    {q:"大文字 Q の小文字は？", o:["q","p","g","d"], why:"p と q も向きが反対。Q の小文字は q。"},
+    {q:"アルファベットの順番は？ A B C ( ) E", o:["D","G","B","F"], why:"A B C D E F G の順。"},
+    {q:"「シュ」の音を表す2文字は？", o:["sh","ch","th","ck"], why:"sh は fish の「シュ」。ch は chair の「チ」。"},
+    {q:"「チ」の音で始まる語は？", o:["chair","ship","three","phone"], why:"ch は「チ」。ship は sh、three は th で始まる。"},
+    {q:"a を「エイ」と読む語は？", o:["cake","cat","bag","apple"], why:"cake のように最後に読まない e があると、a は名前どおり「エイ」と読むことが多い。"},
+    {q:"別れるときのあいさつは？", o:["See you.","Hello.","Nice to meet you.","How are you?"], why:"See you. は「またね」。"}
+  ],
+  order:[
+    {jp:"はじめまして。", en:"Nice to meet you.", why:"Nice to meet you. で1つのあいさつ。"},
+    {jp:"わたしは犬が好きです。", en:"I like dogs.", why:"だれが（I）、どうする（like）、何を（dogs）の順。"},
+    {jp:"あなたは何色が好きですか。", en:"What color do you like?", why:"What color（何色）を先頭に置き、そのあと do you like。"},
+    {jp:"お元気ですか。", en:"How are you?", why:"How are you? でひとまとまりのあいさつ。"},
+    {jp:"わたしは夏が好きです。", en:"I like summer.", why:"I like 〜. で好きなものを伝える。"},
+    {jp:"あなたはどの動物が好きですか。", en:"What animal do you like?", why:"What ＋名詞 で「何の〜」「どの〜」。"},
+    {jp:"おはようございます、ケン。", en:"Good morning, Ken.", why:"呼びかける名前はコンマのあとに置く。"},
+    {jp:"わたしは音楽が好きです。", en:"I like music.", why:"I、like、music の順。"}
+  ],
+  listen:[
+    {en:"Nice to meet you.", jp:"はじめまして。", ng:["またね。","おやすみなさい。","ありがとう。"]},
+    {en:"I like cats.", jp:"わたしはねこが好きです。", ng:["わたしは犬が好きです。","あなたはねこが好きです。","わたしはねこが好きではありません。"]},
+    {en:"What fruit do you like?", jp:"あなたは何のくだものが好きですか。", ng:["あなたは何色が好きですか。","わたしはくだものが好きです。","あなたはくだものを食べますか。"]},
+    {en:"Good morning.", jp:"おはようございます。", ng:["こんばんは。","おやすみなさい。","さようなら。"]},
+    {en:"See you tomorrow.", jp:"また明日。", ng:["また来週。","はじめまして。","今日はありがとう。"]},
+    {en:"How are you?", jp:"お元気ですか。", ng:["あなたはだれですか。","あなたは何歳ですか。","あなたはどこから来ましたか。"]},
+    {en:"I like blue and green.", jp:"わたしは青と緑が好きです。", ng:["わたしは青と黄色が好きです。","わたしは赤と緑が好きです。","わたしは青が好きではありません。"]}
+  ]},
+{ id:1, name:"Hello, Everyone!", jp:"中学校生活の始まり・be動詞と一般動詞", c:"var(--u1)", stage:1,
+  goal:"自分のことを伝え、相手のことをたずねられる",
+  boss:{e:"🦀", n:"アムアーガニ"},
+  keys:[["I am Sora.","わたしはソラです。"],["Are you from Osaka? — Yes, I am.","あなたは大阪出身ですか。— はい、そうです。"],["Do you play tennis? — No, I don't.","あなたはテニスをしますか。— いいえ、しません。"]],
+  lessons:[
+    {t:"I am 〜.「わたしは〜です」", b:"自分のことを言うときは I am を使います。am は「＝（イコール）」の働きで、I'm と短くできます。",
+     ex:[["I am Sora.","わたしはソラです。"],["I'm from Nagoya.","わたしは名古屋出身です。"],["I'm twelve.","わたしは12歳です。"]],
+     tip:"I はいつも大文字で書く。"},
+    {t:"Are you 〜? と I am not 〜.", b:"相手にたずねるときは Are you 〜? の順にします。答えは Yes, I am. か No, I'm not.。否定の文は am のあとに not を置きます。",
+     ex:[["Are you from Osaka?","あなたは大阪出身ですか。"],["Yes, I am.","はい、そうです。"],["I am not tired.","わたしはつかれていません。"]],
+     tip:"you のときの be動詞は are。"},
+    {t:"動作や気持ちは一般動詞", b:"like, play, have, eat のように、動作や気持ちを表す語を一般動詞といいます。たずねるときは文の頭に Do、否定は動詞の前に do not（don't）を置きます。",
+     ex:[["I play the piano.","わたしはピアノをひきます。"],["Do you like natto?","あなたは納豆が好きですか。"],["No, I don't.","いいえ、好きではありません。"],["I do not have a pet.","わたしはペットを飼っていません。"]],
+     tip:"Do でたずねられたら do / don't で答える。"},
+    {t:"英語の語順", b:"日本語は「する」が最後に来ますが、英語は「だれが」のすぐあとに動詞が来ます。",
+     board:[["だれが","I"],["する","play"],["何を","soccer"],["いつ","every day"]], boardJp:"わたしは 毎日 サッカーを します。",
+     ex:[["I play soccer every day.","わたしは毎日サッカーをします。"]],
+     tip:"迷ったら、だれが、どうする、何を、どこで、いつ の順。"}
+  ],
+  vocab:[["play","（スポーツを）する・演奏する"],["like","好きだ"],["have","持っている"],["want","ほしい"],["eat","食べる"],["drink","飲む"],["watch","見る（テレビなど）"],["practice","練習する"],["every day","毎日"],["very much","とても"],["sometimes","ときどき"],["often","よく"],["comic","まんが"],["guitar","ギター"],["piano","ピアノ"],["basketball","バスケットボール"],["Japanese","日本語"],["hungry","おなかがすいた"],["tired","つかれた"],["call","呼ぶ"]],
+  grammar:[
+    {q:"I ( ) Hana.", s:"わたしはハナです。", o:["am","are","is","do"], why:"主語が I のときの be動詞は am。"},
+    {q:"You ( ) a good singer.", s:"あなたは歌が上手です。", o:["are","am","is","do"], why:"主語が you のときの be動詞は are。"},
+    {q:"( ) you from Kyoto? — Yes, I am.", o:["Are","Do","Am","Is"], why:"Yes, I am. と答えているので be動詞の疑問文。you には Are。"},
+    {q:"( ) you play tennis? — Yes, I do.", o:["Do","Are","Am","Is"], why:"play は一般動詞。一般動詞の疑問文は Do で始める。"},
+    {q:"Do you like math? — No, I ( ).", o:["don't","am not","do","not"], why:"Do でたずねられたら do / don't で答える。"},
+    {q:"Are you a soccer fan? — Yes, I ( ).", o:["am","do","are","is"], why:"Are you でたずねられたら I am で答える。"},
+    {q:"I ( ) not hungry.", s:"わたしはおなかがすいていません。", o:["am","do","don't","is"], why:"hungry は状態を表す語。be動詞 am のあとに not。"},
+    {q:"I ( ) like natto.", s:"わたしは納豆が好きではありません。", o:["do not","am not","not","are not"], why:"like は一般動詞。否定は動詞の前に do not。"},
+    {q:"「わたしは毎日ピアノを練習します」はどれ？", o:["I practice the piano every day.","I am practice the piano every day.","I the piano practice every day.","Practice I the piano every day."], why:"だれが（I）、どうする（practice）、何を（the piano）、いつ（every day）の順。"},
+    {q:"I'm を短くしない形は？", o:["I am","I do","I is","I are"], why:"I'm は I am の短縮形。"},
+    {q:"I play ( ) guitar.", s:"わたしはギターをひきます。", o:["the","a","an","is"], why:"楽器を演奏するときは play the 〜 と the をつける。"},
+    {q:"Are you tired? — No, I'm ( ).", o:["not","don't","no","am"], why:"No, I'm not. で「いいえ、ちがいます」。"},
+    {q:"I ( ) a new bike.", s:"わたしは新しい自転車がほしいです。", o:["want","am","am want","wanting"], why:"「ほしい」は一般動詞 want。be動詞 am と並べない。"}
+  ],
+  order:[
+    {jp:"わたしは東京出身です。", en:"I am from Tokyo.", why:"I am のあとに from Tokyo（東京出身）。"},
+    {jp:"あなたはテニスをしますか。", en:"Do you play tennis?", x:["Are"], why:"play は一般動詞なので Do を先頭に。"},
+    {jp:"わたしは魚を食べません。", en:"I do not eat fish.", x:["am"], why:"一般動詞 eat の否定は、動詞の前に do not。"},
+    {jp:"あなたはおなかがすいていますか。", en:"Are you hungry?", x:["Do"], why:"hungry は状態を表す語なので be動詞の疑問文。Are を先頭に。"},
+    {jp:"わたしは毎日ギターをひきます。", en:"I play the guitar every day.", why:"「いつ」を表す every day は文の最後。"},
+    {jp:"わたしはつかれていません。", en:"I am not tired.", why:"be動詞の否定は am のあとに not。"},
+    {jp:"わたしをケンと呼んでください。", en:"Call me Ken.", why:"Call me 〜. で「わたしを〜と呼んで」。"},
+    {jp:"あなたはねこが好きですか。", en:"Do you like cats?", x:["Are"], why:"like は一般動詞。Do で始める。"},
+    {jp:"わたしは新しいかばんがほしいです。", en:"I want a new bag.", why:"a new bag で「新しいかばん」。a は new の前。"},
+    {jp:"わたしはバスケットボールがとても好きです。", en:"I like basketball very much.", why:"very much（とても）は文の最後。"}
+  ],
+  listen:[
+    {en:"I am from Hokkaido.", jp:"わたしは北海道出身です。", ng:["あなたは北海道出身です。","わたしは北海道に行きます。","わたしは北海道が好きです。"]},
+    {en:"Do you like math?", jp:"あなたは数学が好きですか。", ng:["わたしは数学が好きです。","あなたは数学が好きではありません。","あなたは理科が好きですか。"]},
+    {en:"I don't play soccer.", jp:"わたしはサッカーをしません。", ng:["わたしはサッカーをします。","あなたはサッカーをしますか。","わたしは野球をしません。"]},
+    {en:"Are you hungry?", jp:"あなたはおなかがすいていますか。", ng:["あなたはつかれていますか。","わたしはおなかがすいています。","あなたは何か食べますか。"]},
+    {en:"I play the piano every day.", jp:"わたしは毎日ピアノをひきます。", ng:["わたしはときどきピアノをひきます。","わたしは毎日ギターをひきます。","わたしはピアノをひきません。"]},
+    {en:"Call me Yumi.", jp:"わたしをユミと呼んでください。", ng:["わたしはユミです。","ユミに電話してください。","あなたはユミですか。"]},
+    {en:"I'm not a good cook.", jp:"わたしは料理が上手ではありません。", ng:["わたしは料理が上手です。","わたしは料理をしません。","あなたは料理が上手ですか。"]}
+  ]},
+{ id:2, name:"Our New Teacher", jp:"新しい先生・he / she・can・this / that", c:"var(--u2)", stage:1,
+  goal:"身近な人やものを紹介し、できることをたずねられる",
+  boss:{e:"🦈", n:"キャンザメ"},
+  keys:[["She is our new teacher.","彼女はわたしたちの新しい先生です。"],["Can you cook? — Yes, I can.","あなたは料理ができますか。— はい、できます。"],["Is this your pen? — Yes, it is.","これはあなたのペンですか。— はい、そうです。"]],
+  lessons:[
+    {t:"He is 〜. / She is 〜.", b:"自分と相手以外の1人を紹介するときは be動詞 is を使います。男性は he、女性は she で表します。",
+     ex:[["This is Ms. Chen.","こちらはチェン先生です。"],["She is from Singapore.","彼女はシンガポール出身です。"],["He is my brother.","彼はわたしの兄です。"]],
+     tip:"I は am、you は are、それ以外の1人は is。"},
+    {t:"Is he 〜? の答え方", b:"is を文の頭に出すと疑問文になります。否定は is のあとに not（isn't）を置きます。",
+     ex:[["Is she a teacher?","彼女は先生ですか。"],["Yes, she is.","はい、そうです。"],["Is he tall?","彼は背が高いですか。"],["No, he isn't.","いいえ、高くありません。"]],
+     tip:"答えでは名前を he / she に置きかえる。"},
+    {t:"can で「〜できる」", b:"can のあとは動詞の元の形を置きます。主語が he や she でも can の形は変わりません。",
+     ex:[["I can swim.","わたしは泳げます。"],["She can play the drums.","彼女はドラムを演奏できます。"],["Can you cook?","あなたは料理ができますか。"],["I can't dance.","わたしはおどれません。"]],
+     tip:"can't は cannot の短縮形。"},
+    {t:"This is 〜. / That is 〜.", b:"近くのものは this、遠くのものは that で指します。たずねられたら、答えでは it を使います。",
+     ex:[["This is my bag.","これはわたしのかばんです。"],["That is our gym.","あれはわたしたちの体育館です。"],["Is this your pen?","これはあなたのペンですか。"],["Yes, it is.","はい、そうです。"]],
+     tip:"答えに this や that は使わない。"},
+    {t:"be動詞と一般動詞を並べない", b:"1つの文に入る動詞は基本的に1つです。be動詞（am / are / is）と一般動詞（play など）を並べると誤りになります。",
+     table:[["○","I play tennis.","わたしはテニスをします。"],["○","I am a tennis player.","わたしはテニスの選手です。"],["×","I am play tennis.","be動詞と一般動詞が並んでいる"]],
+     tip:"「〜です」なら be動詞、「〜する」なら一般動詞。"}
+  ],
+  vocab:[["teacher","先生"],["student","生徒・学生"],["cook","料理する"],["dance","おどる"],["sing","歌う"],["swim","泳ぐ"],["run","走る"],["jump","とぶ"],["ride","乗る"],["speak","話す"],["write","書く"],["fast","速く"],["well","上手に"],["kind","親切な"],["funny","おもしろい"],["tall","背が高い"],["popular","人気のある"],["brother","兄・弟"],["sister","姉・妹"],["unicycle","一輪車"]],
+  grammar:[
+    {q:"Ms. Chen ( ) our new teacher.", s:"チェン先生はわたしたちの新しい先生です。", o:["is","am","are","do"], why:"I と you 以外の1人が主語なら be動詞は is。"},
+    {q:"( ) is my brother.", s:"彼はわたしの兄です。", o:["He","She","It","I"], why:"男性の「彼」は he。文の最初なので大文字。"},
+    {q:"( ) is my sister.", s:"彼女はわたしの姉です。", o:["She","He","It","You"], why:"女性の「彼女」は she。"},
+    {q:"Is Mr. Brown from Canada? — Yes, ( ) is.", o:["he","she","it","you"], why:"Mr. は男性につける。答えでは he に置きかえる。"},
+    {q:"Is this your pen? — Yes, ( ) is.", o:["it","this","he","that"], why:"this / that でたずねられたら、答えは it を使う。"},
+    {q:"I can ( ) fast.", s:"わたしは速く走れます。", o:["run","runs","running","am run"], why:"can のあとは動詞の元の形。"},
+    {q:"Can you sing well? — No, I ( ).", o:["can't","don't","am not","isn't"], why:"Can でたずねられたら can / can't で答える。"},
+    {q:"( ) you cook? — Yes, I can.", o:["Can","Are","Do","Is"], why:"Yes, I can. と答えているので Can でたずねる。"},
+    {q:"( ) is our gym.", s:"（遠くの建物を指して）あれはわたしたちの体育館です。", o:["That","This","It","He"], why:"遠くのものは that。近くのものは this。"},
+    {q:"正しい英文はどれ？", o:["I play tennis.","I am play tennis.","I am tennis.","I can plays tennis."], why:"be動詞と一般動詞を並べない。can のあとは元の形。"},
+    {q:"Is Ken a good cook? — No, he ( ).", o:["isn't","doesn't","can't","not"], why:"Is でたずねられたら is / isn't で答える。"},
+    {q:"She can ( ) the drums.", s:"彼女はドラムを演奏できます。", o:["play","plays","is play","playing"], why:"主語が she でも can のあとは元の形 play。"},
+    {q:"Mr. Sato ( ) funny.", s:"佐藤先生はおもしろいです。", o:["is","are","am","can"], why:"funny は様子を表す語。be動詞 is でつなぐ。"}
+  ],
+  order:[
+    {jp:"こちらはわたしの友だちのアヤです。", en:"This is my friend Aya.", why:"人を紹介するときも This is 〜. を使う。"},
+    {jp:"彼女は親切です。", en:"She is kind.", why:"She is 〜. で様子を説明する。"},
+    {jp:"彼は速く泳ぐことができます。", en:"He can swim fast.", x:["swims"], why:"can のあとは元の形 swim。"},
+    {jp:"あなたはダンスができますか。", en:"Can you dance?", x:["Do"], why:"can の疑問文は Can を先頭に。"},
+    {jp:"わたしは一輪車に乗れません。", en:"I can't ride a unicycle.", why:"can't（できない）のあとに動詞 ride。"},
+    {jp:"あれはあなたの自転車ですか。", en:"Is that your bike?", x:["this"], why:"Is を先頭に。遠くのものなので that。"},
+    {jp:"彼はカナダ出身ではありません。", en:"He is not from Canada.", why:"be動詞の否定は is のあとに not。"},
+    {jp:"わたしは英語を上手に話せます。", en:"I can speak English well.", why:"well（上手に）は文の最後。"},
+    {jp:"チェン先生は人気があります。", en:"Ms. Chen is popular.", why:"Ms. Chen が主語。is でつなぐ。"},
+    {jp:"これはわたしの新しいラケットです。", en:"This is my new racket.", why:"my new racket の順。my が先。"}
+  ],
+  listen:[
+    {en:"She can play the guitar.", jp:"彼女はギターをひくことができます。", ng:["彼女はギターをひきます。","彼はギターをひくことができます。","彼女はギターをひくことができません。"]},
+    {en:"Is this your notebook?", jp:"これはあなたのノートですか。", ng:["あれはあなたのノートですか。","これはわたしのノートです。","これはあなたの本ですか。"]},
+    {en:"He is not my brother.", jp:"彼はわたしの兄弟ではありません。", ng:["彼はわたしの兄弟です。","彼女はわたしの姉妹ではありません。","彼はあなたの兄弟ですか。"]},
+    {en:"Can you swim?", jp:"あなたは泳げますか。", ng:["あなたは泳ぎますか。","わたしは泳げます。","あなたは走れますか。"]},
+    {en:"That is our music room.", jp:"あれはわたしたちの音楽室です。", ng:["これはわたしたちの音楽室です。","あれはわたしたちの体育館です。","あれはあなたの音楽室ですか。"]},
+    {en:"I can't cook.", jp:"わたしは料理ができません。", ng:["わたしは料理ができます。","わたしは料理をしません。","あなたは料理ができますか。"]},
+    {en:"Mr. Sato is very funny.", jp:"佐藤先生はとてもおもしろいです。", ng:["佐藤先生はとても親切です。","佐藤先生は少しおもしろいです。","佐藤先生は背が高いです。"]}
+  ]},
+{ id:3, name:"Our School", jp:"学校生活・疑問詞・場所を表す語", c:"var(--u3)", stage:1,
+  goal:"何・だれ・どこ・いつ・どのように をたずねられる",
+  boss:{e:"🐡", n:"ハテナフグ"},
+  keys:[["What is this? — It's a recorder.","これは何ですか。— リコーダーです。"],["Where is the library? — It's on the second floor.","図書館はどこですか。— 2階にあります。"],["How do you come to school? — By bike.","あなたはどうやって学校に来ますか。— 自転車で来ます。"]],
+  lessons:[
+    {t:"疑問詞は文の先頭に", b:"「何」「だれ」「どこ」「いつ」「どのように」をたずねるときは、疑問詞を文の先頭に置きます。Yes / No では答えません。",
+     table:[["What","何","What is this?"],["Who","だれ","Who is that girl?"],["Where","どこ","Where is the gym?"],["When","いつ","When is the festival?"],["How","どのように","How do you come here?"]],
+     tip:"疑問詞のあとは、ふつうの疑問文の形（is 〜? / do you 〜?）を続ける。"},
+    {t:"Who / Where / When で聞く", b:"答えるときは、たずねられたことだけをはっきり伝えます。",
+     ex:[["Who is that girl?","あの女の子はだれですか。"],["She is Rina.","彼女はリナです。"],["Where is the library?","図書館はどこですか。"],["It's on the third floor.","3階にあります。"],["When is the school festival?","文化祭はいつですか。"],["It's in October.","10月です。"]],
+     tip:"「〜階に」は on the 〜 floor。"},
+    {t:"How と What do you 〜?", b:"一般動詞の文では、疑問詞のあとに do you ＋動詞 を続けます。",
+     ex:[["How do you come to school?","あなたはどうやって学校に来ますか。"],["By bike.","自転車でです。"],["What do you do after school?","あなたは放課後に何をしますか。"],["I play volleyball.","バレーボールをします。"]],
+     tip:"by bike, by bus のように、乗り物の前に a や the をつけない。"},
+    {t:"ものの場所 in / on / under / near", b:"場所を言うときは、もののすぐ前に場所を表す語を置きます。",
+     table:[["in","〜の中に","The pen is in the box."],["on","〜の上に","The cap is on the desk."],["under","〜の下に","The cat is under the chair."],["near","〜の近くに","The gym is near the library."]],
+     tip:"on は「くっついている」こと。かべにはってあるポスターも on the wall。"}
+  ],
+  vocab:[["library","図書館"],["gym","体育館"],["classroom","教室"],["cafeteria","食堂"],["nurse's office","保健室"],["teachers' room","職員室"],["school festival","文化祭"],["club","部活動"],["floor","階・床"],["box","箱"],["desk","机"],["in","〜の中に"],["on","〜の上に"],["under","〜の下に"],["near","〜の近くに"],["what","何"],["who","だれ"],["where","どこ"],["when","いつ"],["how","どのように"]],
+  grammar:[
+    {q:"( ) is that? — It's a new computer.", o:["What","Who","Where","When"], why:"「新しいコンピューター」と答えているので、「何」の What。"},
+    {q:"( ) is that girl? — She is Saki.", o:["Who","What","Where","How"], why:"人の名前を答えているので「だれ」の Who。"},
+    {q:"( ) is the library? — It's on the second floor.", o:["Where","When","Who","What"], why:"場所を答えているので「どこ」の Where。"},
+    {q:"( ) is the school festival? — It's in October.", o:["When","Where","What","Who"], why:"10月という時を答えているので「いつ」の When。"},
+    {q:"( ) do you come to school? — By bus.", o:["How","What","Where","Who"], why:"「バスで」は手段。「どうやって」の How。"},
+    {q:"What do you have in your bag? — ( )", o:["I have a notebook.","Yes, I do.","It's my bag.","No, I don't."], why:"疑問詞の疑問文には Yes / No で答えない。持っているものを答える。"},
+    {q:"The cat is ( ) the desk.", s:"ねこは机の下にいます。", o:["under","on","in","near"], why:"under は「〜の下に」。"},
+    {q:"My pen is ( ) the pencil case.", s:"わたしのペンは筆箱の中にあります。", o:["in","on","under","near"], why:"in は「〜の中に」。"},
+    {q:"The book is ( ) the desk.", s:"本は机の上にあります。", o:["on","in","under","at"], why:"on は「〜の上に（接して）」。"},
+    {q:"Who is Mr. Kato? — ( )", o:["He is our P.E. teacher.","It's in the gym.","Yes, he is.","By bike."], why:"Who（だれ）には、その人がどんな人かを答える。"},
+    {q:"Where do you practice? — ( )", o:["In the gym.","On Monday.","Yes, I do.","By train."], why:"Where（どこで）には場所を答える。"},
+    {q:"When do you play tennis? — ( )", o:["After school.","In the park.","With Ken.","Yes, I do."], why:"When（いつ）には時を答える。"},
+    {q:"( ) do you eat lunch? — In the classroom.", o:["Where","When","What","Who"], why:"「教室で」と場所を答えているので Where。"}
+  ],
+  order:[
+    {jp:"あれは何ですか。", en:"What is that?", why:"疑問詞 What を先頭に、そのあと is that。"},
+    {jp:"あの男の人はだれですか。", en:"Who is that man?", why:"Who を先頭に。that man で「あの男の人」。"},
+    {jp:"図書館はどこですか。", en:"Where is the library?", why:"Where を先頭に、is the library と続ける。"},
+    {jp:"あなたはどうやって学校に来ますか。", en:"How do you come to school?", why:"How のあとに do you ＋動詞。"},
+    {jp:"文化祭はいつですか。", en:"When is the school festival?", why:"When を先頭に。"},
+    {jp:"あなたのかばんはいすの下にあります。", en:"Your bag is under the chair.", x:["on"], why:"under the chair で「いすの下に」。"},
+    {jp:"あなたは放課後に何をしますか。", en:"What do you do after school?", why:"What do you do で「何をしますか」。最初の do は疑問文を作る do、2つ目は「する」。"},
+    {jp:"保健室は1階にあります。", en:"The nurse's office is on the first floor.", why:"「〜階に」は on the 〜 floor。"},
+    {jp:"あなたはどこで昼食を食べますか。", en:"Where do you eat lunch?", why:"Where のあとに do you eat lunch。"},
+    {jp:"わたしは自転車で学校に来ます。", en:"I come to school by bike.", x:["a"], why:"by bike（自転車で）の bike には a をつけない。"}
+  ],
+  listen:[
+    {en:"Where is my pencil?", jp:"わたしのえんぴつはどこですか。", ng:["わたしのえんぴつはどれですか。","あなたのえんぴつはどこですか。","わたしのえんぴつは机の上です。"]},
+    {en:"Who is that boy?", jp:"あの男の子はだれですか。", ng:["あの女の子はだれですか。","あの男の子はどこにいますか。","この男の子はだれですか。"]},
+    {en:"It's under the desk.", jp:"それは机の下にあります。", ng:["それは机の上にあります。","それは机の中にあります。","それは机の近くにあります。"]},
+    {en:"When is your birthday?", jp:"あなたの誕生日はいつですか。", ng:["わたしの誕生日はいつですか。","あなたの誕生日は5月ですか。","あなたのお姉さんの誕生日はいつですか。"]},
+    {en:"How do you go to the park?", jp:"あなたはどうやって公園に行きますか。", ng:["あなたはいつ公園に行きますか。","あなたはどこの公園に行きますか。","あなたは公園に行きますか。"]},
+    {en:"What do you study on Monday?", jp:"あなたは月曜日に何を勉強しますか。", ng:["あなたは日曜日に何を勉強しますか。","あなたは月曜日に勉強しますか。","あなたはいつ数学を勉強しますか。"]},
+    {en:"The gym is near the library.", jp:"体育館は図書館の近くにあります。", ng:["図書館は体育館の近くにあります。","体育館は図書館の中にあります。","体育館は図書館の上にあります。"]}
+  ]},
+{ id:4, name:"Friends in New Zealand", jp:"海外の学校との交流・数と時刻・命令文", c:"var(--u4)", stage:1,
+  goal:"数や時刻をたずね、指示やお願いができる",
+  boss:{e:"🦑", n:"フクスウイカ"},
+  keys:[["How many dogs do you have? — I have two.","あなたは犬を何匹飼っていますか。— 2匹です。"],["What time is it? — It's eight fifteen.","何時ですか。— 8時15分です。"],["Don't run in the hall.","ろうかを走らないで。"]],
+  lessons:[
+    {t:"How many 〜? で数をたずねる", b:"How many のあとには名詞の複数形を置きます。答えは数で言います。",
+     ex:[["How many dogs do you have?","あなたは犬を何匹飼っていますか。"],["I have two.","2匹です。"],["How many classes do you have today?","今日は授業がいくつありますか。"]],
+     tip:"日本語では「何匹」「何本」と数え方が変わるが、英語はどれも How many。"},
+    {t:"複数形のつくり方", b:"2つ以上のものを言うときは、名詞の形を変えます。",
+     table:[["多くの語","s をつける","book → books"],["s, x, sh, ch で終わる","es をつける","box → boxes, watch → watches"],["子音字＋y で終わる","y を i にして es","city → cities"],["特別な形","形が変わる","child → children, man → men"],["同じ形","変わらない","fish → fish, sheep → sheep"]],
+     tip:"water（水）のように数えられない名詞には s をつけない。"},
+    {t:"What time / What ＋名詞", b:"時刻は What time でたずね、It's ＋時＋分 で答えます。「何時に〜する？」には at ＋時刻 で答えます。",
+     ex:[["What time is it?","何時ですか。"],["It's eight fifteen.","8時15分です。"],["What time do you get up?","あなたは何時に起きますか。"],["At six.","6時です。"],["What food do you like?","あなたはどんな食べ物が好きですか。"]],
+     tip:"fifteen（15）は後ろを強く、fifty（50）は前を強く読む。"},
+    {t:"命令文で指示やお願いをする", b:"主語を言わずに、動詞から文を始めます。be動詞の文は Be で始め、「〜しないで」は Don't で始めます。Please をつけるとていねいになります。",
+     ex:[["Come here.","ここに来て。"],["Be careful.","気をつけて。"],["Don't run in the hall.","ろうかを走らないで。"],["Please sit down.","すわってください。"]],
+     tip:"careful, quiet などの様子を表す語は、Be をつけて命令文にする。"}
+  ],
+  vocab:[["thirteen","13"],["fifteen","15"],["fifty","50"],["twenty","20"],["forty","40"],["hundred","100"],["o'clock","〜時（ちょうど）"],["get up","起きる"],["go to bed","寝る"],["breakfast","朝食"],["lunch","昼食"],["dinner","夕食"],["quiet","静かな"],["careful","注意深い"],["open","開ける"],["close","閉める"],["wait","待つ"],["child","子ども"],["children","子どもたち"],["sheep","羊"]],
+  grammar:[
+    {q:"I have two ( ).", s:"わたしは犬を2匹飼っています。", o:["dogs","dog","doges","a dog"], why:"2匹なので複数形。dog には s をつける。"},
+    {q:"box の複数形は？", o:["boxes","boxs","boxies","box"], why:"x で終わる語は es をつける。"},
+    {q:"city の複数形は？", o:["cities","citys","cityes","city"], why:"子音字＋y で終わる語は y を i に変えて es。"},
+    {q:"child の複数形は？", o:["children","childs","childes","child"], why:"child は特別な形 children になる。"},
+    {q:"watch の複数形は？", o:["watches","watchs","watchies","watch"], why:"ch で終わる語は es をつける。"},
+    {q:"( ) many pens do you have?", o:["How","What","Who","Where"], why:"How many 〜? で「いくつの〜」。"},
+    {q:"How many books do you have? — ( )", o:["I have five.","Yes, I do.","It's five o'clock.","At five."], why:"数をたずねられているので数を答える。"},
+    {q:"What time do you get up? — ( )", o:["At six.","Six books.","Yes, I do.","On Sunday."], why:"「何時に」には At ＋時刻 で答える。"},
+    {q:"What time is it? — ( )", o:["It's three ten.","It's Monday.","It's sunny.","It's my watch."], why:"時刻は It's ＋時＋分。three ten は3時10分。"},
+    {q:"「静かにしなさい」はどれ？", o:["Be quiet.","Quiet is.","Are quiet.","Don't quiet."], why:"quiet は様子を表す語。命令文では Be で始める。"},
+    {q:"「ここで走ってはいけません」はどれ？", o:["Don't run here.","Not run here.","No run here.","Run don't here."], why:"禁止は Don't ＋動詞の元の形。"},
+    {q:"( ) sport do you like? — I like rugby.", o:["What","How","Who","When"], why:"What ＋名詞 で「何の〜」。"},
+    {q:"「窓を開けてください」はどれ？", o:["Please open the window.","Please opens the window.","Open please window the.","You please the window open."], why:"命令文に Please をつけるとていねい。動詞は元の形。"},
+    {q:"「15」はどれ？", o:["fifteen","fifty","five","fiveteen"], why:"15 は fifteen、50 は fifty。fiveteen というつづりはない。"}
+  ],
+  order:[
+    {jp:"あなたはねこを何匹飼っていますか。", en:"How many cats do you have?", x:["cat"], why:"How many のあとの名詞は複数形 cats。"},
+    {jp:"今何時ですか。", en:"What time is it?", why:"時刻をたずねる文の主語は it。"},
+    {jp:"あなたは何時に寝ますか。", en:"What time do you go to bed?", why:"What time を先頭に、do you go to bed と続ける。"},
+    {jp:"ここに来てください。", en:"Please come here.", why:"Please のあとに動詞。"},
+    {jp:"プールでは気をつけなさい。", en:"Be careful in the pool.", x:["Are"], why:"careful は様子を表す語。命令文なので Be で始める。"},
+    {jp:"この部屋で食べてはいけません。", en:"Don't eat in this room.", why:"Don't ＋動詞 で「〜してはいけない」。"},
+    {jp:"あなたはどの教科が好きですか。", en:"What subject do you like?", why:"What subject で「何の教科」。"},
+    {jp:"わたしには3人の兄弟がいます。", en:"I have three brothers.", x:["brother"], why:"3人なので複数形 brothers。"},
+    {jp:"わたしは6時30分に起きます。", en:"I get up at six thirty.", why:"「〜時に」は at ＋時刻。"},
+    {jp:"ドアを閉めないでください。", en:"Please don't close the door.", why:"Please don't ＋動詞 でていねいに禁止する。"}
+  ],
+  listen:[
+    {en:"How many pencils do you have?", jp:"あなたはえんぴつを何本持っていますか。", ng:["あなたはえんぴつを持っていますか。","あなたはペンを何本持っていますか。","あなたは何色のえんぴつを持っていますか。"]},
+    {en:"Don't use your phone here.", jp:"ここでスマートフォンを使わないで。", ng:["ここでスマートフォンを使って。","ここでスマートフォンを使いますか。","ここでスマートフォンを使えます。"]},
+    {en:"It's seven fifteen.", jp:"7時15分です。", ng:["7時50分です。","7時5分です。","5時15分です。"]},
+    {en:"What color do you like?", jp:"あなたは何色が好きですか。", ng:["あなたは何のスポーツが好きですか。","あなたは色が好きですか。","わたしは青が好きです。"]},
+    {en:"Be quiet in the library.", jp:"図書館では静かにしなさい。", ng:["図書館で静かにしています。","図書館は静かです。","図書館で話してもいいです。"]},
+    {en:"I have twelve cousins.", jp:"わたしにはいとこが12人います。", ng:["わたしにはいとこが20人います。","わたしにはいとこが2人います。","わたしにはいとこがいません。"]},
+    {en:"What time do you eat dinner?", jp:"あなたは何時に夕食を食べますか。", ng:["あなたは何時に朝食を食べますか。","あなたは夕食に何を食べますか。","あなたはどこで夕食を食べますか。"]}
+  ]},
+{ id:5, name:"My Brother in Hawaii", jp:"家族の紹介・3人称単数現在形", c:"var(--u5)", stage:2,
+  goal:"自分と相手以外の人について説明し、たずねられる",
+  boss:{e:"🐋", n:"サンタンクジラ"},
+  keys:[["My brother lives in Hawaii.","わたしの兄はハワイに住んでいます。"],["Does he surf? — Yes, he does.","彼はサーフィンをしますか。— はい、します。"],["She doesn't eat meat.","彼女は肉を食べません。"]],
+  lessons:[
+    {t:"3人称単数ってなに？", b:"I（わたし）と you（あなた）以外の1人や1つが主語のとき、今のことを言う文では一般動詞に s をつけます。これを3人称単数現在形（3単現）といいます。",
+     board:[["だれが","My brother"],["する","lives"],["どこに","in Hawaii"]], boardJp:"わたしの兄は ハワイに 住んでいます。",
+     ex:[["I live in Japan.","わたしは日本に住んでいます。"],["My brother lives in Hawaii.","わたしの兄はハワイに住んでいます。"]],
+     tip:"he, she, it, Ken, my mother, the dog などが主語なら s がつく。"},
+    {t:"s のつけ方", b:"動詞の終わりの文字によって、s のつけ方が変わります。",
+     table:[["多くの動詞","s をつける","play → plays, like → likes"],["s, x, sh, ch, o で終わる","es をつける","watch → watches, go → goes, wash → washes"],["子音字＋y で終わる","y を i にして es","study → studies"],["特別な形","形が変わる","have → has"]],
+     tip:"play のように母音字＋y なら、そのまま s（plays）。"},
+    {t:"Does 〜? でたずねる", b:"3単現の文の疑問文は Does を文の頭に置き、動詞の s をとって元の形にもどします。",
+     ex:[["Does she play the violin?","彼女はバイオリンをひきますか。"],["Yes, she does.","はい、ひきます。"],["No, she doesn't.","いいえ、ひきません。"]],
+     tip:"× Does she plays 〜? にしない。s は Does が引き受けている。"},
+    {t:"doesn't で否定する", b:"否定の文は does not（doesn't）を動詞の前に置き、動詞は元の形にします。",
+     ex:[["He doesn't eat meat.","彼は肉を食べません。"],["Ken does not have a bike.","ケンは自転車を持っていません。"]],
+     tip:"× He doesn't eats にしない。"}
+  ],
+  vocab:[["live","住んでいる"],["study","勉強する"],["go","行く"],["teach","教える"],["work","働く"],["help","手伝う"],["wash","洗う"],["use","使う"],["know","知っている"],["visit","訪れる"],["beach","浜辺"],["surf","サーフィンをする"],["cousin","いとこ"],["grandmother","祖母"],["restaurant","レストラン"],["weekend","週末"],["usually","ふだんは"],["after school","放課後"],["ocean","海・大洋"],["meat","肉"]],
+  grammar:[
+    {q:"My brother ( ) in Hawaii.", s:"わたしの兄はハワイに住んでいます。", o:["lives","live","living","is live"], why:"my brother は3人称単数。一般動詞に s をつけて lives。"},
+    {q:"Emma ( ) English.", s:"エマは英語を勉強しています。", o:["studies","studys","study","studyes"], why:"子音字＋y で終わる動詞は y を i に変えて es。"},
+    {q:"Ken ( ) a dog.", s:"ケンは犬を飼っています。", o:["has","have","haves","is have"], why:"have は3人称単数のとき has になる。"},
+    {q:"She ( ) TV after dinner.", s:"彼女は夕食後にテレビを見ます。", o:["watches","watchs","watch","watching"], why:"ch で終わる動詞は es をつける。"},
+    {q:"( ) your sister play tennis?", o:["Does","Do","Is","Are"], why:"主語が your sister（3人称単数）の一般動詞の疑問文は Does。"},
+    {q:"Does Mr. Lee speak Japanese? — Yes, he ( ).", o:["does","do","is","speaks"], why:"Does でたずねられたら does / doesn't で答える。"},
+    {q:"Does he ( ) soccer?", o:["play","plays","playing","played"], why:"Does を使ったら、動詞は元の形にもどす。"},
+    {q:"Aya doesn't ( ) meat.", o:["eat","eats","eating","does eat"], why:"doesn't のあとも動詞は元の形。"},
+    {q:"My cat ( ) like milk.", s:"わたしのねこは牛乳が好きではありません。", o:["doesn't","don't","isn't","not"], why:"主語が my cat（3人称単数）なので doesn't。"},
+    {q:"I ( ) tennis.", s:"わたしはテニスをします。", o:["play","plays","playes","am play"], why:"主語が I のときは s をつけない。"},
+    {q:"Taku and Ryo ( ) baseball.", s:"タクとリョウは野球をします。", o:["play","plays","is play","does play"], why:"主語が2人なので複数。s はつけない。"},
+    {q:"go の3単現の形は？", o:["goes","gos","goies","go"], why:"o で終わる go は es をつけて goes。"},
+    {q:"Does your mother work? — No, she ( ).", o:["doesn't","isn't","don't","not"], why:"Does でたずねられたので、No なら doesn't。"},
+    {q:"He ( ) his car on Sundays.", s:"彼は日曜日に車を洗います。", o:["washes","washs","wash","is wash"], why:"sh で終わる動詞は es をつける。"}
+  ],
+  order:[
+    {jp:"わたしの兄はハワイに住んでいます。", en:"My brother lives in Hawaii.", x:["live"], why:"主語が my brother なので lives。"},
+    {jp:"彼は毎朝サーフィンをします。", en:"He surfs every morning.", x:["surf"], why:"主語が he なので surfs。every morning は文の最後。"},
+    {jp:"彼女は日本語を勉強しています。", en:"She studies Japanese.", x:["study"], why:"study は y を i に変えて studies。"},
+    {jp:"あなたのお父さんは料理をしますか。", en:"Does your father cook?", x:["Do"], why:"主語が your father なので Does で始める。"},
+    {jp:"彼はコーヒーを飲みません。", en:"He does not drink coffee.", x:["drinks"], why:"does not のあとは元の形 drink。"},
+    {jp:"エマはねこを2匹飼っています。", en:"Emma has two cats.", x:["have"], why:"have は3人称単数で has。"},
+    {jp:"わたしの祖母は京都で働いています。", en:"My grandmother works in Kyoto.", why:"主語が my grandmother なので works。"},
+    {jp:"ケンは日曜日にはテレビを見ません。", en:"Ken doesn't watch TV on Sundays.", x:["watches"], why:"doesn't のあとは元の形 watch。"},
+    {jp:"彼女はピアノをひきますか。", en:"Does she play the piano?", x:["plays"], why:"Does を使った疑問文の動詞は元の形。"},
+    {jp:"彼は放課後にサッカーを練習します。", en:"He practices soccer after school.", why:"practice に s をつけて practices。"}
+  ],
+  listen:[
+    {en:"My sister lives in Osaka.", jp:"わたしの姉は大阪に住んでいます。", ng:["わたしの兄は大阪に住んでいます。","わたしの姉は大阪で働いています。","わたしは大阪に住んでいます。"]},
+    {en:"Does he like curry?", jp:"彼はカレーが好きですか。", ng:["彼女はカレーが好きですか。","彼はカレーが好きです。","あなたはカレーが好きですか。"]},
+    {en:"She doesn't play video games.", jp:"彼女はテレビゲームをしません。", ng:["彼女はテレビゲームをします。","彼はテレビゲームをしません。","彼女はテレビゲームを持っていません。"]},
+    {en:"Tom goes to school by train.", jp:"トムは電車で学校に行きます。", ng:["トムはバスで学校に行きます。","トムは歩いて学校に行きます。","トムは電車が好きです。"]},
+    {en:"My father has a red car.", jp:"父は赤い車を持っています。", ng:["父は青い車を持っています。","父は赤い車がほしいです。","母は赤い車を持っています。"]},
+    {en:"Emma teaches English.", jp:"エマは英語を教えています。", ng:["エマは英語を勉強しています。","エマは英語を話しません。","エマは日本語を教えています。"]},
+    {en:"Does your cousin live in Hawaii?", jp:"あなたのいとこはハワイに住んでいますか。", ng:["あなたのいとこはハワイに住んでいます。","あなたのおばはハワイに住んでいますか。","あなたのいとこはハワイが好きですか。"]}
+  ]}
+];
+
+const MODES = [
+  ["lesson","ポイント解説","例文で文法のきまりを確認"],
+  ["vocab","単語トレーニング","8問"],
+  ["grammar","文法チャレンジ","8問"],
+  ["order","ならべかえパズル","6問"],
+  ["listen","リスニング","6問"],
+  ["boss","ボス戦","10問・ライフ3"]
+];
+const TAGS = {vocab:"単語", grammar:"文法", order:"ならべかえ", listen:"リスニング"};
+const RANKS = ["見習いクルー","甲板クルー","航海士","副船長","船長","提督","英語マスター"];
+const BADGES = [
+  ["first","⚓","はじめの一歩","初めて正解する"],
+  ["boss1","🏴‍☠️","初勝利","ボスを1体たおす"],
+  ["perfect","💎","ノーミス","ボスをノーミスでたおす"],
+  ["combo10","🔥","10コンボ","10問連続で正解する"],
+  ["order20","🧩","ならべかえ名人","ならべかえを合計20問正解"],
+  ["review10","📓","やり直しの達人","まちがいノートで10問正解"],
+  ["attack15","⚡","スピードスター","タイムアタックで15問正解"],
+  ["poster","🖼️","ポスター完成","自己紹介ポスターを全部うめる"],
+  ["allboss","👑","全島制覇","Unit 0〜5 のボスを全部たおす"]
+];
+
+/* ============ 保存 ============ */
+const KEY = "eiq-v1";
+function defaults(){ return {xp:0, stars:{}, best:{attack:0}, wrong:[], badges:[], stats:{ok:0, order:0, review:0, maxCombo:0}, seen:{}, settings:{sound:true, slow:false}, poster:null}; }
+function load(){
+  const d = defaults();
+  try{
+    const raw = localStorage.getItem(KEY);
+    if(raw){
+      const s = JSON.parse(raw);
+      return Object.assign(d, s, {stats:Object.assign(d.stats, s.stats||{}), settings:Object.assign(d.settings, s.settings||{}), best:Object.assign(d.best, s.best||{})});
+    }
+  }catch(e){}
+  return d;
+}
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} }
+let S = load();
+
+/* ============ 小道具 ============ */
+const app = document.getElementById("app");
+const sheetRoot = document.getElementById("sheet-root");
+const esc = s => String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const isJa = s => /[぀-ヿ㐀-鿿！-｠]/.test(s);
+const range = n => Array.from({length:n}, (_, i) => i);
+function shuffle(a){ a = a.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+const sample = (a, n) => shuffle(a).slice(0, n);
+const pick = a => a[Math.floor(Math.random()*a.length)];
+const XP_LV = 300;
+const level = xp => Math.floor(xp/XP_LV) + 1;
+const rankOf = lv => RANKS[Math.min(RANKS.length-1, lv-1)];
+const starStr = n => "★".repeat(n) + `<span class="off">${"★".repeat(3-n)}</span>`;
+function blankify(s){ return esc(s).replace(/\( \)/g, '<span class="blank" aria-label="空欄"></span>'); }
+
+/* ============ 効果音 ============ */
+let AC = null;
+function tone(seq){
+  if(!S.settings.sound) return;
+  try{
+    AC = AC || new (window.AudioContext || window.webkitAudioContext)();
+    const t0 = AC.currentTime;
+    seq.forEach(([f, d, st, type, vol]) => {
+      const o = AC.createOscillator(), g = AC.createGain();
+      o.type = type || "triangle"; o.frequency.value = f;
+      g.gain.setValueAtTime(0.0001, t0+st);
+      g.gain.exponentialRampToValueAtTime(vol || 0.16, t0+st+0.01);
+      g.gain.exponentialRampToValueAtTime(0.0001, t0+st+d);
+      o.connect(g); g.connect(AC.destination);
+      o.start(t0+st); o.stop(t0+st+d+0.03);
+    });
+  }catch(e){}
+}
+const SFX = {
+  ok: () => tone([[660,.12,0],[990,.2,.09]]),
+  ng: () => tone([[196,.28,0,"sawtooth",.07],[147,.3,.1,"sawtooth",.06]]),
+  win: () => tone([[523,.15,0],[659,.15,.12],[784,.15,.24],[1047,.4,.36]]),
+  lose: () => tone([[392,.2,0],[330,.2,.18],[262,.45,.36]]),
+  tap: () => tone([[880,.05,0,"sine",.08]]),
+  hit: () => tone([[320,.08,0,"square",.07],[200,.12,.06,"square",.06]])
+};
+
+/* ============ 読み上げ ============ */
+const canSpeak = "speechSynthesis" in window && "SpeechSynthesisUtterance" in window;
+let VOICE = null;
+function pickVoice(){
+  try{
+    const vs = speechSynthesis.getVoices();
+    VOICE = vs.find(v => /^en[-_]US/i.test(v.lang) && /Samantha|Google US|Jenny|Aria|Allison|Ava/i.test(v.name))
+         || vs.find(v => /^en[-_]US/i.test(v.lang)) || vs.find(v => /^en/i.test(v.lang)) || null;
+  }catch(e){}
+}
+if(canSpeak){ pickVoice(); try{ speechSynthesis.addEventListener("voiceschanged", pickVoice); }catch(e){} }
+function speak(text, slow){
+  if(!canSpeak || !text) return false;
+  try{
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text.replace(/\s*—\s*/g, ", "));
+    u.lang = "en-US"; if(VOICE) u.voice = VOICE;
+    u.rate = (slow || S.settings.slow) ? 0.62 : 0.92;
+    speechSynthesis.speak(u);
+    return true;
+  }catch(e){ return false; }
+}
+const sayBtn = (text, label) => canSpeak ? `<button class="say" data-say="${esc(text)}" aria-label="${esc(label || "読み上げる")}">🔊</button>` : "";
+
+/* ============ 画面遷移 ============ */
+let view = {name:"home"};
+let Q = null;
+function go(name, p){
+  stopTimer(); closeSheet();
+  if(canSpeak) try{ speechSynthesis.cancel(); }catch(e){}
+  view = Object.assign({name}, p || {});
+  render();
+  window.scrollTo(0, 0);
+}
+function render(){
+  const r = {home:renderHome, unit:renderUnit, lesson:renderLesson, quiz:renderQuiz, result:renderResult, badges:renderBadges, note:renderNote, poster:renderPoster}[view.name];
+  (r || renderHome)();
+}
+
+/* ============ ホーム（海図） ============ */
+function renderHome(){
+  const lv = level(S.xp), into = S.xp % XP_LV;
+  const bossDone = UNITS.filter(u => (S.stars[u.id]||0) > 0).length;
+  let isles = "", side = 0;
+  UNITS.forEach(u => {
+    if(u.id === 0) isles += `<div class="stage">Stage 1</div>`;
+    if(u.id === 5){
+      isles += isleSA(side++ % 2);
+      isles += `<div class="stage">Stage 2</div>`;
+    }
+    const st = S.stars[u.id] || 0;
+    isles += `<button class="isle ${side++ % 2 ? "r" : ""}" style="--c:${u.c}" data-go="unit" data-u="${u.id}">
+      <span class="disc"><small>UNIT</small><b>${u.id}</b></span>
+      <span class="isle-t"><span class="en">${esc(u.name)}</span><span class="jp">${esc(u.jp)}</span><span class="stars" aria-label="星${st}個">${starStr(st)}</span></span>
+      <span class="mon-s" aria-hidden="true">${u.boss.e}</span>
+    </button>`;
+  });
+  app.innerHTML = `
+  <header class="top">
+    <div class="brand"><div class="eyebrow">中学1年 英語 UNIT 0–5</div><h1>英語アイランド<br><span>クエスト</span></h1></div>
+    <div class="player">
+      <div class="lv"><div><small>Lv</small>${lv}</div></div>
+      <div class="pinfo"><b>${rankOf(lv)}</b><div class="xpbar"><i style="width:${into*100/XP_LV}%"></i></div><small>${into} / ${XP_LV} XP（合計 ${S.xp}）</small></div>
+    </div>
+  </header>
+  <nav class="quick" aria-label="メニュー">
+    <button class="qbtn" data-act="attack"><span class="ic">⚡</span>タイムアタック<small>最高 ${S.best.attack} 問</small></button>
+    <button class="qbtn" data-go="note"><span class="ic">📓</span>まちがいノート<small>${S.wrong.length} 問</small></button>
+    <button class="qbtn" data-go="badges"><span class="ic">🏅</span>バッジ<small>${S.badges.length} / ${BADGES.length}</small></button>
+    <button class="qbtn" data-act="settings" aria-expanded="${!!view.settings}"><span class="ic">⚙️</span>設定<small>${S.settings.sound ? "音あり" : "音なし"}</small></button>
+  </nav>
+  ${view.settings ? settingsPanel() : ""}
+  <section class="map" aria-label="島の地図">${isles}</section>
+  <p class="foot">島をタップして冒険スタート。ポイント解説で文法を確認し、単語・文法・ならべかえ・リスニングで練習してから、ボスに挑戦しよう。ボスをたおした数 ${bossDone} / 6。<br>問題は教科書 Unit 0〜5 の文法事項にそって作ったオリジナルです。音声はブラウザの読み上げ機能を使います。記録はこの端末のブラウザに保存されます。</p>`;
+}
+function isleSA(r){
+  const done = S.badges.includes("poster");
+  return `<button class="isle sa ${r ? "r" : ""}" data-go="poster">
+    <span class="disc"><small>STAGE</small><b>A1</b></span>
+    <span class="isle-t"><span class="en">"All about Me" Poster</span><span class="jp">Unit 1〜4 の英語で自己紹介ポスターを作る</span><span class="stars">${done ? "完成！" : '<span class="off">未完成</span>'}</span></span>
+    <span class="mon-s" aria-hidden="true">🖼️</span>
+  </button>`;
+}
+function settingsPanel(){
+  return `<div class="panel" id="settings">
+    <div class="toggle"><span>効果音</span><button class="switch" role="switch" aria-checked="${S.settings.sound}" data-act="t-sound" aria-label="効果音"></button></div>
+    <div class="toggle"><span>読み上げをゆっくりにする</span><button class="switch" role="switch" aria-checked="${S.settings.slow}" data-act="t-slow" aria-label="ゆっくり読み上げ"></button></div>
+    ${canSpeak ? "" : '<p class="warn">このブラウザは英語の読み上げに対応していません。リスニング問題は英文を文字で表示します。</p>'}
+    <div class="toggle"><span class="muted">記録をすべて消す</span><button class="btn small" data-act="reset">${view.resetArm ? "もう一度押すと消えます" : "リセット"}</button></div>
+  </div>`;
+}
+
+/* ============ ユニット ============ */
+function renderUnit(){
+  const u = UNITS[view.u];
+  const st = S.stars[u.id] || 0;
+  app.innerHTML = `
+  <div class="bar"><button class="link" data-go="home">← 地図にもどる</button><span class="stars" aria-label="星${st}個">${starStr(st)}</span></div>
+  <section class="hero" style="--c:${u.c}">
+    <span class="disc"><small>UNIT</small><b>${u.id}</b></span>
+    <div><h2>${esc(u.name)}</h2><p>${esc(u.jp)}</p></div>
+    <div class="goal">ゴール　${esc(u.goal)}</div>
+  </section>
+  <h3 class="sec-h">キーセンテンス</h3>
+  <div class="keys">${u.keys.map(k => `<div class="ex">${sayBtn(k[0])}<div><div class="en">${esc(k[0])}</div><div class="jp">${esc(k[1])}</div></div></div>`).join("")}</div>
+  <h3 class="sec-h">おすすめの順番</h3>
+  <div class="modes" style="--c:${u.c}">
+    ${MODES.map(([m, name, note], i) => {
+      const best = S.seen[u.id + "-" + m];
+      if(m === "boss") return `<button class="mode boss" data-act="start" data-m="boss" data-u="${u.id}"><span class="mon-s" aria-hidden="true">${u.boss.e}</span><span><b>ボス戦 VS ${esc(u.boss.n)}</b><small>${note}。ミス3回で負け</small></span><span class="stars">${starStr(st)}</span></button>`;
+      return `<button class="mode" ${m === "lesson" ? `data-go="lesson" data-u="${u.id}"` : `data-act="start" data-m="${m}" data-u="${u.id}"`}>
+        <span class="step">${i+1}</span><span><b>${name}</b><small>${note}</small></span>
+        <span class="st">${best != null ? (m === "lesson" ? "済" : "最高 " + best + "%") : ""}</span></button>`;
+    }).join("")}
+  </div>`;
+}
+
+/* ============ ポイント解説 ============ */
+function renderLesson(){
+  const u = UNITS[view.u], i = view.i || 0, L = u.lessons[i], last = i === u.lessons.length - 1;
+  if(last){ S.seen[u.id + "-lesson"] = 100; save(); }
+  let body = `<h3>${esc(L.t)}</h3><p>${esc(L.b)}</p>`;
+  if(L.board) body += `<div class="board" style="--c:${u.c}">${L.board.map(([r, w]) => `<div class="cell"><small>${esc(r)}</small><span>${esc(w)}</span></div>`).join("")}</div><p class="muted">${esc(L.boardJp)}</p>`;
+  if(L.table) body += `<div class="tbl"><table><tbody>${L.table.map(r => `<tr>${r.map((c, k) => `<td class="${isJa(c) ? "" : "en"}">${esc(c)}</td>`).join("")}</tr>`).join("")}</tbody></table></div>`;
+  if(L.ex) body += `<div class="keys">${L.ex.map(k => `<div class="ex">${sayBtn(k[0])}<div><div class="en">${esc(k[0])}</div><div class="jp">${esc(k[1])}</div></div></div>`).join("")}</div>`;
+  if(L.tip) body += `<div class="tip"><b>ここに注意</b>${esc(L.tip)}</div>`;
+  app.innerHTML = `
+  <div class="bar"><button class="link" data-go="unit" data-u="${u.id}">← Unit ${u.id} にもどる</button><span class="muted">${i+1} / ${u.lessons.length}</span></div>
+  <article class="lesson">${body}
+    <div class="dots" aria-hidden="true">${u.lessons.map((_, k) => `<i class="${k === i ? "on" : ""}"></i>`).join("")}</div>
+    <div class="navrow">
+      <button class="btn" data-go="lesson" data-u="${u.id}" data-i="${i-1}" ${i === 0 ? "disabled" : ""}>前へ</button>
+      ${last ? `<button class="btn primary" data-act="start" data-m="vocab" data-u="${u.id}">単語トレーニングへ</button>` : `<button class="btn primary" data-go="lesson" data-u="${u.id}" data-i="${i+1}">次へ</button>`}
+    </div>
+  </article>`;
+}
+
+/* ============ 問題づくり ============ */
+function mkVocab(uid, i, forceVariant){
+  const V = UNITS[uid].vocab, [en, jp] = V[i];
+  const others = sample(range(V.length).filter(j => j !== i && V[j][1] !== jp && V[j][0] !== en), 3).map(j => V[j]);
+  const variant = forceVariant || pick(canSpeak ? ["en2jp","en2jp","jp2en","hear"] : ["en2jp","jp2en"]);
+  const base = {id:`${uid}:v:${i}`, kind:"vocab", uid, say:en};
+  if(variant === "jp2en") return Object.assign(base, {prompt:jp, big:true, sub:"英語にすると？", options:shuffle([en, ...others.map(o => o[0])]), answer:en, why:`「${jp}」は ${en}。`});
+  if(variant === "hear") return Object.assign(base, {listen:true, prompt:"聞こえた単語はどれ？", options:shuffle([en, ...others.map(o => o[0])]), answer:en, why:`${en} は「${jp}」。`, reveal:en});
+  return Object.assign(base, {prompt:en, promptEn:true, big:true, sub:"意味はどれ？", options:shuffle([jp, ...others.map(o => o[1])]), answer:jp, why:`${en} は「${jp}」。`, autoSay:true});
+}
+function mkGrammar(uid, i){
+  const g = UNITS[uid].grammar[i], ans = g.o[0];
+  const full = /\( \)/.test(g.q) && !isJa(g.q) ? g.q.replace("( )", ans) : (!isJa(ans) ? ans : "");
+  return {id:`${uid}:g:${i}`, kind:"grammar", uid, prompt:g.q, promptEn:!isJa(g.q), sub:g.s || "", options:shuffle(g.o), answer:ans, why:g.why, say:full, showFull:full !== ans ? full : ""};
+}
+function splitSentence(en){
+  const m = en.match(/^(.*?)([.?!])$/);
+  return {words:(m ? m[1] : en).split(" "), punct:m ? m[2] : ""};
+}
+function mkOrder(uid, i){
+  const o = UNITS[uid].order[i], sp = splitSentence(o.en);
+  const all = sp.words.concat(o.x || []).map((w, k) => ({k, w}));
+  let pool = shuffle(all), tries = 0;
+  while(tries++ < 10 && pool.slice(0, sp.words.length).map(t => t.w).join(" ") === sp.words.join(" ")) pool = shuffle(all);
+  return {id:`${uid}:o:${i}`, kind:"order", uid, prompt:o.jp, sub:"英語の語順にならべよう", words:sp.words, punct:sp.punct, pool, placed:[], answer:o.en, say:o.en, why:o.why, extra:(o.x || []).length};
+}
+function mkListen(uid, i){
+  const l = UNITS[uid].listen[i];
+  return {id:`${uid}:l:${i}`, kind:"listen", uid, listen:true, prompt:"英語を聞いて、意味を選ぼう", say:l.en, reveal:l.en, options:shuffle([l.jp, ...l.ng]), answer:l.jp, why:`${l.en} は「${l.jp}」。`};
+}
+function fromId(id){
+  const [u, k, i] = id.split(":"), uid = +u, idx = +i;
+  if(!UNITS[uid]) return null;
+  const f = {v:mkVocab, g:mkGrammar, o:mkOrder, l:mkListen}[k];
+  const src = {v:"vocab", g:"grammar", o:"order", l:"listen"}[k];
+  if(!f || !UNITS[uid][src][idx]) return null;
+  return f(uid, idx);
+}
+function describeId(id){
+  const [u, k, i] = id.split(":"), U = UNITS[+u];
+  if(!U) return null;
+  if(k === "v"){ const v = U.vocab[+i]; return v && {tag:"単語", q:v[0], a:v[1]}; }
+  if(k === "g"){ const g = U.grammar[+i]; return g && {tag:"文法", q:g.q, a:g.o[0]}; }
+  if(k === "o"){ const o = U.order[+i]; return o && {tag:"ならべかえ", q:o.jp, a:o.en}; }
+  if(k === "l"){ const l = U.listen[+i]; return l && {tag:"リスニング", q:l.en, a:l.jp}; }
+  return null;
+}
+function attackQ(){
+  const uid = Math.floor(Math.random()*UNITS.length), U = UNITS[uid];
+  return Math.random() < 0.5 ? mkVocab(uid, Math.floor(Math.random()*U.vocab.length), pick(["en2jp","jp2en"])) : mkGrammar(uid, Math.floor(Math.random()*U.grammar.length));
+}
+
+/* ============ セッション ============ */
+let timer = null;
+function stopTimer(){ if(timer){ clearInterval(timer); timer = null; } }
+function startQuiz(mode, uid){
+  let qs = [];
+  const U = UNITS[uid];
+  if(mode === "vocab") qs = sample(range(U.vocab.length), 8).map(i => mkVocab(uid, i));
+  if(mode === "grammar") qs = sample(range(U.grammar.length), 8).map(i => mkGrammar(uid, i));
+  if(mode === "order") qs = sample(range(U.order.length), 6).map(i => mkOrder(uid, i));
+  if(mode === "listen") qs = sample(range(U.listen.length), 6).map(i => mkListen(uid, i));
+  if(mode === "boss") qs = shuffle([
+    ...sample(range(U.vocab.length), 3).map(i => mkVocab(uid, i)),
+    ...sample(range(U.grammar.length), 3).map(i => mkGrammar(uid, i)),
+    ...sample(range(U.order.length), 2).map(i => mkOrder(uid, i)),
+    ...sample(range(U.listen.length), 2).map(i => mkListen(uid, i))
+  ]);
+  if(mode === "review") qs = shuffle(S.wrong).slice(0, 10).map(fromId).filter(Boolean);
+  if(mode === "attack") qs = [attackQ()];
+  if(!qs.length) return;
+  Q = {mode, uid, qs, i:0, ok:0, miss:0, combo:0, maxCombo:0, hearts:3, hp:8, hpMax:8, xp:0, lvBefore:level(S.xp), badgesBefore:S.badges.slice(), answered:false, mistakes:[], timeLeft:60, quitArm:false};
+  view = {name:"quiz"};
+  render();
+  window.scrollTo(0, 0);
+  if(mode === "attack"){
+    const end = Date.now() + 60000;
+    timer = setInterval(() => {
+      Q.timeLeft = Math.max(0, (end - Date.now())/1000);
+      const t = document.getElementById("timer");
+      if(t){ t.textContent = Math.ceil(Q.timeLeft); t.classList.toggle("low", Q.timeLeft <= 10); }
+      if(Q.timeLeft <= 0){ stopTimer(); finish(); }
+    }, 200);
+  }
+}
+const cur = () => Q.qs[Q.i];
+
+function renderQuiz(){
+  const q = cur();
+  Q.answered = false;
+  let right = "";
+  if(Q.mode === "boss") right = `<span class="hearts" aria-label="ライフ${Q.hearts}">${"♥".repeat(Q.hearts)}<span class="off">${"♥".repeat(3-Q.hearts)}</span></span>`;
+  else if(Q.mode === "attack") right = `<span class="timer" id="timer" aria-label="残り秒数">${Math.ceil(Q.timeLeft)}</span>`;
+  else right = `<span class="muted" style="font-variant-numeric:tabular-nums">${Q.i+1}/${Q.qs.length}</span>`;
+  const pct = Q.mode === "attack" ? Math.min(100, Q.ok*100/20) : Q.i*100/Q.qs.length;
+  const U = UNITS[Q.uid];
+  const boss = Q.mode === "boss" ? `<div class="bossbox" id="bossbox"><span class="mon" id="mon" aria-hidden="true">${U.boss.e}</span><div><b>${esc(U.boss.n)}</b><div class="hp"><i id="hpbar" style="width:${Q.hp*100/Q.hpMax}%"></i></div><small id="hptext">HP ${Q.hp} / ${Q.hpMax}</small></div></div>` : "";
+  const combo = Q.combo >= 2 ? `<div style="text-align:center"><span class="combo">${Q.combo} コンボ！</span></div>` : "";
+  app.innerHTML = `
+  <div class="qtop"><button class="x" data-act="quit">${Q.quitArm ? "やめる？" : "✕"}</button><div class="prog" aria-hidden="true"><i style="width:${pct}%"></i></div>${right}</div>
+  ${boss}${combo}
+  <section class="qcard" id="qcard">
+    <span class="tag">${TAGS[q.kind]}${Q.mode === "review" || Q.mode === "attack" ? "・Unit " + q.uid : ""}</span>
+    ${qBody(q)}
+  </section>`;
+  if(q.kind !== "order" && (q.listen || q.autoSay)) setTimeout(() => speak(q.say), 250);
+}
+function qBody(q){
+  let h = "";
+  if(q.listen){
+    h += `<div class="prompt" style="text-align:center">${esc(q.prompt)}</div>`;
+    if(canSpeak) h += `<div class="listen"><button class="bigsay" data-say="${esc(q.say)}" aria-label="もう一度聞く">🔊</button><button class="bigsay slow" data-say-slow="${esc(q.say)}" aria-label="ゆっくり聞く">🐢</button></div>
+      <div class="reveal en" id="reveal"><button class="link" data-act="reveal">英文を見る</button></div>`;
+    else h += `<div class="reveal en">${esc(q.reveal)}</div><p class="sub" style="text-align:center">読み上げが使えないため、英文を表示しています。</p>`;
+  } else {
+    const cls = ["prompt", q.promptEn ? "en" : "", q.big ? "big" : ""].join(" ");
+    h += `<div class="${cls}">${q.kind === "grammar" ? blankify(q.prompt) : esc(q.prompt)}</div>`;
+    if(q.sub) h += `<div class="sub">${esc(q.sub)}</div>`;
+    if(q.autoSay && canSpeak) h += `<div style="text-align:center">${sayBtn(q.say, "もう一度聞く")}</div>`;
+  }
+  if(q.kind === "order") return h + orderArea(q);
+  const long = q.options.some(o => o.length > (isJa(o) ? 9 : 14));
+  h += `<div class="opts ${long ? "one" : ""}">${q.options.map((o, k) => `<button class="opt ${isJa(o) ? "" : "en"}" data-act="ans" data-k="${k}"><span class="k">${k+1}</span><span class="t">${esc(o)}</span></button>`).join("")}</div>`;
+  return h;
+}
+function orderArea(q){
+  const placed = q.placed.map(k => q.pool.find(t => t.k === k));
+  return `<div class="lines" id="lines">${placed.length ? placed.map(t => `<button class="w" data-act="o-out" data-k="${t.k}" aria-label="${esc(t.w)} をもどす">${esc(t.w)}</button>`).join("") + `<span class="pt">${esc(q.punct)}</span>` : '<span class="hint">下の語をタップして、ここに英文を書こう</span>'}</div>
+  <div class="pool" id="pool">${q.pool.map(t => `<button class="chip ${q.placed.includes(t.k) ? "used" : ""}" data-act="o-in" data-k="${t.k}" ${q.placed.includes(t.k) ? 'tabindex="-1" aria-hidden="true"' : ""}>${esc(t.w)}</button>`).join("")}</div>
+  ${q.extra ? `<p class="sub">使わない語が ${q.extra} つまじっています。</p>` : ""}
+  <div class="orow"><button class="btn" data-act="o-clear">やり直す</button><button class="btn primary" data-act="o-check" ${q.placed.length ? "" : "disabled"}>こたえる</button></div>`;
+}
+function refreshOrder(){
+  const q = cur(), card = document.getElementById("qcard");
+  if(!card) return;
+  const old = card.querySelector(".lines");
+  const wrap = document.createElement("div");
+  wrap.innerHTML = orderArea(q);
+  // replace order area (lines, pool, note, row)
+  let n = old;
+  const toRemove = [];
+  while(n){ toRemove.push(n); n = n.nextElementSibling; }
+  toRemove.forEach(e => e.remove());
+  Array.from(wrap.children).forEach(c => card.appendChild(c));
+}
+
+/* ============ 採点 ============ */
+function answer(given){
+  if(Q.answered) return;
+  Q.answered = true;
+  const q = cur();
+  const ok = given === q.answer;
+  if(q.kind !== "order"){
+    document.querySelectorAll(".opt").forEach(b => {
+      const t = q.options[+b.dataset.k];
+      b.disabled = true;
+      if(t === q.answer) b.classList.add("is-ok");
+      else if(t === given) b.classList.add("is-ng");
+    });
+  } else {
+    document.querySelectorAll("#qcard button").forEach(b => b.disabled = true);
+  }
+  if(ok){
+    Q.ok++; Q.combo++; Q.maxCombo = Math.max(Q.maxCombo, Q.combo);
+    S.stats.ok++; S.stats.maxCombo = Math.max(S.stats.maxCombo, Q.combo);
+    if(q.kind === "order") S.stats.order++;
+    if(Q.mode === "review"){ S.stats.review++; }
+    S.wrong = S.wrong.filter(id => id !== q.id);
+    const gain = Q.mode === "attack" ? 5 : 10 + Math.min(10, Math.max(0, Q.combo-2)*2);
+    Q.xp += gain;
+    SFX.ok();
+    if(Q.mode === "boss") bossHit();
+  } else {
+    Q.miss++; Q.combo = 0;
+    if(!S.wrong.includes(q.id)) S.wrong.push(q.id);
+    if(S.wrong.length > 80) S.wrong = S.wrong.slice(-80);
+    Q.mistakes.push({q, given});
+    SFX.ng();
+    const card = document.getElementById("qcard");
+    if(card){ card.classList.remove("shake"); void card.offsetWidth; card.classList.add("shake"); }
+    if(Q.mode === "boss") bossAttack();
+  }
+  save();
+  if(Q.mode === "attack"){
+    setTimeout(() => { if(view.name !== "quiz" || !timer) return; Q.qs.push(attackQ()); Q.i++; renderQuiz(); }, ok ? 300 : 1100);
+    return;
+  }
+  showSheet(ok, q, given);
+}
+function bossHit(){
+  Q.hp = Math.max(0, Q.hp - 1);
+  const m = document.getElementById("mon"), box = document.getElementById("bossbox");
+  if(m){ m.classList.remove("hit"); void m.offsetWidth; m.classList.add("hit"); }
+  const bar = document.getElementById("hpbar"); if(bar) bar.style.width = (Q.hp*100/Q.hpMax) + "%";
+  const tx = document.getElementById("hptext"); if(tx) tx.textContent = `HP ${Q.hp} / ${Q.hpMax}`;
+  if(box){ const d = document.createElement("span"); d.className = "dmg"; d.textContent = Q.combo >= 3 ? `${Q.combo}コンボ！` : "HIT!"; box.appendChild(d); setTimeout(() => d.remove(), 900); }
+  setTimeout(SFX.hit, 120);
+}
+function bossAttack(){
+  Q.hearts = Math.max(0, Q.hearts - 1);
+  const m = document.getElementById("mon");
+  if(m){ m.classList.remove("atk"); void m.offsetWidth; m.classList.add("atk"); }
+  const h = document.querySelector(".hearts");
+  if(h) h.innerHTML = "♥".repeat(Q.hearts) + `<span class="off">${"♥".repeat(3-Q.hearts)}</span>`;
+}
+function showSheet(ok, q, given){
+  const praise = ok ? pick(["せいかい！","ナイス！","すばらしい！","その調子！"]) : "おしい！";
+  const full = q.kind === "order" ? q.answer : (q.showFull || q.answer);
+  const showAns = !ok || q.kind === "order" || q.showFull;
+  const sayText = q.say || (!isJa(q.answer) ? q.answer : "");
+  sheetRoot.innerHTML = `<div class="sheet ${ok ? "ok" : "ng"}" role="status">
+    <div class="sheet-in">
+      <h3>${praise}${ok && Q.combo >= 3 ? `　${Q.combo}コンボ` : ""}</h3>
+      ${showAns ? `<div class="ans">${sayText ? sayBtn(sayText) : ""}<span class="${isJa(full) ? "" : "en"}">${!ok ? "正解　" : ""}${esc(full)}</span></div>` : ""}
+      ${q.listen && q.reveal && !ok ? `<div class="muted en">${esc(q.reveal)}</div>` : ""}
+      <p class="why"><b>なぜ？</b>${esc(q.why)}</p>
+      <div style="display:flex;justify-content:flex-end"><button class="btn ${ok ? "primary" : "gold"}" id="next" data-act="next">${isLast() ? "結果を見る" : "つぎへ"}</button></div>
+    </div></div>`;
+  app.style.paddingBottom = (sheetRoot.firstElementChild.offsetHeight + 24) + "px";
+  const nb = document.getElementById("next"); if(nb) nb.focus({preventScroll:true});
+  if(ok && q.kind === "order") speak(q.say);
+}
+function isLast(){
+  if(Q.mode === "boss") return Q.hp <= 0 || Q.hearts <= 0 || Q.i >= Q.qs.length - 1;
+  return Q.i >= Q.qs.length - 1;
+}
+function closeSheet(){ sheetRoot.innerHTML = ""; app.style.paddingBottom = ""; }
+function next(){
+  closeSheet();
+  if(isLast()) return finish();
+  Q.i++; Q.quitArm = false;
+  renderQuiz();
+  window.scrollTo(0, 0);
+}
+
+/* ============ 結果 ============ */
+function finish(){
+  stopTimer(); closeSheet();
+  const R = {mode:Q.mode, uid:Q.uid, ok:Q.ok, total:Q.mode === "attack" ? Q.ok + Q.miss : Math.min(Q.qs.length, Q.i + 1), maxCombo:Q.maxCombo, mistakes:Q.mistakes, stars:0, win:false, newBest:false};
+  if(Q.mode === "boss"){
+    R.win = Q.hp <= 0;
+    if(R.win) R.stars = Q.miss === 0 ? 3 : Q.miss === 1 ? 2 : 1;
+    if(R.win){
+      Q.xp += 50 + R.stars*20;
+      S.stars[Q.uid] = Math.max(S.stars[Q.uid] || 0, R.stars);
+    }
+  }
+  if(Q.mode === "attack"){ if(Q.ok > S.best.attack){ S.best.attack = Q.ok; R.newBest = true; } }
+  if(["vocab","grammar","order","listen","boss"].includes(Q.mode)){
+    const pct = Math.round(Q.ok*100/R.total);
+    const key = Q.uid + "-" + Q.mode;
+    if(Q.mode !== "boss") S.seen[key] = Math.max(S.seen[key] || 0, pct);
+  }
+  S.xp += Q.xp;
+  checkBadges(R);
+  R.xp = Q.xp;
+  R.lvUp = level(S.xp) > Q.lvBefore ? level(S.xp) : 0;
+  R.newBadges = S.badges.filter(b => !Q.badgesBefore.includes(b));
+  save();
+  view = {name:"result", R};
+  render();
+  window.scrollTo(0, 0);
+  if(R.win || R.lvUp || R.newBest) { SFX.win(); confetti(); }
+  else if(Q.mode === "boss") SFX.lose();
+}
+function checkBadges(R){
+  const add = b => { if(!S.badges.includes(b)) S.badges.push(b); };
+  if(S.stats.ok >= 1) add("first");
+  if(R && R.win) add("boss1");
+  if(R && R.win && R.stars === 3) add("perfect");
+  if(S.stats.maxCombo >= 10) add("combo10");
+  if(S.stats.order >= 20) add("order20");
+  if(S.stats.review >= 10) add("review10");
+  if(S.best.attack >= 15) add("attack15");
+  if(UNITS.every(u => (S.stars[u.id] || 0) > 0)) add("allboss");
+}
+function renderResult(){
+  const R = view.R, U = UNITS[R.uid];
+  let title = "トレーニング完了！";
+  if(R.mode === "boss") title = R.win ? `${U.boss.n}をたおした！` : `${U.boss.n}に負けてしまった…`;
+  if(R.mode === "attack") title = R.newBest ? "最高記録を更新！" : "タイムアップ！";
+  if(R.mode === "review") title = "復習完了！";
+  const bossFace = R.mode === "boss" ? `<div style="font-size:64px;line-height:1;${R.win ? "opacity:.35;transform:rotate(180deg)" : ""}" aria-hidden="true">${U.boss.e}</div>` : "";
+  const again = R.mode === "attack" ? `<button class="btn primary" data-act="attack">もう一度</button>` :
+    R.mode === "review" ? (S.wrong.length ? `<button class="btn primary" data-act="start" data-m="review" data-u="0">続けて復習</button>` : "") :
+    `<button class="btn primary" data-act="start" data-m="${R.mode}" data-u="${R.uid}">もう一度</button>`;
+  const back = R.mode === "attack" || R.mode === "review" ? `<button class="btn" data-go="home">地図へ</button>` : `<button class="btn" data-go="unit" data-u="${R.uid}">Unit ${R.uid} へ</button>`;
+  const tip = R.mode === "boss" && !R.win ? `<p class="muted" style="margin:0">ポイント解説を見直してから、もう一度挑戦しよう。まちがえた問題はまちがいノートに入っています。</p>` : "";
+  app.innerHTML = `
+  <section class="result">
+    ${bossFace}
+    <h2>${esc(title)}</h2>
+    ${R.mode === "boss" && R.win ? `<div class="bigstars" aria-label="星${R.stars}個">${starStr(R.stars)}</div>` : ""}
+    ${tip}
+    <div class="stats">
+      <div class="stat"><b>${R.ok}/${R.total}</b><small>正解</small></div>
+      <div class="stat"><b>${R.maxCombo}</b><small>最大コンボ</small></div>
+      <div class="stat"><b>+${R.xp}</b><small>XP</small></div>
+    </div>
+    ${R.lvUp || R.newBadges.length ? `<div class="news">${R.lvUp ? `<div class="new">レベルアップ！ Lv ${R.lvUp}「${rankOf(R.lvUp)}」になった</div>` : ""}${R.newBadges.map(b => { const B = BADGES.find(x => x[0] === b); return `<div class="new">${B[1]} バッジ獲得「${B[2]}」</div>`; }).join("")}</div>` : ""}
+    ${R.mistakes.length ? `<div class="mist"><h3 class="sec-h" style="margin:4px 0 0">まちがえた問題</h3>${R.mistakes.slice(0, 10).map(({q, given}) => `
+      <div class="row"><small>${TAGS[q.kind]}・Unit ${q.uid}　${esc(q.listen ? q.reveal : q.prompt)}</small>
+      <span>あなたの答え <span class="${isJa(given) ? "" : "en"}" style="text-decoration:line-through">${esc(given || "（なし）")}</span></span>
+      <span>正解 <span class="${isJa(q.answer) ? "" : "en"}">${esc(q.answer)}</span></span></div>`).join("")}</div>` : ""}
+    <div class="btnrow">${again}${back}</div>
+  </section>`;
+}
+
+/* ============ まちがいノート ============ */
+function renderNote(){
+  const items = S.wrong.map(id => describeId(id)).filter(Boolean);
+  app.innerHTML = `
+  <div class="bar"><button class="link" data-go="home">← 地図にもどる</button></div>
+  <section class="lesson">
+    <h3>まちがいノート</h3>
+    <p>まちがえた問題がここにたまります。復習で正解すると、ノートから消えます。</p>
+    ${items.length ? `<button class="btn primary" data-act="start" data-m="review" data-u="0" style="justify-self:start">復習する（最大10問）</button>` : ""}
+    <div class="mist note-list">${items.length ? items.map(d => `<div class="row"><small>${d.tag}</small><span class="${isJa(d.q) ? "" : "en"}">${esc(d.q)}</span><span class="muted">正解 <span class="${isJa(d.a) ? "" : "en"}">${esc(d.a)}</span></span></div>`).join("") : '<p class="muted">まだありません。島で問題に挑戦しよう。</p>'}</div>
+  </section>`;
+}
+
+/* ============ バッジ ============ */
+function renderBadges(){
+  app.innerHTML = `
+  <div class="bar"><button class="link" data-go="home">← 地図にもどる</button><span class="muted">${S.badges.length} / ${BADGES.length}</span></div>
+  <h2 style="font-family:var(--f-display);font-weight:400;font-size:26px;margin:8px 0 14px">バッジ</h2>
+  <div class="badges">${BADGES.map(([id, ic, name, cond]) => `<div class="badge ${S.badges.includes(id) ? "" : "lock"}"><span class="ic" aria-hidden="true">${ic}</span><b>${name}</b><small>${cond}</small></div>`).join("")}</div>
+  <p class="foot">正解数 ${S.stats.ok}　最大コンボ ${S.stats.maxCombo}　ならべかえ正解 ${S.stats.order}</p>`;
+}
+
+/* ============ 自己紹介ポスター（Stage Activity） ============ */
+const POSTER_FIELDS = [
+  ["name","名前（Unit 1）","I'm","",".","Haruto"],
+  ["from","出身・住んでいる所（Unit 1）","I'm from","",".","Chiba"],
+  ["like","好きなもの（Unit 1）","I like","",".","baseball and ramen"],
+  ["can","できること（Unit 2）","I can","",".","play the drums"],
+  ["day","毎日すること（Unit 1・4）","I","every day",".","practice baseball"],
+  ["ask","みんなへの質問（Unit 1）","Do you like","","?","baseball"]
+];
+function renderPoster(){
+  const P = S.poster || {};
+  const val = f => P[f[0]] != null ? P[f[0]] : f[5];
+  app.innerHTML = `
+  <div class="bar"><button class="link" data-go="home">← 地図にもどる</button></div>
+  <section class="lesson">
+    <h3>"All about Me" ポスター</h3>
+    <p>Unit 1〜4 で学んだ英語を使って、自己紹介ポスターを作ろう。最初は例が入っています。自分のことに書きかえてね。</p>
+    <div class="form">${POSTER_FIELDS.map(f => `
+      <div class="field"><label for="pf-${f[0]}">${f[1]}</label>
+        <div class="frame"><span>${esc(f[2])}</span><input id="pf-${f[0]}" data-pf="${f[0]}" value="${esc(val(f))}" autocomplete="off" spellcheck="false"><span>${esc(f[3])}${f[4]}</span></div>
+        <span class="warn" id="pw-${f[0]}"></span></div>`).join("")}
+    </div>
+  </section>
+  <h3 class="sec-h">できあがり</h3>
+  <div class="poster" id="poster"></div>
+  <div class="btnrow" style="margin-top:14px">${canSpeak ? `<button class="btn primary" data-act="poster-say">🔊 読み上げる</button>` : ""}<button class="btn" data-act="poster-reset">例にもどす</button></div>`;
+  drawPoster();
+}
+function posterLines(){
+  const P = S.poster || {};
+  return POSTER_FIELDS.map(f => {
+    const v = (P[f[0]] != null ? P[f[0]] : f[5]).trim();
+    if(!v) return "";
+    return [f[2], v, f[3]].filter(Boolean).join(" ") + f[4];
+  }).filter(Boolean);
+}
+function drawPoster(){
+  const el = document.getElementById("poster");
+  if(!el) return;
+  const lines = posterLines();
+  el.innerHTML = `<h3>All about Me</h3>${lines.map(l => `<div class="lines"><span>${esc(l)}</span></div>`).join("")}`;
+  POSTER_FIELDS.forEach(f => {
+    const w = document.getElementById("pw-" + f[0]);
+    const v = (S.poster && S.poster[f[0]] != null) ? S.poster[f[0]] : f[5];
+    if(w) w.textContent = isJa(v) ? "英語（ローマ字）で書こう" : "";
+  });
+}
+
+/* ============ 紙ふぶき ============ */
+function confetti(){
+  if(window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const cv = document.getElementById("fx"); cv.hidden = false;
+  const ctx = cv.getContext("2d");
+  const W = cv.width = innerWidth, H = cv.height = innerHeight;
+  const cs = getComputedStyle(document.documentElement);
+  const cols = ["--accent","--ok","--deep","--ng","--u5"].map(v => cs.getPropertyValue(v).trim() || "#F2A900");
+  const ps = range(110).map(() => ({x:W/2 + (Math.random()-.5)*80, y:H*0.35, vx:(Math.random()-.5)*12, vy:-Math.random()*12-4, r:Math.random()*6+4, c:pick(cols), a:Math.random()*6}));
+  const t0 = performance.now();
+  (function f(t){
+    ctx.clearRect(0, 0, W, H);
+    ps.forEach(p => { p.vy += .35; p.x += p.vx; p.y += p.vy; p.a += .2; ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.a); ctx.fillStyle = p.c; ctx.fillRect(-p.r/2, -p.r/4, p.r, p.r/2); ctx.restore(); });
+    if(t - t0 < 2200) requestAnimationFrame(f); else { ctx.clearRect(0, 0, W, H); cv.hidden = true; }
+  })(t0);
+}
+
+/* ============ イベント ============ */
+document.addEventListener("click", e => {
+  const sayEl = e.target.closest("[data-say],[data-say-slow]");
+  if(sayEl){ speak(sayEl.dataset.say || sayEl.dataset.saySlow, !!sayEl.dataset.saySlow); return; }
+  const g = e.target.closest("[data-go]");
+  if(g){
+    SFX.tap();
+    const p = {};
+    if(g.dataset.u != null) p.u = +g.dataset.u;
+    if(g.dataset.i != null) p.i = +g.dataset.i;
+    if(g.dataset.go === "lesson" && p.i < 0) return;
+    if(view.name === "quiz" && Q) Q = null;
+    go(g.dataset.go, p);
+    return;
+  }
+  const a = e.target.closest("[data-act]");
+  if(!a) return;
+  const act = a.dataset.act;
+  if(act === "start"){ SFX.tap(); startQuiz(a.dataset.m, +a.dataset.u); return; }
+  if(act === "attack"){ SFX.tap(); startQuiz("attack", 0); return; }
+  if(act === "settings"){ view.settings = !view.settings; view.resetArm = false; render(); return; }
+  if(act === "t-sound"){ S.settings.sound = !S.settings.sound; save(); render(); SFX.tap(); return; }
+  if(act === "t-slow"){ S.settings.slow = !S.settings.slow; save(); render(); speak("Nice to meet you."); return; }
+  if(act === "reset"){
+    if(!view.resetArm){ view.resetArm = true; render(); return; }
+    S = defaults(); save(); view = {name:"home"}; render(); return;
+  }
+  if(act === "quit"){
+    if(!Q.quitArm){ Q.quitArm = true; a.textContent = "やめる？"; setTimeout(() => { if(Q && Q.quitArm){ Q.quitArm = false; const x = document.querySelector(".x"); if(x) x.textContent = "✕"; } }, 2500); return; }
+    const m = Q.mode, u = Q.uid; Q = null;
+    go(m === "attack" || m === "review" ? "home" : "unit", {u});
+    return;
+  }
+  if(act === "reveal"){ const r = document.getElementById("reveal"); if(r) r.textContent = cur().reveal; return; }
+  if(act === "ans"){ answer(cur().options[+a.dataset.k]); return; }
+  if(act === "next"){ next(); return; }
+  if(act === "o-in" || act === "o-out" || act === "o-clear"){
+    const q = cur(); if(Q.answered) return;
+    const k = +a.dataset.k;
+    if(act === "o-in" && !q.placed.includes(k)){ q.placed.push(k); SFX.tap(); const t = q.pool.find(x => x.k === k); if(t && S.settings.sound) speak(t.w); }
+    if(act === "o-out") q.placed = q.placed.filter(x => x !== k);
+    if(act === "o-clear") q.placed = [];
+    refreshOrder();
+    return;
+  }
+  if(act === "o-check"){
+    const q = cur();
+    const s = q.placed.map(k => q.pool.find(t => t.k === k).w).join(" ") + q.punct;
+    answer(s === q.answer ? q.answer : s);
+    return;
+  }
+  if(act === "poster-say"){ speak(posterLines().join(" ")); return; }
+  if(act === "poster-reset"){ S.poster = null; save(); renderPoster(); return; }
+});
+document.addEventListener("input", e => {
+  const f = e.target.dataset && e.target.dataset.pf;
+  if(!f) return;
+  S.poster = S.poster || {};
+  POSTER_FIELDS.forEach(pf => { if(S.poster[pf[0]] == null) S.poster[pf[0]] = pf[5]; });
+  S.poster[f] = e.target.value;
+  if(POSTER_FIELDS.every(pf => (S.poster[pf[0]] || "").trim() && !isJa(S.poster[pf[0]])) && POSTER_FIELDS.some(pf => S.poster[pf[0]] !== pf[5])){
+    if(!S.badges.includes("poster")) S.badges.push("poster");
+  }
+  save(); drawPoster();
+});
+document.addEventListener("keydown", e => {
+  if(view.name !== "quiz" || !Q || e.target.tagName === "INPUT") return;
+  const q = cur();
+  if(!Q.answered && q.kind !== "order" && /^[1-4]$/.test(e.key)){
+    const o = q.options[+e.key - 1]; if(o != null) answer(o);
+  }
+});
+
+render();
+</script>
+</body>
+</html>
