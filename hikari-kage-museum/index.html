@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>光とかげの美術館</title>
-<meta name="description" content="中学1年美術の鑑賞（レオナルド・ダ・ヴィンチと明暗のドラマ）を、ヒントクイズ・実験・コレクションで楽しく覚える無料のブラウザゲーム。">
+<meta name="description" content="教科書の名画を、絵と題名で楽しく覚える。絵を見て題名、ぼかしあて、神経衰弱など。中学1年美術（レオナルド・ダ・ヴィンチと明暗のドラマ）の無料ブラウザゲーム。">
 <meta name="theme-color" content="#171326">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon-192.png" type="image/png">
@@ -14,9 +14,7 @@
 <meta name="apple-mobile-web-app-title" content="光とかげ">
 <meta property="og:type" content="website">
 <meta property="og:title" content="光とかげの美術館">
-<meta property="og:description" content="レオナルドと光の画家たちの作品を、ヒントクイズや光の実験で楽しく覚えよう。">
-<meta property="og:image" content="__SITE__/og.png">
-<meta property="og:url" content="__SITE__/">
+<meta property="og:description" content="教科書の名画を、絵と題名で楽しく覚えよう。ぼかしあて・神経衰弱・フラッシュカードで遊べる。">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -261,6 +259,50 @@ h1,h2,h3{margin:0;text-wrap:balance}
 .dl dt{color:var(--ink-soft);font-weight:700;font-size:12px;padding-top:2px}
 .dl dd{margin:0;min-width:0;overflow-wrap:anywhere}
 
+/* 作品の画像まわり */
+.pic{margin:0;background:#0d0b16;border-radius:14px;overflow:hidden;display:grid;place-items:center;border:2px solid var(--ink)}
+.pic img{display:block;max-width:100%;max-height:min(46vh,440px);width:auto;height:auto}
+.pic.sm img{max-height:min(30vh,260px)}
+.sheet .pic img{max-height:22vh}
+.zoom{aspect-ratio:4/3;border-radius:14px;border:2px solid var(--ink);background-color:#0d0b16;background-repeat:no-repeat}
+.zoom.full{background-size:contain!important;background-position:center!important}
+.opts.pics{grid-template-columns:1fr 1fr}
+.opts.pics .opt{flex-direction:column;align-items:stretch;gap:6px;padding:6px;min-height:0;position:relative;font-weight:700}
+.opts.pics .opt .k{position:absolute;top:10px;left:10px;z-index:1;background:var(--panel)}
+.opts.pics .opt img{width:100%;aspect-ratio:4/3;object-fit:contain;border-radius:8px;background:#0d0b16;display:block}
+.opts.pics .opt .cap{display:none;font-size:12px;line-height:1.45;padding:0 4px 2px}
+.opts.pics.rev .opt .cap{display:block}
+.study{display:grid;gap:10px;grid-template-columns:1fr}
+@media (min-width:560px){.study{grid-template-columns:1fr 1fr}}
+.big{text-align:left;background:var(--ink);color:var(--wall);border:2px solid var(--ink);border-radius:16px;padding:16px 18px;display:grid;gap:4px;box-shadow:0 4px 0 var(--lamp)}
+.big:active{transform:translateY(3px);box-shadow:none}
+.big b{font-family:var(--f-display);font-size:20px}
+.big small{font-size:13px;opacity:.85;line-height:1.55}
+.mini{grid-template-columns:repeat(auto-fill,minmax(64px,1fr))}
+.mt{padding:0;border:2px solid var(--line);border-radius:6px;overflow:hidden;background:#0d0b16;aspect-ratio:3/2}
+.mt img{display:block;width:100%;height:100%;object-fit:cover}
+.mt.dim img{filter:brightness(.72) saturate(.55)}
+.mt.mid{border-color:var(--lamp)}
+.mt.gold{border-color:var(--gold);box-shadow:0 0 0 2px var(--lamp)}
+.plate.w2{font-size:21px}
+.gtoggle{margin:4px 0 14px;background:var(--panel);border:1.5px solid var(--line);border-radius:14px;padding:10px 14px}
+.cc img{width:100%;aspect-ratio:4/3;object-fit:contain;background:#0d0b16;border-radius:8px;display:block}
+.ugrid .ucard{background:none;border:0;padding:0;color:inherit;font:inherit;display:grid;gap:4px;text-align:left;font-size:12px;font-weight:700}
+.ugrid .ucard img{width:100%;aspect-ratio:4/3;object-fit:contain;background:#0d0b16;border-radius:6px;border:2px solid var(--gold);display:block}
+.oc.t{grid-template-columns:auto 1fr;column-gap:10px;align-items:center}
+.oc.t img{grid-row:span 2;width:56px;height:56px;object-fit:cover;border-radius:8px;background:#0d0b16;display:block}
+.mgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+@media (min-width:520px){.mgrid{grid-template-columns:repeat(4,1fr)}}
+.mc{aspect-ratio:1;border-radius:12px;border:2px solid var(--line);background:var(--hero-bg);color:var(--hero-ink);display:grid;place-items:center;padding:0;overflow:hidden;font-weight:700;font-size:13px;line-height:1.4;min-width:0}
+.mc .back{font-family:var(--f-display);font-size:30px;color:var(--lamp)}
+.mc img{width:100%;height:100%;object-fit:cover;display:block}
+.mc.t{background:var(--gold-soft);color:var(--gold-ink);padding:6px;text-align:center}
+.mc.up{border-color:var(--lamp)}
+.mc.done{border-color:var(--ok);opacity:.55}
+.mc:disabled{cursor:default}
+.artcap{font-size:12px;color:var(--ink-soft)}
+.util{grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}
+
 canvas#fx{position:fixed;inset:0;pointer-events:none;z-index:50;width:100%;height:100%}
 @media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
 </style>
@@ -282,67 +324,68 @@ const ARTISTS = {
   ver:{n:"ヨハネス・フェルメール", s:"フェルメール", yrs:"1632〜75年", land:"オランダ"},
   tai:{n:"横山大観", s:"横山大観", yrs:"1868〜1958年", land:"茨城県"}
 };
-const P = (bg, mid, hi, acc, ink) => ({bg, mid, hi, acc, ink});
 const WORKS = [
- {id:"mona", t:"モナ・リザ", a:"leo", k:"絵画", y:"1503〜06年ごろ", y0:1503, tech:"油彩", full:"油彩、板", size:[77,53], place:"ルーヴル美術館", land:"フランス", pg:110, motif:"portrait", l:[.5,.36], pal:P("#1F1F14","#5C5A36","#E2C58E","#7FA39C"),
+ {id:"mona", t:"モナ・リザ", a:"leo", k:"絵画", y:"1503〜06年ごろ", y0:1503, tech:"油彩", full:"油彩、板", size:[77,53], place:"ルーヴル美術館", land:"フランス", pg:110,
   sum:"輪郭線を描かないスフマートと、青みを帯びる空気遠近法でえがかれた肖像画。",
   hints:["レオナルドの作品。画材は油彩で、板に描かれている。","輪郭線を描かないぼかし技法で立体感を出し、背景は遠ざかるほど淡く青みを帯びる。","ルーヴル美術館（フランス）にあり、大きさは77×53cm。1503〜06年ごろの作品。"]},
- {id:"last", t:"最後の晩餐", a:"leo", k:"絵画", y:"1495〜98年", y0:1495, tech:"テンペラ", full:"テンペラ、壁", size:[420,910], place:"サンタ・マリア・デッレ・グラツィエ教会", land:"イタリア", pg:110, motif:"hall", l:[.5,.45], pal:P("#2E2820","#8A7F6A","#EBE1C8","#7C90B6"),
+ {id:"last", t:"最後の晩餐", a:"leo", k:"絵画", y:"1495〜98年", y0:1495, tech:"テンペラ", full:"テンペラ、壁", size:[420,910], place:"サンタ・マリア・デッレ・グラツィエ教会", land:"イタリア", pg:110,
   sum:"一点透視図法で空間をえがき、人物を三人一組で演出した壁画。世界遺産。",
   hints:["壁に描かれた、横が9m以上もある大作。","一点透視図法で空間を表し、人物を三人一組で劇的に演出している。視線と手の表情で心理を描く。","イタリアのサンタ・マリア・デッレ・グラツィエ教会にあり、世界遺産。1495〜98年の作品。"]},
- {id:"annun", t:"受胎告知", a:"leo", k:"絵画", y:"1472〜75年ごろ", y0:1472, tech:null, full:null, size:null, place:"ウフィツィ美術館", land:"イタリア", pg:110, motif:"portrait", l:[.62,.38], pal:P("#233322","#587049","#EADDB0","#A8433D"),
+ {id:"annun", t:"受胎告知", a:"leo", k:"絵画", y:"1472〜75年ごろ", y0:1472, tech:null, full:null, size:null, place:"ウフィツィ美術館", land:"イタリア", pg:110,
   sum:"20歳のころの作品。人物や植物、背景の表現にレオナルドの特徴が表れている。",
   hints:["レオナルドが20歳のころに描いた作品。","人物や植物、背景の表現に、レオナルドの作品の特徴が確認できる。","ウフィツィ美術館（イタリア）にある。1472〜75年ごろ。"]},
- {id:"jerome", t:"聖ヒエロニムス", a:"leo", k:"絵画", y:"1480〜82年ごろ", y0:1480, tech:null, full:null, size:null, place:"バチカン美術館", land:"バチカン", pg:110, motif:"portrait", l:[.46,.34], pal:P("#3A2418","#9A5B2A","#E8B56C","#6E7B8B"),
+ {id:"jerome", t:"聖ヒエロニムス", a:"leo", k:"絵画", y:"1480〜82年ごろ", y0:1480, tech:null, full:null, size:null, place:"バチカン美術館", land:"バチカン", pg:110,
   sum:"28歳ごろの未完の作品。人物表現に解剖学の成果が見られる。",
   hints:["レオナルドが28歳ごろに手がけた未完の作品。","砂漠で苦行する聖人に、レオナルド自身の姿を投影している。人物表現に解剖学の成果が見られる。","バチカン美術館（バチカン）にある。1480〜82年ごろ。"]},
- {id:"ermine", t:"白貂を抱く婦人", a:"leo", k:"絵画", y:"1485〜90年ごろ", y0:1485, tech:null, full:null, size:null, place:"チャルトリスキ美術館", land:"ポーランド", pg:111, motif:"portrait", l:[.44,.4], pal:P("#14110F","#3A2A24","#E8C9A5","#EFE9DF"),
+ {id:"ermine", t:"白貂を抱く婦人", a:"leo", k:"絵画", y:"1485〜90年ごろ", y0:1485, tech:null, full:null, size:null, place:"チャルトリスキ美術館", land:"ポーランド", pg:111,
   sum:"優美で気品がある肖像画。手や動物の表現に観察眼の鋭さがうかがえる。",
   hints:["レオナルドが33〜38歳ごろに描いた、優美で気品のある肖像画。","手や動物の表現に、レオナルドの観察眼の鋭さがうかがえる。","ポーランドのチャルトリスキ美術館にある。女性がかかえているのは白い貂（てん）。"]},
- {id:"anne", t:"聖アンナと聖母子", a:"leo", k:"絵画", y:"1510年ごろ", y0:1510, tech:null, full:null, size:null, place:"ルーヴル美術館", land:"フランス", pg:111, motif:"triangle", l:[.5,.3], pal:P("#43362A","#788A76","#E3CB9C","#5E7FA3"),
+ {id:"anne", t:"聖アンナと聖母子", a:"leo", k:"絵画", y:"1510年ごろ", y0:1510, tech:null, full:null, size:null, place:"ルーヴル美術館", land:"フランス", pg:111,
   sum:"マリアとアンナと幼いキリストが、三角形にまとまった構図でえがかれている。",
   hints:["レオナルドが58歳ごろ（1510年ごろ）に描いた作品。","幼いキリストを抱き寄せるマリアと、二人を見つめるアンナが、三角形にまとまった構図で描かれている。","ルーヴル美術館（フランス）にある。"]},
- {id:"john", t:"洗礼者ヨハネ", a:"leo", k:"絵画", y:"1513〜16年ごろ", y0:1513, tech:null, full:null, size:null, place:"ルーヴル美術館", land:"フランス", pg:111, motif:"portrait", l:[.52,.36], pal:P("#1B1410","#6B4A2B","#E6B979","#C4A07A"),
+ {id:"john", t:"洗礼者ヨハネ", a:"leo", k:"絵画", y:"1513〜16年ごろ", y0:1513, tech:null, full:null, size:null, place:"ルーヴル美術館", land:"フランス", pg:111,
   sum:"レオナルド最後の作品。不思議な笑みをスフマートの技法で表現している。",
   hints:["レオナルド最後の作品。61〜64歳ごろに描かれた。","不思議な笑みをたたえた表情が、スフマートの技法で表現されている。","ルーヴル美術館（フランス）にある。1513〜16年ごろ。"]},
- {id:"self", t:"自画像（部分）", a:"leo", k:"素描", y:"1512〜13年ごろ", y0:1512, tech:null, full:null, size:null, place:"トリノ王立図書館", land:"イタリア", pg:110, motif:"sk-chalk", l:[.5,.4], pal:P("#E7CFA8","#D2AE7C","#F6E9CF","#9A4A2C","#8A3F25"),
+ {id:"self", t:"自画像（部分）", a:"leo", k:"素描", y:"1512〜13年ごろ", y0:1512, tech:null, full:null, size:null, place:"トリノ王立図書館", land:"イタリア", pg:110,
   sum:"60歳前後のレオナルドの姿。赤茶色の線でえがかれている。",
   hints:["レオナルド自身の姿をえがいた作品（部分）。","1512〜13年ごろ、レオナルドが60歳前後のころの作品。","トリノ王立図書館（イタリア）にある。"]},
- {id:"anat", t:"肩の筋肉の解剖図", a:"leo", k:"素描", y:"1510〜11年ごろ", y0:1510, tech:"ペン・インク", full:"ペン・インク、紙", size:[29.2,19.8], place:"ウィンザー城王立図書館", land:"イギリス", pg:111, motif:"sk-anatomy", l:[.4,.4], pal:P("#E6D3AC","#CDB083","#F4E8CB","#6B3F20","#5A3418"),
+ {id:"anat", t:"肩の筋肉の解剖図", a:"leo", k:"素描", y:"1510〜11年ごろ", y0:1510, tech:"ペン・インク", full:"ペン・インク、紙", size:[29.2,19.8], place:"ウィンザー城王立図書館", land:"イギリス", pg:111,
   sum:"体のしくみを観察して記録した手稿。まわりに鏡文字の書き込みがある。",
   hints:["ペンとインクで紙に描かれた手稿のひとつ。","肩の筋肉のようすを観察して描いた図。まわりに鏡文字の書き込みがある。","ウィンザー城王立図書館（イギリス）にある。1510〜11年ごろ。"]},
- {id:"heli", t:"ヘリコプターの習作（部分）", a:"leo", k:"素描", y:"1483〜90年ごろ", y0:1483, tech:"ペン・インク", full:"ペン・インク、紙", size:[23.3,16.6], place:"国立レオナルド・ダ・ヴィンチ科学技術博物館", land:"イタリア", pg:111, motif:"sk-spiral", l:[.42,.4], pal:P("#E8D6AF","#D0B484","#F5EACB","#5E3A1E","#503119"),
+ {id:"heli", t:"ヘリコプターの習作（部分）", a:"leo", k:"素描", y:"1483〜90年ごろ", y0:1483, tech:"ペン・インク", full:"ペン・インク、紙", size:[23.3,16.6], place:"国立レオナルド・ダ・ヴィンチ科学技術博物館", land:"イタリア", pg:111,
   sum:"時代を先取りした発明家の一面を示すスケッチ。のちに模型が再現された。",
   hints:["レオナルドが考えた、空を飛ぶ機械のスケッチ。","ペン・インクで紙に描かれた。この図をもとに模型が再現されている。","国立レオナルド・ダ・ヴィンチ科学技術博物館（イタリア）にある。1483〜90年ごろ。"]},
- {id:"water", t:"水流のスケッチ（部分）", a:"leo", k:"素描", y:"1508〜10年ごろ", y0:1508, tech:"ペン・インク", full:"ペン・インク、紙", size:[29,20.2], place:"ウィンザー城王立図書館", land:"イギリス", pg:111, motif:"sk-swirl", l:[.5,.5], pal:P("#E5D2AA","#CBAE80","#F3E7C8","#5B3A22","#4B2F1B"),
+ {id:"water", t:"水流のスケッチ（部分）", a:"leo", k:"素描", y:"1508〜10年ごろ", y0:1508, tech:"ペン・インク", full:"ペン・インク、紙", size:[29,20.2], place:"ウィンザー城王立図書館", land:"イギリス", pg:111,
   sum:"うずまく水を観察して描いたスケッチ。レオナルドの探究心を示す。",
   hints:["レオナルドが自然を観察して描いたスケッチ。","うずを巻いて流れる水のようすを、ペン・インクで描いている。","ウィンザー城王立図書館（イギリス）にある。1508〜10年ごろ。"]},
- {id:"pump", t:"揚水機のスケッチ（部分）", a:"leo", k:"素描", y:"1480〜82年ごろ", y0:1480, tech:"ペン・インク", full:"ペン・インク、紙", size:null, place:"アンブロジアーナ図書館", land:"イタリア", pg:111, motif:"sk-wheel", l:[.4,.5], pal:P("#E6D4AD","#CDB284","#F4E9CC","#5A381D","#4D301A"),
+ {id:"pump", t:"揚水機のスケッチ（部分）", a:"leo", k:"素描", y:"1480〜82年ごろ", y0:1480, tech:"ペン・インク", full:"ペン・インク、紙", size:null, place:"アンブロジアーナ図書館", land:"イタリア", pg:111,
   sum:"水をくみ上げる機械を考えたスケッチ。工学への関心を示す。",
   hints:["水をくみ上げる機械を考えた手稿。","歯車や水車のような部品が、ペン・インクで描かれている。","アンブロジアーナ図書館（イタリア）にある。1480〜82年ごろ。"]},
- {id:"dogcat", t:"犬と猫の習作（部分）", a:"leo", k:"素描", y:"1467〜1519年", y0:1467, tech:"メタルポイント", full:"メタルポイント、紙", size:[13.9,10.4], place:"大英博物館", land:"イギリス", pg:111, motif:"sk-animals", l:[.45,.5], pal:P("#E7D5B0","#CFB487","#F5EACD","#6A4526","#5A3A20"),
+ {id:"dogcat", t:"犬と猫の習作（部分）", a:"leo", k:"素描", y:"1467〜1519年", y0:1467, tech:"メタルポイント", full:"メタルポイント、紙", size:[13.9,10.4], place:"大英博物館", land:"イギリス", pg:111,
   sum:"動物のさまざまなポーズを観察した小さな習作。",
   hints:["動物をじっくり観察して描いた習作。","メタルポイントという画材で、紙に小さく描かれている。","大英博物館（イギリス）にある。大きさは13.9×10.4cm。"]},
- {id:"study", t:"「最後の晩餐」のための習作", a:"leo", k:"素描", y:"1495〜97年ごろ", y0:1495, tech:"サンギュイン", full:"サンギュイン、紙", size:null, place:"アカデミア美術館", land:"イタリア", pg:111, motif:"sk-chalk2", l:[.5,.5], pal:P("#EAD8B9","#D6B88C","#F7EBD2","#A5472F","#9B3F29"),
+ {id:"study", t:"「最後の晩餐」のための習作", a:"leo", k:"素描", y:"1495〜97年ごろ", y0:1495, tech:"サンギュイン", full:"サンギュイン、紙", size:null, place:"アカデミア美術館", land:"イタリア", pg:111,
   sum:"名画をつくるための下絵。人物の配置や表情を練っている。",
   hints:["大きな壁画をつくる前に描いた下絵（習作）。","サンギュインという赤茶色の画材で、紙に描かれた。","アカデミア美術館（イタリア）にある。1495〜97年ごろ。"]},
- {id:"night", t:"夜警", a:"rem", k:"絵画", y:"1642年", y0:1642, tech:"油彩", full:"油彩、キャンヴァス", size:[379.5,453.5], place:"アムステルダム国立美術館", land:"オランダ", pg:112, motif:"group", l:[.5,.52], pal:P("#1A1510","#5A4730","#F0C45A","#B23A2E"),
+ {id:"night", t:"夜警", a:"rem", k:"絵画", y:"1642年", y0:1642, tech:"油彩", full:"油彩、キャンヴァス", size:[379.5,453.5], place:"アムステルダム国立美術館", land:"オランダ", pg:112,
   sum:"出動する自警団を、スポットライトを当てたように浮かび上がらせた集団肖像画。",
   hints:["1642年にオランダの画家が描いた、縦横3m以上の大きな作品。","今まさに出動しようとする自警団を描いた集団肖像画。","スポットライトを当てたように人物を浮かび上がらせている。アムステルダム国立美術館にある。"]},
- {id:"folies", t:"フォリー・ベルジェールのバー", a:"man", k:"絵画", y:"1882年", y0:1882, tech:"油彩", full:"油彩、キャンヴァス", size:[96,130], place:"コートールド美術館", land:"イギリス", pg:113, motif:"bar", l:[.5,.2], pal:P("#241C33","#5B4A67","#F4E3C4","#E8892B"),
+ {id:"folies", t:"フォリー・ベルジェールのバー", a:"man", k:"絵画", y:"1882年", y0:1882, tech:"油彩", full:"油彩、キャンヴァス", size:[96,130], place:"コートールド美術館", land:"イギリス", pg:113,
   sum:"背後ににぎやかな店内が鏡に映る。ガラスやシャンデリアの輝きが華やかさを盛り上げる。",
   hints:["1882年に描かれた、フランスの画家の作品。","カウンターにたたずむ女性の背後に、鏡に映ったにぎやかな店内が描かれている。","ガラスやシャンデリアの輝きが場の華やかさを盛り上げる。コートールド美術館（イギリス）にある。"]},
- {id:"joseph", t:"大工の聖ヨセフ", a:"tou", k:"絵画", y:"1640年ころ", y0:1640, tech:"油彩", full:"油彩、キャンヴァス", size:[137,102], place:"ルーヴル美術館", land:"フランス", pg:113, motif:"candle", l:[.52,.5], pal:P("#0C0A09","#2A1810","#FF9E3D","#FFD08A"),
+ {id:"joseph", t:"大工の聖ヨセフ", a:"tou", k:"絵画", y:"1640年ころ", y0:1640, tech:"油彩", full:"油彩、キャンヴァス", size:[137,102], place:"ルーヴル美術館", land:"フランス", pg:113,
   sum:"闇の中で、ろうそくの光が人物を照らし出している。",
   hints:["1640年ころにフランスの画家が描いた作品。","まわりは闇で、ろうそくの光が人物を照らし出している。","ルーヴル美術館（フランス）にある。大きさは137×102cm。"]},
- {id:"milk", t:"牛乳を注ぐ女", a:"ver", k:"絵画", y:"1658〜59年", y0:1658, tech:"油彩", full:"油彩、キャンヴァス", size:[45.5,41], place:"アムステルダム国立美術館", land:"オランダ", pg:113, motif:"window", l:[.16,.3], pal:P("#B9AE94","#D3C8AE","#FBEFC8","#2F4F9B"),
+ {id:"milk", t:"牛乳を注ぐ女", a:"ver", k:"絵画", y:"1658〜59年", y0:1658, tech:"油彩", full:"油彩、キャンヴァス", size:[45.5,41], place:"アムステルダム国立美術館", land:"オランダ", pg:113,
   sum:"45.5×41cmの小さな画面に、台所の静かな光をとらえた作品。",
   hints:["1658〜59年ごろに描かれた、45.5×41cmの小さな作品。","オランダの画家の作品。台所で女性が壺から器へ、何かをそそいでいる。","アムステルダム国立美術館にある。作者はヨハネス・フェルメール。"]},
- {id:"yoz", t:"夜桜", a:"tai", k:"絵画", y:"1929年", y0:1929, tech:"紙本着色", full:"紙本着色／六曲一双のうち左隻", size:[177.5,376.8], place:"大倉集古館", land:"日本（東京都）", pg:113, motif:"blossom", l:[.82,.16], pal:P("#0F1A22","#1F3340","#F4E6A8","#2F6B4B"),
+ {id:"yoz", t:"夜桜", a:"tai", k:"絵画", y:"1929年", y0:1929, tech:"紙本着色", full:"紙本着色／六曲一双のうち左隻", size:[177.5,376.8], place:"大倉集古館", land:"日本（東京都）", pg:113,
   sum:"満月とかがり火に照らされ、桜の花が白く幻想的に浮かび上がる。",
   hints:["日本の画家が1929年に描いた、紙本着色の作品。","六曲一双の屏風のうち左隻。満月のもと、かがり火に照らされて花が白く浮かび上がる。","東京都の大倉集古館にある。作者は横山大観。"]}
 ];
 const W = Object.fromEntries(WORKS.map(w => [w.id, w]));
+const IMGDIM = {"folies":[1052,830],"joseph":[496,612],"milk":[616,685],"yoz":[1078,504],"night":[1100,933],"anat":[392,663],"heli":[608,395],"water":[403,342],"pump":[469,340],"dogcat":[343,416],"study":[644,417],"ermine":[331,396],"anne":[276,412],"john":[381,479],"self":[168,158],"mona":[407,636],"last":[1100,587],"annun":[598,273],"jerome":[279,407]};
+WORKS.forEach(w => { w.img = "img/" + w.id + ".jpg"; w.sm = "img/s/" + w.id + ".jpg"; w.iw = IMGDIM[w.id][0]; w.ih = IMGDIM[w.id][1]; w.zoomOk = w.id !== "self"; });
 const PAINT = WORKS.filter(w => w.k === "絵画");
 const SIZED = PAINT.filter(w => w.size);
 const area = w => w.size[0] * w.size[1];
@@ -405,7 +448,7 @@ light:[
  {q:"「フォリー・ベルジェールのバー」（1882年）が描かれたころ、日本は何時代？", a:"明治時代", x:["江戸時代","大正時代","昭和時代"], why:"1882年は明治15年。明治時代は1868年から1912年まで。", work:"folies", pg:112},
  {q:"「夜桜」（1929年）が描かれたころ、日本は何時代？", a:"昭和時代", x:["明治時代","大正時代","江戸時代"], why:"1929年は昭和4年。昭和時代は1926年に始まった。", work:"yoz", pg:112}
 ]};
-const TAGNAME = {leo:"レオナルド", tech:"技法", light:"光とかげ", g:"作品データ", h:"ヒントクイズ", o:"ならべかえ", l:"光のラボ"};
+const TAGNAME = {leo:"レオナルド", tech:"技法", light:"光とかげ", g:"作品データ", h:"ヒントクイズ", o:"ならべかえ", l:"光のラボ", pic2title:"絵→題名", blur:"ぼかしあて", zoom:"ズーム", t2p:"題名→絵", match:"神経衰弱"};
 const LABS = [
   {id:"sfu", n:"スフマート", t:"輪郭線を消して、ぼかしてみよう"},
   {id:"air", n:"空気遠近法", t:"遠くの山を、かすませてみよう"},
@@ -417,14 +460,20 @@ const ARROW = {"右":"→","右上":"↗","上":"↑","左上":"↖","左":"←"
 const OPP = {"右":"左","右上":"左下","上":"下","左上":"右下","左":"右","左下":"右上","下":"上","右下":"左上"};
 const RANKS = [[0,"見習い学芸員"],[120,"学芸員補"],[320,"学芸員"],[600,"主任学芸員"],[1000,"館長"]];
 const ROOMS = [
-  {id:"hint", n:1, t:"この作品なーんだ", d:"ヒントを1つずつひらいて、作品名を当てる。少ないヒントで当てるほど高得点。", meta:"6問"},
-  {id:"leo", n:2, t:"レオナルドの人生", d:"生い立ち、発明、手稿。○×と4択で確かめる。", meta:"8問"},
-  {id:"data", n:3, t:"作者・美術館・年代", d:"作品のデータを、ぬけなく覚える。", meta:"10問"},
-  {id:"order", n:4, t:"ならべかえ", d:"年代順と大きさ順に、カードをならべる。", meta:"4回"},
-  {id:"lab", n:5, t:"技法ラボ", d:"スフマートや透視図法を、さわって試す。", meta:"4つの実験"},
-  {id:"light", n:6, t:"光のラボ", d:"光を動かして、かげの向きを読みとる。", meta:"6問"},
-  {id:"exam", n:7, t:"学芸員試験", d:"全室の総まとめ。ライフは3つ。", meta:"12問"}
+  {id:"pic", n:1, g:0, t:"絵を見て、題名", d:"絵が出る。題名を4つから選ぶ。まずはここから。", meta:"8問"},
+  {id:"t2p", n:2, g:0, t:"題名から、絵を選ぶ", d:"題名が出る。4枚の絵から、正しい1枚を選ぶ。", meta:"8問"},
+  {id:"blur", n:3, g:0, t:"ぼかしあてクイズ", d:"ぼやけた絵が、だんだんはっきりする。早く当てるほど高得点。", meta:"6問"},
+  {id:"zoom", n:4, g:0, t:"ズームクイズ", d:"絵の一部だけが見える。どの作品か当てる。", meta:"6問"},
+  {id:"match", n:5, g:0, t:"神経衰弱", d:"絵と題名のペアを探す。12枚のカード。", meta:"6ペア"},
+  {id:"hint", n:6, g:0, t:"この作品なーんだ", d:"ヒントを1つずつひらいて、作品名を当てる。", meta:"6問"},
+  {id:"data", n:7, g:1, t:"作者・美術館・年代", d:"作品のデータを、絵を見ながら覚える。", meta:"10問"},
+  {id:"leo", n:8, g:1, t:"レオナルドの人生", d:"生い立ち、発明、手稿。○×と4択で確かめる。", meta:"8問"},
+  {id:"order", n:9, g:1, t:"ならべかえ", d:"年代順と大きさ順に、絵のカードをならべる。", meta:"4回"},
+  {id:"lab", n:10, g:2, t:"技法ラボ", d:"スフマートや透視図法を、さわって試す。", meta:"4つの実験"},
+  {id:"light", n:11, g:2, t:"光のラボ", d:"光を動かして、かげの向きを読みとる。", meta:"6問"},
+  {id:"exam", n:12, g:3, t:"学芸員試験", d:"全室の総まとめ。ライフは3つ。", meta:"12問"}
 ];
+const GROUPS = ["絵と題名を覚える","作品のことを知る","技法と光を体験する","総まとめ"];
 
 /* ================= 小道具 ================= */
 const app = document.getElementById("app"), sheetRoot = document.getElementById("sheet"), modalRoot = document.getElementById("modal");
@@ -477,7 +526,7 @@ const SFX = {
   lamp:() => tone([[440,.08,0,"sine",.08],[587,.1,.06,"sine",.08]])
 };
 
-/* ================= 作品の「色と光のイメージ」（実物ではなく、色と光の配置を描いたもの） ================= */
+/* ================= 描画の小道具 ================= */
 function rng(seed){ let a = seed >>> 0; return () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
 function hashStr(s){ let h = 2166136261; for(const ch of s){ h ^= ch.charCodeAt(0); h = Math.imul(h, 16777619); } return h >>> 0; }
 const hexRGB = h => { const n = parseInt(h.slice(1), 16); return [n>>16&255, n>>8&255, n&255]; };
@@ -487,164 +536,14 @@ function vgrad(c, W, H, top, bot){ const g = c.createLinearGradient(0,0,0,H); g.
 function glow(c, W, H, x, y, rad, col, a){ const g = c.createRadialGradient(x,y,0,x,y,rad); g.addColorStop(0, rgba(col, a)); g.addColorStop(1, rgba(col, 0)); c.fillStyle = g; c.fillRect(0,0,W,H); }
 const TAU = Math.PI * 2;
 function ell(c, x, y, rx, ry){ c.beginPath(); c.ellipse(x, y, rx, ry, 0, 0, TAU); }
-function parch(c, W, H, p, r){ vgrad(c, W, H, p.mid, p.bg); for(let i=0;i<260;i++){ c.fillStyle = rgba(p.ink, .04 + .05*r()); c.fillRect(r()*W, r()*H, 1 + r()*2, 1 + r()*2); } }
-function mirrorText(c, x, y, w, n, p, r){
-  c.strokeStyle = rgba(p.ink, .55); c.lineWidth = 1.2;
-  for(let i=0;i<n;i++){ const yy = y + i*9; let len = 0; c.beginPath(); while(len < w-6){ const s = 3 + r()*9; c.moveTo(x+w-len, yy); c.lineTo(x+w-len-s, yy + (r()-.5)*2); len += s + 3; } c.stroke(); }
-}
-const MOTIF = {
- portrait(c,W,H,p,r,lx,ly){
-  vgrad(c,W,H,p.mid,p.bg);
-  for(let k=0;k<3;k++){ c.fillStyle = rgba(p.acc, .16 + .08*k); c.beginPath(); c.moveTo(0,H*.75); for(let x=0;x<=W;x+=20) c.lineTo(x, H*(.5+.06*k) - 18*r()); c.lineTo(W,H*.75); c.fill(); }
-  glow(c,W,H,lx,ly,H*.75,p.hi,.55);
-  c.fillStyle = mix(p.bg,"#000000",.35); ell(c,W*.5,H*1.02,W*.3,H*.36); c.fill();
-  c.fillStyle = rgba(p.acc,.75); ell(c,W*.5,H*1.05,W*.26,H*.3); c.fill();
-  const g = c.createRadialGradient(lx,ly,4,W*.5,H*.42,H*.26); g.addColorStop(0,p.hi); g.addColorStop(1,mix(p.hi,p.bg,.7));
-  c.fillStyle = g; ell(c,W*.5,H*.42,W*.095,H*.19); c.fill();
-  c.fillStyle = mix(p.bg,"#000000",.5); c.beginPath(); c.ellipse(W*.5,H*.3,W*.11,H*.13,0,Math.PI,0); c.fill();
- },
- hall(c,W,H,p,r){
-  vgrad(c,W,H,p.mid,p.bg);
-  c.fillStyle = mix(p.mid,p.hi,.25); c.fillRect(W*.3,H*.18,W*.4,H*.38);
-  for(let i=0;i<3;i++){ c.fillStyle = rgba(p.acc,.8); c.fillRect(W*(.36+i*.11),H*.24,W*.07,H*.17); }
-  c.strokeStyle = rgba(p.hi,.35); c.lineWidth = 1.5;
-  [[0,0,W*.3,H*.18],[W,0,W*.7,H*.18],[0,H,W*.3,H*.56],[W,H,W*.7,H*.56]].forEach(l => { c.beginPath(); c.moveTo(l[0],l[1]); c.lineTo(l[2],l[3]); c.stroke(); });
-  c.fillStyle = mix(p.hi,p.bg,.15); c.fillRect(W*.1,H*.6,W*.8,H*.1);
-  const cols = [p.acc,p.mid,p.hi,"#9A6F4A"];
-  for(let i=0;i<13;i++){ const x = W*(.14+i*.06), c0 = cols[i%4]; c.fillStyle = c0; c.fillRect(x-6,H*.5,12,H*.12); c.fillStyle = p.hi; c.beginPath(); c.arc(x,H*.47,5,0,TAU); c.fill(); }
-  glow(c,W,H,W*.5,H*.5,H*.5,p.hi,.45);
- },
- triangle(c,W,H,p,r,lx,ly){
-  vgrad(c,W,H,p.mid,p.bg);
-  for(let k=0;k<2;k++){ c.fillStyle = rgba(p.acc,.18+.1*k); c.beginPath(); c.moveTo(0,H*.7); for(let x=0;x<=W;x+=24) c.lineTo(x,H*(.45+.08*k)-16*r()); c.lineTo(W,H*.7); c.fill(); }
-  glow(c,W,H,lx,ly,H*.8,p.hi,.5);
-  c.fillStyle = rgba(p.acc,.75); c.beginPath(); c.moveTo(W*.12,H*1.02); c.lineTo(W*.5,H*.34); c.lineTo(W*.88,H*1.02); c.fill();
-  [[.5,.28,17],[.38,.55,13],[.64,.62,9]].forEach(([x,y,rr]) => { c.fillStyle = p.hi; c.beginPath(); c.arc(W*x,H*y,rr,0,TAU); c.fill(); });
- },
- group(c,W,H,p,r){
-  vgrad(c,W,H,p.mid,p.bg);
-  c.strokeStyle = rgba(p.hi,.3); c.lineWidth = 1.2;
-  for(let i=0;i<7;i++){ c.beginPath(); c.moveTo(W*(.1+r()*.8),H*.85); c.lineTo(W*(.1+r()*.8),H*.05); c.stroke(); }
-  for(let i=0;i<16;i++){ const x = W*(.06+r()*.88), y = H*(.42+r()*.12); c.fillStyle = mix(p.bg,"#000000",.3+.3*r()); c.fillRect(x-8,y,16,H*.4); c.fillStyle = mix(p.mid,p.bg,.4); c.beginPath(); c.arc(x,y-4,6,0,TAU); c.fill(); }
-  glow(c,W,H,W*.5,H*.58,W*.42,p.hi,.7);
-  c.fillStyle = "#15110d"; c.fillRect(W*.37,H*.5,W*.1,H*.46); c.fillStyle = p.acc; c.fillRect(W*.37,H*.56,W*.1,10);
-  c.fillStyle = p.hi; c.fillRect(W*.5,H*.52,W*.1,H*.44);
-  c.fillStyle = mix(p.hi,p.bg,.2); c.beginPath(); c.arc(W*.42,H*.45,9,0,TAU); c.arc(W*.55,H*.47,9,0,TAU); c.fill();
- },
- bar(c,W,H,p,r){
-  vgrad(c,W,H,p.mid,p.bg);
-  c.fillStyle = rgba(p.hi,.18); c.fillRect(W*.05,H*.08,W*.9,H*.45);
-  for(let i=0;i<40;i++){ c.fillStyle = rgba(p.hi,.25 + .3*r()); c.beginPath(); c.arc(W*(.08+r()*.84),H*(.22+r()*.28),2+r()*3,0,TAU); c.fill(); }
-  for(let i=0;i<9;i++){ glow(c,W,H,W*(.2+i*.075),H*.12+ (i%3)*6,26,p.hi,.8); c.fillStyle = p.hi; c.beginPath(); c.arc(W*(.2+i*.075),H*.12+(i%3)*6,3.5,0,TAU); c.fill(); }
-  c.fillStyle = mix(p.mid,p.hi,.2); c.fillRect(0,H*.64,W,H*.36);
-  c.fillStyle = mix(p.bg,"#000000",.4); ell(c,W*.5,H*.8,W*.13,H*.3); c.fill();
-  c.fillStyle = p.hi; c.beginPath(); c.arc(W*.5,H*.4,14,0,TAU); c.fill();
-  for(let i=0;i<5;i++){ c.fillStyle = i%2 ? "#3C5A2C" : "#6A2A20"; c.fillRect(W*(.06+i*.055),H*.5,12,H*.2); }
-  for(let i=0;i<6;i++){ c.fillStyle = p.acc; c.beginPath(); c.arc(W*(.72+(i%3)*.05),H*(.68-Math.floor(i/3)*.06),8,0,TAU); c.fill(); }
- },
- candle(c,W,H,p,r){
-  c.fillStyle = "#070605"; c.fillRect(0,0,W,H);
-  glow(c,W,H,W*.52,H*.5,W*.34,p.hi,.95);
-  glow(c,W,H,W*.52,H*.5,W*.12,p.acc,.95);
-  c.fillStyle = "#1a0f0a"; ell(c,W*.3,H*.78,W*.22,H*.32); c.fill();
-  c.fillStyle = mix(p.hi,"#000000",.55); c.beginPath(); c.arc(W*.34,H*.38,17,0,TAU); c.fill();
-  c.fillStyle = "#24140c"; ell(c,W*.7,H*.85,W*.14,H*.25); c.fill();
-  c.fillStyle = p.acc; c.beginPath(); c.arc(W*.64,H*.52,11,0,TAU); c.fill();
-  c.fillStyle = "#FFF3C4"; ell(c,W*.52,H*.46,3.5,8); c.fill();
- },
- window(c,W,H,p,r){
-  vgrad(c,W,H,p.bg,p.mid);
-  c.fillStyle = "#F9EFCB"; c.fillRect(W*.05,H*.06,W*.2,H*.5);
-  c.strokeStyle = "#7A6D55"; c.lineWidth = 3; c.strokeRect(W*.05,H*.06,W*.2,H*.5);
-  c.fillStyle = rgba("#FFF6D6",.35); c.beginPath(); c.moveTo(W*.25,H*.06); c.lineTo(W*.75,H*.5); c.lineTo(W*.75,H*.95); c.lineTo(W*.25,H*.56); c.fill();
-  c.fillStyle = p.hi; c.beginPath(); c.moveTo(W*.44,H*.3); c.lineTo(W*.66,H*.3); c.lineTo(W*.7,H*.6); c.lineTo(W*.4,H*.6); c.fill();
-  c.fillStyle = p.acc; c.beginPath(); c.moveTo(W*.4,H*.58); c.lineTo(W*.7,H*.58); c.lineTo(W*.78,H*1.0); c.lineTo(W*.32,H*1.0); c.fill();
-  c.fillStyle = "#E6C7A0"; c.beginPath(); c.arc(W*.55,H*.22,13,0,TAU); c.fill();
-  c.fillStyle = "#FFFFFF"; c.beginPath(); c.ellipse(W*.55,H*.17,16,9,0,Math.PI,0); c.fill();
-  c.fillStyle = "#2E4A66"; c.fillRect(W*.7,H*.72,W*.28,H*.28);
-  for(let i=0;i<4;i++){ c.fillStyle = "#A8743A"; c.beginPath(); c.arc(W*(.74+i*.06),H*.7,9,0,TAU); c.fill(); }
- },
- blossom(c,W,H,p,r,lx,ly){
-  vgrad(c,W,H,p.bg,p.mid);
-  glow(c,W,H,lx,ly,60,p.hi,.8); c.fillStyle = p.hi; c.beginPath(); c.arc(lx,ly,14,0,TAU); c.fill();
-  c.fillStyle = "#16100C"; c.fillRect(0,H*.88,W,H*.12);
-  [[.1,.5,.18],[.9,.5,.2]].forEach(([x,y,s]) => { for(let k=0;k<4;k++){ c.fillStyle = mix(p.acc,"#000000",.1*k); c.beginPath(); c.moveTo(W*x,H*(y+k*.07)-H*.3*s*4); c.lineTo(W*(x-s),H*(y+k*.1+.25)); c.lineTo(W*(x+s),H*(y+k*.1+.25)); c.fill(); } });
-  c.fillStyle = "#2A1A10"; c.fillRect(W*.5-3,H*.5,6,H*.4);
-  for(let i=0;i<260;i++){ const a = r()*TAU, d = Math.sqrt(r()); const x = W*.52 + Math.cos(a)*d*W*.3, y = H*.42 + Math.sin(a)*d*H*.3; c.fillStyle = rgba("#FFFFFF",.55+.45*r()); c.beginPath(); c.arc(x,y,1+r()*2.4,0,TAU); c.fill(); }
-  glow(c,W,H,W*.18,H*.92,50,"#FF8A2A",.8); glow(c,W,H,W*.84,H*.92,50,"#FF8A2A",.8);
- },
- "sk-anatomy"(c,W,H,p,r){
-  parch(c,W,H,p,r); c.strokeStyle = rgba(p.ink,.8); c.lineWidth = 1.3;
-  for(let k=0;k<12;k++){ c.beginPath(); c.moveTo(W*.1+k*9,H*.12); c.bezierCurveTo(W*.3+r()*30,H*.3,W*.2+r()*50,H*.6,W*.45+r()*30,H*.88); c.stroke(); }
-  c.beginPath(); c.arc(W*.62,H*.3,20,0,TAU); c.stroke(); c.beginPath(); c.arc(W*.62,H*.3,12,0,TAU); c.stroke();
-  mirrorText(c,W*.58,H*.55,W*.38,6,p,r);
- },
- "sk-spiral"(c,W,H,p,r){
-  parch(c,W,H,p,r); c.strokeStyle = rgba(p.ink,.85); c.lineWidth = 1.4;
-  c.beginPath(); c.moveTo(W*.42,H*.1); c.lineTo(W*.42,H*.86); c.stroke();
-  for(let i=0;i<3;i++){ c.beginPath(); c.ellipse(W*.42,H*(.3+.13*i),78-16*i,16-3*i,0,0,TAU); c.stroke(); }
-  c.beginPath(); c.moveTo(W*.2,H*.9); c.lineTo(W*.42,H*.62); c.lineTo(W*.64,H*.9); c.stroke();
-  mirrorText(c,W*.04,H*.1,W*.28,5,p,r); mirrorText(c,W*.7,H*.7,W*.26,4,p,r);
- },
- "sk-swirl"(c,W,H,p,r){
-  parch(c,W,H,p,r); c.strokeStyle = rgba(p.ink,.75); c.lineWidth = 1.1;
-  for(let i=0;i<70;i++){ const x = W*(.15+r()*.55), y = H*(.15+r()*.7), rad = 5+r()*18, s = r()*TAU; c.beginPath(); c.arc(x,y,rad,s,s+3+r()*2.5); c.stroke(); }
-  mirrorText(c,W*.7,H*.12,W*.26,4,p,r);
- },
- "sk-wheel"(c,W,H,p,r){
-  parch(c,W,H,p,r); c.strokeStyle = rgba(p.ink,.85); c.lineWidth = 1.4;
-  c.beginPath(); c.arc(W*.38,H*.56,54,0,TAU); c.stroke(); c.beginPath(); c.arc(W*.38,H*.56,40,0,TAU); c.stroke();
-  for(let i=0;i<8;i++){ c.beginPath(); c.moveTo(W*.38,H*.56); c.lineTo(W*.38+Math.cos(i*TAU/8)*54,H*.56+Math.sin(i*TAU/8)*54); c.stroke(); }
-  c.beginPath(); c.arc(W*.14,H*.3,22,0,TAU); c.stroke();
-  c.beginPath(); c.moveTo(W*.5,H*.12); c.lineTo(W*.88,H*.5); c.moveTo(W*.56,H*.1); c.lineTo(W*.94,H*.48); c.stroke();
-  mirrorText(c,W*.62,H*.66,W*.34,4,p,r);
- },
- "sk-animals"(c,W,H,p,r){
-  parch(c,W,H,p,r); c.strokeStyle = rgba(p.ink,.85); c.lineWidth = 1.4;
-  ell(c,W*.4,H*.4,44,24); c.stroke(); c.beginPath(); c.arc(W*.62,H*.28,17,0,TAU); c.stroke();
-  c.beginPath(); c.moveTo(W*.58,H*.14); c.lineTo(W*.55,H*.28); c.moveTo(W*.68,H*.15); c.lineTo(W*.7,H*.28); c.stroke();
-  [.3,.36,.46,.5].forEach(x => { c.beginPath(); c.moveTo(W*x,H*.55); c.lineTo(W*x,H*.72); c.stroke(); });
-  c.beginPath(); c.arc(W*.3,H*.82,20,Math.PI*.9,Math.PI*2.2); c.stroke(); c.beginPath(); c.arc(W*.72,H*.78,24,0,TAU); c.stroke();
- },
- "sk-chalk"(c,W,H,p,r){
-  parch(c,W,H,p,r); c.strokeStyle = rgba(p.ink,.85); c.lineWidth = 1.5;
-  ell(c,W*.5,H*.42,36,50); c.stroke();
-  for(let i=0;i<14;i++){ c.beginPath(); c.moveTo(W*.5-32+i*5,H*.14+ i); c.lineTo(W*.5-26+i*5,H*.6); c.stroke(); }
-  c.beginPath(); c.moveTo(W*.3,H*.9); c.quadraticCurveTo(W*.5,H*.62,W*.7,H*.9); c.stroke();
- },
- "sk-chalk2"(c,W,H,p,r){
-  parch(c,W,H,p,r); c.strokeStyle = rgba(p.ink,.85); c.lineWidth = 1.5;
-  for(let i=0;i<6;i++){ const x = W*(.16+i*.13), y = H*(i%2 ? .36 : .3); c.beginPath(); c.arc(x,y,12,0,TAU); c.stroke(); c.beginPath(); c.moveTo(x-18,H*.62); c.quadraticCurveTo(x,H*.4,x+18,H*.62); c.stroke(); }
-  c.beginPath(); c.moveTo(W*.06,H*.7); c.lineTo(W*.94,H*.7); c.stroke();
-  for(let i=0;i<24;i++){ c.beginPath(); c.moveTo(W*.1+i*8,H*.72); c.lineTo(W*.1+i*8-5,H*.9); c.stroke(); }
- }
-};
-const DECO = {
- mona(c,W,H,p){ c.strokeStyle = rgba(p.hi,.38); c.lineWidth = 4; c.lineCap = "round"; c.beginPath(); c.moveTo(W*.64,H*.52); c.bezierCurveTo(W*.7,H*.58,W*.62,H*.64,W*.8,H*.74); c.stroke();
-   c.fillStyle = mix(p.hi,p.bg,.35); ell(c,W*.46,H*.88,26,10); c.fill(); ell(c,W*.55,H*.9,24,9); c.fill(); },
- ermine(c,W,H,p){ c.save(); c.translate(W*.6,H*.78); c.rotate(-.45); c.fillStyle = "#F3EEE4"; ell(c,0,0,40,11); c.fill(); c.restore();
-   c.fillStyle = "#F3EEE4"; c.beginPath(); c.arc(W*.73,H*.66,8,0,TAU); c.fill(); c.fillStyle = "#2A1F1A"; c.beginPath(); c.arc(W*.755,H*.67,2,0,TAU); c.fill(); },
- john(c,W,H,p){ c.strokeStyle = p.hi; c.lineWidth = 8; c.lineCap = "round"; c.beginPath(); c.moveTo(W*.6,H*.7); c.lineTo(W*.69,H*.36); c.stroke();
-   c.fillStyle = p.hi; c.beginPath(); c.arc(W*.69,H*.33,5,0,TAU); c.fill();
-   for(let i=0;i<12;i++){ const a = i*TAU/12; c.fillStyle = mix(p.bg,"#000000",.35); c.beginPath(); c.arc(W*.5+Math.cos(a)*W*.115,H*.42+Math.sin(a)*H*.2,9,0,TAU); c.fill(); }
-   c.fillStyle = mix(p.hi,p.bg,.15); ell(c,W*.5,H*.42,W*.085,H*.17); c.fill(); },
- jerome(c,W,H,p){ c.fillStyle = "rgba(0,0,0,.6)"; c.beginPath(); c.moveTo(0,0); c.lineTo(W*.3,0); c.lineTo(W*.17,H); c.lineTo(0,H); c.fill(); c.beginPath(); c.moveTo(W,0); c.lineTo(W*.72,0); c.lineTo(W*.85,H); c.lineTo(W,H); c.fill();
-   c.strokeStyle = p.hi; c.lineWidth = 3; c.beginPath(); c.moveTo(W*.74,H*.3); c.lineTo(W*.74,H*.58); c.moveTo(W*.7,H*.38); c.lineTo(W*.78,H*.38); c.stroke(); },
- annun(c,W,H,p){ c.fillStyle = rgba(p.hi,.5); c.beginPath(); c.moveTo(W*.04,H*.6); c.lineTo(W*.26,H*.22); c.lineTo(W*.3,H*.72); c.fill();
-   c.strokeStyle = "#FFFFFF"; c.lineWidth = 2.5; c.beginPath(); c.moveTo(W*.84,H*.95); c.lineTo(W*.84,H*.55); c.stroke(); c.fillStyle = "#FFFFFF"; ell(c,W*.84,H*.52,6,10); c.fill(); }
-};
-function drawWork(cv, w){
-  const c = cv.getContext("2d"), Wd = cv.width = 320, Hd = cv.height = 214;
-  const r = rng(hashStr(w.id)), lx = (w.l ? w.l[0] : .5) * Wd, ly = (w.l ? w.l[1] : .4) * Hd;
-  (MOTIF[w.motif] || MOTIF.portrait)(c, Wd, Hd, w.pal, r, lx, ly);
-  if(DECO[w.id]) DECO[w.id](c, Wd, Hd, w.pal);
-  const v = c.createRadialGradient(Wd/2, Hd/2, Hd*.25, Wd/2, Hd/2, Wd*.62);
-  v.addColorStop(0, "rgba(0,0,0,0)"); v.addColorStop(1, w.motif.startsWith("sk") ? "rgba(70,40,15,.25)" : "rgba(0,0,0,.5)");
-  c.fillStyle = v; c.fillRect(0, 0, Wd, Hd);
-}
-function paintAll(root){ (root || document).querySelectorAll("canvas[data-work]").forEach(cv => drawWork(cv, W[cv.dataset.work])); }
 
 /* ================= 問題づくり ================= */
+const imgTag = (id, cls, extra, small) => `<img ${cls ? `class="${cls}" ` : ""}src="${small ? W[id].sm : W[id].img}" alt="${esc(W[id].t)}" ${extra || ""}>`;
+const facts = w => `${w.t}（${ARTISTS[w.a].n}・${w.y}）`;
+const ZOOM = 2.4;
+function pickWorks(n, pool){ return (pool || WORKS).map(w => ({w, s:(S.m[w.id] || 0) + Math.random()*1.2})).sort((a, b) => a.s - b.s).slice(0, n).map(x => x.w); }
+const sameGroup = w => WORKS.filter(x => x.id !== w.id && x.k === w.k);
+const optText = (q, v) => q.pics ? W[v].t : v;
 function buildStatic(bank, i){
   const b = BANKS[bank][i], tf = b.x.length === 1;
   return {key:`b:${bank}:${i}`, kind:"choice", tag:TAGNAME[bank], prompt:b.q, sub:b.sub || "", think:!!b.think, options:tf ? ["○","×"] : shuffle([b.a, ...b.x]), tf, answer:b.a, why:b.why, work:b.work, pg:b.pg};
@@ -661,15 +560,29 @@ function buildGen(type, wid){
   return Object.assign({key:`g:${type}:${wid}`, kind:"choice", tag:TAGNAME.g, sub:"", options:[], tf:false, work:wid, pg:w.pg}, g);
 }
 function buildArtistQ(type, ak){
-  const A = ARTISTS[ak], others = Object.keys(ARTISTS).filter(k => k !== ak);
-  if(type === "life") return {key:`g:life:${ak}`, kind:"choice", tag:TAGNAME.g, prompt:`${A.n}が生きたのは、いつ？`, sub:"", options:shuffle([A.yrs, ...sample(others, 3).map(k => ARTISTS[k].yrs)]), answer:A.yrs, why:`${A.n}は${A.yrs}（${A.land}）。`, pg:ak === "leo" ? 110 : ak === "rem" ? 112 : 113};
+  const A = ARTISTS[ak], others = Object.keys(ARTISTS).filter(k => k !== ak), pg = ak === "leo" ? 110 : ak === "rem" ? 112 : 113;
+  if(type === "life") return {key:`g:life:${ak}`, kind:"choice", tag:TAGNAME.g, prompt:`${A.n}が生きたのは、いつ？`, sub:"", options:shuffle([A.yrs, ...sample(others, 3).map(k => ARTISTS[k].yrs)]), answer:A.yrs, why:`${A.n}は${A.yrs}（${A.land}）。`, pg};
   const lands = ["イタリア","フランス","オランダ","茨城県"];
-  return {key:`g:aland:${ak}`, kind:"choice", tag:TAGNAME.g, prompt:`${A.n}は、どこの出身（国・県）？`, sub:"", options:shuffle(lands.includes(A.land) ? lands : [A.land, ...lands.slice(0,3)]), answer:A.land, why:`${A.n}は${A.yrs}（${A.land}）。`, pg:ak === "leo" ? 110 : ak === "rem" ? 112 : 113};
+  return {key:`g:aland:${ak}`, kind:"choice", tag:TAGNAME.g, prompt:`${A.n}は、どこの出身（国・県）？`, sub:"", options:shuffle(lands.includes(A.land) ? lands : [A.land, ...lands.slice(0,3)]), answer:A.land, why:`${A.n}は${A.yrs}（${A.land}）。`, pg};
 }
 function buildHint(wid){
   const w = W[wid], same = WORKS.filter(x => x.id !== wid && x.a === w.a), diff = WORKS.filter(x => x.id !== wid && x.a !== w.a);
   const ds = [...sample(same, 2), ...sample(diff, 3)].slice(0, 3);
   return {key:`h:${wid}`, kind:"hint", tag:TAGNAME.h, prompt:"この作品は、どれ？", options:shuffle([w.t, ...ds.map(d => d.t)]), answer:w.t, why:w.sum, work:wid, hints:w.hints, used:1, pg:w.pg};
+}
+/* 絵を見て題名／ぼかしあて／ズーム。まぎらわしさが同じになるよう、絵画は絵画、素描は素描どうしで選択肢をつくる */
+function buildPic(type, wid){
+  const w = W[wid], ds = sample(sameGroup(w), 3);
+  const prompt = {pic2title:"この絵の題名は？", blur:"ぼやけた絵が、だんだんはっきりする。題名は？", zoom:"拡大した部分は、どの作品？"}[type];
+  return {key:`p:${type}:${wid}`, kind:"choice", media:type, tag:TAGNAME[type], prompt, sub:"", tf:false, options:shuffle([w.t, ...ds.map(d => d.t)]), answer:w.t, why:w.sum, work:wid, pg:w.pg, zx:20 + Math.random()*60, zy:20 + Math.random()*60};
+}
+function buildT2P(wid){
+  const w = W[wid], ds = sample(sameGroup(w), 3);
+  return {key:`p:t2p:${wid}`, kind:"choice", media:"t2p", pics:true, tag:TAGNAME.t2p, prompt:`「${w.t}」は、どの絵？`, sub:"", tf:false, options:shuffle([w.id, ...ds.map(d => d.id)]), answer:w.id, why:w.sum, work:wid, pg:w.pg};
+}
+function buildMatch(){
+  const ws = pickWorks(6);
+  return {key:"m", kind:"match", tag:TAGNAME.match, cards:shuffle([...ws.map(w => ({wid:w.id, type:"pic", st:"down"})), ...ws.map(w => ({wid:w.id, type:"title", st:"down"}))]), misses:0, answer:""};
 }
 function buildOrder(mode){
   if(mode === "time"){
@@ -683,7 +596,7 @@ function buildOrder(mode){
   return {key:"o:size", kind:"order", tag:TAGNAME.o, mode, prompt:"画面の大きさが大きい順に、ならべよう。", sub:"たて×よこの面積で考える。大きいものから上にならべる。", items:shuffle(ids), placed:[], answer:ans, labels:["いちばん大きい","2番め","3番め","いちばん小さい"]};
 }
 function buildLight(i){ return {key:"l", kind:"light", tag:TAGNAME.l, idx:Math.floor(Math.random()*8), variant:i % 2 ? "b" : "a", prompt:"", answer:""}; }
-const qText = q => q.kind === "hint" ? `ヒントクイズ「${q.hints[0]}」` : q.kind === "light" ? "光の向きの問題" : q.prompt;
+const qText = q => q.kind === "hint" ? `ヒントクイズ「${q.hints[0]}」` : q.kind === "light" ? "光の向きの問題" : q.media === "t2p" ? q.prompt : q.media ? `この絵（${q.tag}）の題名` : q.prompt;
 function fromKey(key){
   const [t, a, b] = key.split(":");
   try{
@@ -691,13 +604,15 @@ function fromKey(key){
     if(t === "g" && (a === "life" || a === "aland") && ARTISTS[b]) return buildArtistQ(a, b);
     if(t === "g" && GENS[a] && W[b]) return buildGen(a, b);
     if(t === "h" && W[a]) return buildHint(a);
+    if(t === "p" && W[b] && (a === "pic2title" || a === "blur" || a === "zoom")) return buildPic(a, b);
+    if(t === "p" && a === "t2p" && W[b]) return buildT2P(b);
   }catch(e){}
   return null;
 }
 
 /* ================= セッション ================= */
 let Q = null, view = {name:"home"};
-function allStatic(banks){ return banks.flatMap(bk => range(BANKS[bk].length).map(i => ({bk, i}))); }
+function stopTimers(){ if(Q && Q.btimer){ clearInterval(Q.btimer); Q.btimer = null; } }
 function genPool(n){
   const types = shuffle(["artist","museum","land","year","tech","life","aland","artist","museum","year"]);
   const used = new Set(), out = [];
@@ -711,8 +626,14 @@ function genPool(n){
   return out;
 }
 function startSession(mode){
+  stopTimers();
   let qs = [], title = "";
-  if(mode === "hint"){ title = "この作品なーんだ"; qs = sample(WORKS, 6).map(w => buildHint(w.id)); }
+  if(mode === "pic"){ title = "絵を見て、題名"; qs = pickWorks(8).map(w => buildPic("pic2title", w.id)); }
+  if(mode === "t2p"){ title = "題名から、絵を選ぶ"; qs = pickWorks(8).map(w => buildT2P(w.id)); }
+  if(mode === "blur"){ title = "ぼかしあてクイズ"; qs = pickWorks(6).map(w => buildPic("blur", w.id)); }
+  if(mode === "zoom"){ title = "ズームクイズ"; qs = pickWorks(6, WORKS.filter(w => w.zoomOk)).map(w => buildPic("zoom", w.id)); }
+  if(mode === "match"){ title = "神経衰弱"; qs = [buildMatch()]; }
+  if(mode === "hint"){ title = "この作品なーんだ"; qs = pickWorks(6).map(w => buildHint(w.id)); }
   if(mode === "leo"){ title = "レオナルドの人生"; qs = sample(range(BANKS.leo.length), 8).map(i => buildStatic("leo", i)); }
   if(mode === "data"){ title = "作者・美術館・年代"; qs = genPool(10); }
   if(mode === "order"){ title = "ならべかえ"; qs = ["time","size","time","size"].map(buildOrder); }
@@ -720,7 +641,7 @@ function startSession(mode){
   if(mode === "exam"){
     title = "学芸員試験";
     const pk = (bk, n) => sample(range(BANKS[bk].length), n).map(i => buildStatic(bk, i));
-    qs = shuffle([...pk("leo",3), ...pk("tech",3), ...pk("light",3), ...genPool(3)]);
+    qs = shuffle([...pk("leo",2), ...pk("tech",2), ...pk("light",2), ...genPool(2), ...pickWorks(2).map(w => buildPic("pic2title", w.id)), ...pickWorks(2).map(w => buildT2P(w.id))]);
   }
   if(mode.startsWith("lab:")){
     const lab = mode.slice(4); title = "ラボのチェック問題";
@@ -728,16 +649,16 @@ function startSession(mode){
   }
   if(mode === "review"){ title = "まちがいノート"; qs = sample(S.wrong, 10).map(fromKey).filter(Boolean); }
   if(!qs.length) return;
-  Q = {mode, title, qs, i:0, ok:0, miss:0, combo:0, maxCombo:0, xp:0, hearts:3, lamps:qs.map(() => ""), mistakes:[], unlocked:[], answered:false, rankBefore:rankInfo(S.xp).i};
+  Q = {mode, title, qs, i:0, ok:0, miss:0, combo:0, maxCombo:0, xp:0, hearts:3, lamps:qs.map(() => ""), mistakes:[], answered:false, rankBefore:rankInfo(S.xp).i, quitArm:false, lock:false};
   SFX.tap(); go("quiz");
 }
 function go(name, p){
-  closeSheet(); closeModal();
+  stopTimers(); closeSheet(); closeModal();
   view = Object.assign({name}, p || {});
   render(); window.scrollTo(0, 0);
 }
 function render(){
-  const f = {home:renderHome, quiz:renderQuiz, result:renderResult, lab:renderLab, light:renderLightLab, collection:renderCollection, notes:renderNotes}[view.name];
+  const f = {home:renderHome, quiz:renderQuiz, result:renderResult, lab:renderLab, light:renderLightLab, gallery:renderGallery, cards:renderCards, notes:renderNotes}[view.name];
   (f || renderHome)();
 }
 const cur = () => Q.qs[Q.i];
@@ -748,6 +669,11 @@ function roomMeta(r){
   const b = S.rooms[r.id]; return b ? `最高 ${b.best}%` : r.meta;
 }
 const doneRoom = r => r.id === "lab" ? LABS.every(l => S.labs[l.id]) : !!(S.rooms[r.id] && S.rooms[r.id].best >= 80);
+const mastered = () => WORKS.filter(w => (S.m[w.id] || 0) >= 3).length;
+const APP_URL = /^https?:/.test(location.protocol) ? location.origin + location.pathname.replace(/index\.html$/, "") : "";
+let installEvt = null;
+window.addEventListener("beforeinstallprompt", e => { e.preventDefault(); installEvt = e; if(view.name === "home" && view.share) renderHome(); });
+const standalone = () => (window.matchMedia && matchMedia("(display-mode: standalone)").matches) || navigator.standalone === true;
 function sharePanel(){
   return `<div class="panel share" id="share">
     <div class="qr" id="qr" role="img" aria-label="このページのQRコード"></div>
@@ -758,60 +684,104 @@ function sharePanel(){
       <p class="howto">ホーム画面に追加するとアプリのように使えます。iPhone は Safari の共有ボタンから「ホーム画面に追加」、Android は Chrome のメニューから「アプリをインストール」。一度開けば、電波がなくても遊べます。登録やログインは要りません。記録はそれぞれの端末に保存されます。</p>
     </div></div>`;
 }
-const APP_URL = /^https?:/.test(location.protocol) ? location.origin + location.pathname.replace(/index\.html$/, "") : "";
-let installEvt = null;
-window.addEventListener("beforeinstallprompt", e => { e.preventDefault(); installEvt = e; if(view.name === "home" && view.share) renderHome(); });
-const standalone = () => (window.matchMedia && matchMedia("(display-mode: standalone)").matches) || navigator.standalone === true;
 function drawQR(){
   const el = document.getElementById("qr"); if(!el) return;
   if(typeof qrcode === "undefined" || !APP_URL){ el.hidden = true; return; }
   try{ const q = qrcode(0, "M"); q.addData(APP_URL); q.make(); el.innerHTML = q.createSvgTag({cellSize:4, margin:0, scalable:true}); const s = el.querySelector("svg"); if(s){ s.setAttribute("width","150"); s.setAttribute("height","150"); } }catch(e){ el.hidden = true; }
 }
 function renderHome(){
-  const ri = rankInfo(S.xp), got = WORKS.filter(w => S.m[w.id] > 0).length;
+  const ri = rankInfo(S.xp), mst = mastered();
+  const roomHtml = r => `<button class="room ${doneRoom(r) ? "done" : ""}" data-act="room" data-id="${r.id}"><span class="plate ${r.n >= 10 ? "w2" : ""}" aria-hidden="true">${r.n}</span><div><b>${esc(r.t)}</b><small>${esc(r.d)}</small><div class="meta">${esc(roomMeta(r))}</div></div></button>`;
   app.innerHTML = `
   <header class="hero" id="hero">
     <p class="kicker">中学1年 美術　鑑賞　教科書 P.110〜113</p>
     <h1><em>光</em>とかげの<br>美術館</h1>
-    <p class="lead">レオナルド・ダ・ヴィンチと、光とかげで物語をえがいた画家たちの世界へ。ヒントクイズや実験で、作品を楽しく覚えよう。</p>
+    <p class="lead">教科書にのっている名画を、題名といっしょに覚えよう。見て、当てて、ならべて、絵と名前がつながるまで遊べる。</p>
     <div class="stats">
       <div><small>ランク</small><b>${ri.name}</b></div>
-      <div><small>集めた作品</small><b>${got} / ${WORKS.length}</b></div>
+      <div><small>覚えた作品</small><b>${mst} / ${WORKS.length}</b></div>
       <div><small>経験値</small><b>${S.xp}</b></div>
       <div class="rankbar" aria-hidden="true"><i style="width:${ri.pct}%"></i></div>
       <div class="ranknote">${ri.next ? `「${ri.next[1]}」まで あと ${ri.toNext} XP` : "最高ランクに到達した"}</div>
     </div>
   </header>
-  <h2 class="sec">ミニ展示室<small>問題に正解すると、作品が飾られる</small></h2>
-  <div class="mini">${WORKS.map(w => S.m[w.id] > 0 ? `<canvas data-work="${w.id}" role="img" aria-label="${esc(w.t)}"></canvas>` : `<div class="lk" aria-label="未公開の作品">？</div>`).join("")}</div>
-  <h2 class="sec">展示室<small>1から順に進むのがおすすめ</small></h2>
-  <div class="rooms">${ROOMS.map(r => `<button class="room ${doneRoom(r) ? "done" : ""}" data-act="room" data-id="${r.id}"><span class="plate" aria-hidden="true">${r.n}</span><div><b>${esc(r.t)}</b><small>${esc(r.d)}</small><div class="meta">${esc(roomMeta(r))}</div></div></button>`).join("")}</div>
+  <h2 class="sec">まず、絵と題名を見て覚える</h2>
+  <div class="study">
+    <button class="big" data-go="gallery"><b>作品図鑑</b><small>${WORKS.length}点の絵と題名を一覧で見る。題名をかくして、自分でためすこともできる。</small></button>
+    <button class="big" data-act="fc-start"><b>フラッシュカード</b><small>絵を見て、心の中で題名を答える。めくって答え合わせ。</small></button>
+  </div>
+  <h2 class="sec">作品一覧<small>覚えるほど、わくが光る（暗い絵は、まだ練習が少ない）</small></h2>
+  <div class="mini">${WORKS.map(w => { const m = S.m[w.id] || 0; return `<button class="mt ${m >= 3 ? "gold" : m > 0 ? "mid" : "dim"}" data-act="work" data-id="${w.id}" aria-label="${esc(w.t)}">${imgTag(w.id, "", "", true)}</button>`; }).join("")}</div>
+  ${GROUPS.map((g, gi) => `<h2 class="sec">${g}</h2><div class="rooms">${ROOMS.filter(r => r.g === gi).map(roomHtml).join("")}</div>`).join("")}
   <nav class="util" aria-label="メニュー">
-    <button class="ub" data-go="collection"><b>コレクション</b><small>${got} / ${WORKS.length} 点</small></button>
     <button class="ub" data-go="notes"><b>まちがいノート</b><small>${S.wrong.length} 問</small></button>
     ${APP_URL ? `<button class="ub" data-act="share-toggle" aria-expanded="${!!view.share}"><b>友だちに教える</b><small>QR・リンク</small></button>` : ""}
     <button class="ub" data-act="settings-toggle" aria-expanded="${!!view.settings}"><b>せってい</b><small>${S.sound ? "音あり" : "音なし"}</small></button>
   </nav>
   ${view.share ? sharePanel() : ""}
   ${view.settings ? `<div class="panel"><div class="toggle"><span>効果音</span><button class="switch" role="switch" aria-checked="${S.sound}" data-act="t-sound" aria-label="効果音"></button></div><div class="toggle"><span class="muted">記録をすべて消す</span><button class="btn small" data-act="reset">${view.resetArm ? "もう一度押すと消えます" : "リセット"}</button></div></div>` : ""}
-  <p class="foot">教科書 P.110〜113「レオナルド・ダ・ヴィンチ」「レオナルドの手稿」「明暗のドラマ」の内容にそって作ったオリジナルの問題です。作品の絵は、実物ではなく、色と光の配置をイメージで描いたものです。本物は教科書で確かめよう。</p>`;
-  paintAll(); if(view.share) drawQR();
+  <p class="foot">教科書 P.110〜113「レオナルド・ダ・ヴィンチ」「レオナルドの手稿」「明暗のドラマ」の内容にそって作った問題です。絵は、教科書の写真から切り出したもので、色や明るさが実物とちがって見えることがあります。</p>`;
+  if(view.share) drawQR();
   const hero = document.getElementById("hero");
   let raf = 0;
   const move = e => { const b = hero.getBoundingClientRect(), x = e.clientX, y = e.clientY; hero.classList.add("tracking"); cancelAnimationFrame(raf); raf = requestAnimationFrame(() => { hero.style.setProperty("--lx", ((x-b.left)*100/b.width) + "%"); hero.style.setProperty("--ly", ((y-b.top)*100/b.height) + "%"); }); };
   hero.addEventListener("pointermove", move); hero.addEventListener("pointerdown", move);
 }
 
+/* ================= 作品図鑑・フラッシュカード ================= */
+const GF = {all:() => true, leop:w => w.a === "leo" && w.k === "絵画", leos:w => w.a === "leo" && w.k === "素描", light:w => w.a !== "leo"};
+function renderGallery(){
+  const f = view.f || "all", hide = !!view.hide, rev = view.rev || (view.rev = {});
+  const list = WORKS.filter(GF[f]);
+  const tabs = [["all","すべて"],["leop","レオナルドの絵"],["leos","手稿・素描"],["light","光とかげ"]];
+  app.innerHTML = `<div class="bar"><button class="link" data-go="home">← 展示室にもどる</button><span class="cnt">${list.length}点</span></div>
+  <h2 class="sec" style="margin-top:6px">作品図鑑<small>タップで、くわしい情報</small></h2>
+  <div class="tabs" role="tablist">${tabs.map(([id, n]) => `<button class="tab" role="tab" aria-selected="${id === f}" data-act="gal-tab" data-id="${id}">${n}</button>`).join("")}</div>
+  <div class="toggle gtoggle"><span>題名をかくして、自分でためす</span><button class="switch" role="switch" aria-checked="${hide}" data-act="gal-hide" aria-label="題名をかくす"></button></div>
+  <div class="cgrid">${list.map(w => { const shown = !hide || rev[w.id], m = S.m[w.id] || 0; return `<button class="cc" data-act="gwork" data-id="${w.id}">${imgTag(w.id, "", "", true)}<b>${shown ? esc(w.t) : "？　題名は、なに？"}</b><small>${shown ? esc(ARTISTS[w.a].s) + "　" + esc(w.y) : "タップで答えを見る"}</small><span class="st" aria-label="覚えた度 ${m}">${"★".repeat(m)}${"☆".repeat(3 - m)}</span></button>`; }).join("")}</div>
+  <p class="foot">星は、クイズで正解した回数（3つで「覚えた」）。絵は、教科書の写真から切り出したものです。</p>`;
+}
+function startCards(){ view = {name:"cards", q:pickWorks(WORKS.length).map(w => w.id), total:WORKS.length, flip:false, known:0}; closeModal(); render(); window.scrollTo(0, 0); }
+function renderCards(){
+  const st = view;
+  if(!st.q.length){
+    app.innerHTML = `<section class="result"><h2>ぜんぶ覚えた！</h2><p style="margin:0">${st.total}点すべてに「覚えた」をつけた。クイズで、絵と題名が本当につながったか、ためしてみよう。</p><div class="btnrow" style="justify-content:center"><button class="btn primary" data-act="room" data-id="pic">絵を見て、題名へ</button><button class="btn" data-go="home">展示室へ</button></div></section>`;
+    return;
+  }
+  const w = W[st.q[0]], A = ARTISTS[w.a];
+  app.innerHTML = `<div class="bar"><button class="x" data-go="home">✕</button><div class="lamps" aria-hidden="true">${range(st.total).map(i => `<span class="lamp ${i < st.known ? "on" : ""}"></span>`).join("")}</div><span class="cnt">残り ${st.q.length}</span></div>
+  <section class="qcard"><span class="chip">フラッシュカード</span><figure class="pic">${imgTag(w.id)}</figure>
+  ${st.flip
+    ? `<div><h3 class="mincho" style="font-size:26px;font-weight:800;line-height:1.4">${esc(w.t)}</h3><p class="muted" style="margin:2px 0 0">${esc(A.n)}（${esc(A.yrs)}・${esc(A.land)}）</p></div>
+       <dl class="dl"><dt>つくられた年</dt><dd>${esc(w.y)}</dd>${w.full ? `<dt>画材・形式</dt><dd>${esc(w.full)}</dd>` : ""}<dt>ある場所</dt><dd>${esc(w.place)}（${esc(w.land)}）</dd><dt>教科書</dt><dd>P.${w.pg}</dd></dl>
+       <p style="margin:0">${esc(w.sum)}</p>
+       <div class="btnrow"><button class="btn primary" data-act="fc-know">覚えた</button><button class="btn" data-act="fc-again">もう一度</button></div>`
+    : `<div class="prompt">この作品の題名は？</div><div class="sub">心の中で答えてから、めくろう。</div><button class="btn primary" style="justify-self:start" data-act="fc-flip">めくる</button>`}
+  </section>`;
+}
+
 /* ================= クイズ画面 ================= */
 function lampsHtml(){ return Q.lamps.map((s, i) => `<span class="lamp ${s} ${i === Q.i && !s ? "now" : ""}"></span>`).join(""); }
+const blurPts = t => t < 3500 ? 15 : t < 7000 ? 10 : 5;
+function mediaHtml(q){
+  if(q.kind !== "choice" || q.pics) return "";
+  if(q.media === "pic2title") return `<figure class="pic">${imgTag(q.work)}</figure>`;
+  if(q.media === "blur") return `<figure class="pic"><img id="bimg" src="${W[q.work].img}" alt="ぼやけた絵" style="filter:blur(26px)"></figure><div class="pt" id="bpt">いま正解すると 15 XP</div>`;
+  if(q.media === "zoom") return `<div class="zoom" id="zoomv" style="background-image:url('${W[q.work].img}');background-size:${ZOOM*100}% auto;background-position:${q.zx.toFixed(1)}% ${q.zy.toFixed(1)}%" role="img" aria-label="絵の一部を拡大したもの"></div>`;
+  if(q.work) return `<figure class="pic sm">${imgTag(q.work)}</figure>`;
+  return "";
+}
 function renderQuiz(){
-  const q = cur(); Q.answered = false;
+  const q = cur();
+  if(q.kind === "match") return renderMatch();
+  Q.answered = false; stopTimers();
   const right = Q.mode === "exam" ? `<span class="hearts" aria-label="ライフ${Q.hearts}">${"♥".repeat(Q.hearts)}<span class="off">${"♥".repeat(3-Q.hearts)}</span></span>` : `<span class="cnt">${Q.i+1} / ${Q.qs.length}</span>`;
   let body = "";
   if(q.kind === "choice" || q.kind === "hint"){
-    body = `<div class="prompt">${esc(q.prompt)}</div>${q.sub ? `<div class="sub">${esc(q.sub)}</div>` : ""}`;
+    body = mediaHtml(q) + `<div class="prompt">${esc(q.prompt)}</div>${q.sub ? `<div class="sub">${esc(q.sub)}</div>` : ""}`;
     if(q.kind === "hint") body += hintsHtml(q);
-    body += `<div class="opts ${q.tf ? "two" : ""}">${q.options.map((o, k) => `<button class="opt" data-act="ans" data-k="${k}"><span class="k">${KANA[k]}</span><span class="t">${esc(o)}</span></button>`).join("")}</div>`;
+    if(q.pics) body += `<div class="opts pics" id="opts">${q.options.map((id, k) => `<button class="opt" data-act="ans" data-k="${k}" aria-label="絵 ${KANA[k]}"><span class="k">${KANA[k]}</span><img src="${W[id].sm}" alt=""><span class="cap">${esc(W[id].t)}</span></button>`).join("")}</div>`;
+    else body += `<div class="opts ${q.tf ? "two" : ""}">${q.options.map((o, k) => `<button class="opt" data-act="ans" data-k="${k}"><span class="k">${KANA[k]}</span><span class="t">${esc(o)}</span></button>`).join("")}</div>`;
   } else if(q.kind === "order") body = orderHtml(q);
   else body = lightHtml(q);
   app.innerHTML = `
@@ -819,6 +789,15 @@ function renderQuiz(){
   ${Q.combo >= 2 ? `<span class="combo">${Q.combo} れんぞく正解</span>` : ""}
   <section class="qcard" id="qcard"><span class="chip ${q.think ? "think" : ""}">${q.think ? "考えよう　" : ""}${esc(q.tag)}</span>${body}</section>`;
   if(q.kind === "light") paintLightQ(q);
+  if(q.media === "blur"){
+    const img = document.getElementById("bimg"), pt = document.getElementById("bpt"); q.t0 = performance.now();
+    Q.btimer = setInterval(() => {
+      const t = performance.now() - q.t0, f = Math.max(0, 1 - t/10000);
+      img.style.filter = `blur(${(26 * Math.pow(f, 1.4)).toFixed(1)}px)`;
+      if(pt) pt.textContent = `いま正解すると ${blurPts(t)} XP`;
+      if(t >= 10000){ clearInterval(Q.btimer); Q.btimer = null; }
+    }, 100);
+  }
 }
 function hintsHtml(q){
   const pts = [0,15,10,5][q.used];
@@ -828,13 +807,13 @@ function hintsHtml(q){
   <div class="btnrow" style="align-items:center">${q.used < 3 ? `<button class="btn small" data-act="hint-open">つぎのヒントをひらく</button>` : ""}<span class="pt">いま正解すると ${pts} XP</span></div>`;
 }
 function orderHtml(q){
-  const card = id => { const w = W[id]; return `<b>${esc(w.t)}</b><small>${esc(ARTISTS[w.a].s)}${q.mode === "size" ? `　たて${w.size[0]}×よこ${w.size[1]}cm` : ""}</small>`; };
+  const card = id => { const w = W[id]; return `<img src="${w.sm}" alt=""><b>${esc(w.t)}</b><small>${esc(ARTISTS[w.a].s)}${q.mode === "size" ? `　たて${w.size[0]}×よこ${w.size[1]}cm` : ""}</small>`; };
   return `<div class="prompt">${esc(q.prompt)}</div><div class="sub">${esc(q.sub)}</div>
-  <ol class="slots">${q.labels.map((lb, i) => { const id = q.placed[i]; return `<li class="slot"><span class="no">${i+1}</span><div class="box">${id ? `<button class="oc" data-act="o-out" data-id="${id}" aria-label="${esc(W[id].t)} をもどす">${card(id)}</button>` : `<span class="hole">${lb}</span>`}</div></li>`; }).join("")}</ol>
-  <div class="pool">${q.items.map(id => `<button class="oc ${q.placed.includes(id) ? "used" : ""}" data-act="o-in" data-id="${id}" ${q.placed.includes(id) ? 'tabindex="-1" aria-hidden="true"' : ""}>${card(id)}</button>`).join("")}</div>
+  <ol class="slots">${q.labels.map((lb, i) => { const id = q.placed[i]; return `<li class="slot"><span class="no">${i+1}</span><div class="box">${id ? `<button class="oc t" data-act="o-out" data-id="${id}" aria-label="${esc(W[id].t)} をもどす">${card(id)}</button>` : `<span class="hole">${lb}</span>`}</div></li>`; }).join("")}</ol>
+  <div class="pool">${q.items.map(id => `<button class="oc t ${q.placed.includes(id) ? "used" : ""}" data-act="o-in" data-id="${id}" ${q.placed.includes(id) ? 'tabindex="-1" aria-hidden="true"' : ""}>${card(id)}</button>`).join("")}</div>
   <div class="orow"><button class="btn" data-act="o-clear">やり直す</button><button class="btn primary" data-act="o-check" ${q.placed.length === q.items.length ? "" : "disabled"}>こたえる</button></div>`;
 }
-function padHtml(cls){
+function padHtml(){
   const cells = [["左上","上","右上"],["左",null,"右"],["左下","下","右下"]];
   return `<div class="pad">${cells.flat().map(d => d ? `<button data-act="l-ans" data-d="${d}" aria-label="${d}">${ARROW[d]}</button>` : `<div class="mid">球</div>`).join("")}</div>`;
 }
@@ -843,6 +822,36 @@ function lightHtml(q){
   return `<div class="prompt">${prompt}</div><div class="stage"><canvas id="lcv" width="340" height="340" role="img" aria-label="光を当てた球"></canvas>${padHtml()}</div>`;
 }
 function paintLightQ(q){ const cv = document.getElementById("lcv"); drawLight(cv, q.idx * Math.PI/4, q.variant === "a" ? {hi:1, sh:.25} : {hi:.2, sh:1}); }
+
+/* 神経衰弱 */
+function matchCard(c, i){
+  const face = c.st !== "down", lbl = face ? (c.type === "pic" ? `${W[c.wid].t}の絵` : W[c.wid].t) : `伏せたカード ${i+1}`;
+  return `<button class="mc ${face && c.type === "title" ? "t" : ""} ${c.st === "up" ? "up" : ""} ${c.st === "done" ? "done" : ""}" data-act="m-flip" data-i="${i}" ${face ? "disabled" : ""} aria-label="${esc(lbl)}">${face ? (c.type === "pic" ? imgTag(c.wid, "", "", true) : `<span>${esc(W[c.wid].t)}</span>`) : '<span class="back">光</span>'}</button>`;
+}
+function renderMatch(){
+  const q = cur(), done = q.cards.filter(c => c.st === "done").length / 2;
+  app.innerHTML = `<div class="bar"><button class="x" data-act="quit">${Q.quitArm ? "やめる？" : "✕"}</button><div class="lamps" aria-hidden="true">${range(6).map(i => `<span class="lamp ${i < done ? "on" : ""}"></span>`).join("")}</div><span class="cnt">ミス ${q.misses}</span></div>
+  <section class="qcard"><span class="chip">神経衰弱</span><div class="prompt">絵と題名のペアを見つけよう。</div><div class="sub">同じ作品の絵と題名を、2枚ずつめくる。ミスが少ないほど高得点。</div><div class="mgrid" id="mgrid">${q.cards.map(matchCard).join("")}</div></section>`;
+}
+function flipCard(i){
+  const q = cur(), c = q.cards[i];
+  if(Q.lock || c.st !== "down") return;
+  const ses = Q; c.st = "up"; SFX.tap(); renderMatch();
+  const ups = q.cards.filter(x => x.st === "up");
+  if(ups.length < 2) return;
+  Q.lock = true;
+  if(ups[0].wid === ups[1].wid){
+    setTimeout(() => { if(Q !== ses) return; ups.forEach(x => x.st = "done"); bump(ups[0].wid); Q.lock = false; SFX.ok(); renderMatch(); if(q.cards.every(x => x.st === "done")) finishMatch(); }, 600);
+  } else {
+    q.misses++; SFX.ng();
+    setTimeout(() => { if(Q !== ses) return; ups.forEach(x => x.st = "down"); Q.lock = false; renderMatch(); }, 1100);
+  }
+}
+function finishMatch(){
+  const q = cur();
+  Q.ok = 6; Q.miss = q.misses; Q.xp = Math.max(10, 60 - 3*q.misses); Q.lamps = range(6).map(() => "on"); Q.maxCombo = 0;
+  save(); finish();
+}
 
 /* 光の描画。th は光が来る向き（0=右、反時計まわり） */
 function drawLight(cv, th, o){
@@ -863,26 +872,23 @@ function drawLight(cv, th, o){
 }
 
 /* ================= 採点 ================= */
-function bump(wid){
-  if(!wid) return;
-  const before = S.m[wid] || 0; S.m[wid] = Math.min(3, before + 1);
-  if(before === 0 && !Q.unlocked.includes(wid)) Q.unlocked.push(wid);
-}
+function bump(wid){ if(wid) S.m[wid] = Math.min(3, (S.m[wid] || 0) + 1); }
 function record(ok, q, given){
   Q.answered = true;
   if(ok){
     Q.ok++; Q.combo++; Q.maxCombo = Math.max(Q.maxCombo, Q.combo);
     let gain = 10 + Math.min(10, Math.max(0, Q.combo-2)*2);
     if(q.kind === "hint") gain = [0,15,10,5][q.used];
+    if(q.media === "blur") gain = q._pts;
     if(q.kind === "order") gain = 20;
     q._gain = gain; Q.xp += gain; Q.lamps[Q.i] = "on";
-    if(q.key.startsWith("b:") || q.key.startsWith("g:") || q.key.startsWith("h:")) S.wrong = S.wrong.filter(k => k !== q.key);
+    if(/^[bghp]:/.test(q.key)) S.wrong = S.wrong.filter(k => k !== q.key);
     if(q.kind === "order") q.answer.forEach(bump); else bump(q.work);
     SFX.ok(); setTimeout(SFX.lamp, 220);
   } else {
     Q.miss++; Q.combo = 0; Q.lamps[Q.i] = "bad";
     if(Q.mode === "exam") Q.hearts--;
-    if(q.kind !== "order" && q.kind !== "light" && !S.wrong.includes(q.key)) S.wrong.push(q.key);
+    if(/^[bghp]:/.test(q.key) && !S.wrong.includes(q.key)) S.wrong.push(q.key);
     if(S.wrong.length > 60) S.wrong = S.wrong.slice(-60);
     Q.mistakes.push({q, given}); SFX.ng();
     const card = document.getElementById("qcard"); if(card){ card.classList.remove("shake"); void card.offsetWidth; card.classList.add("shake"); }
@@ -894,6 +900,9 @@ function record(ok, q, given){
 function answerChoice(k){
   if(Q.answered) return;
   const q = cur(), given = q.options[k], ok = given === q.answer;
+  if(q.media === "blur"){ q._pts = blurPts(performance.now() - q.t0); stopTimers(); const im = document.getElementById("bimg"); if(im) im.style.filter = "none"; }
+  if(q.media === "zoom"){ const z = document.getElementById("zoomv"); if(z) z.classList.add("full"); }
+  if(q.pics){ const o = document.getElementById("opts"); if(o) o.classList.add("rev"); }
   document.querySelectorAll(".opt").forEach(b => { const t = q.options[+b.dataset.k]; b.disabled = true; if(t === q.answer) b.classList.add("is-ok"); else if(t === given) b.classList.add("is-ng"); });
   record(ok, q, given);
 }
@@ -910,54 +919,51 @@ function answerLight(d){
   q.answer = ans; q.why = q.variant === "a" ? `いちばん明るい所が${ans}がわにあるので、光は${ans}から当たっている。` : `かげが${OPP[ans]}がわにのびているので、光は反対の${ans}から当たっている。`;
   record(ok, q, d);
 }
+function orderLine(q){ return q.mode === "time" ? q.answer.map(id => `${W[id].t}（${W[id].y}）`).join(" → ") : q.answer.map(id => `${W[id].t}（${fmt(area(W[id]))}cm²）`).join(" ＞ "); }
 function showSheet(ok, q, given){
   const praise = ok ? pick(["せいかい！","いいね！","さすが！","その調子！"]) : "おしい！";
   let ans = "";
-  if(!ok){
-    if(q.kind === "order"){
-      ans = q.mode === "time" ? q.answer.map(id => `${W[id].t}（${W[id].y}）`).join(" → ") : q.answer.map(id => `${W[id].t}（${fmt(area(W[id]))}cm²）`).join(" ＞ ");
-    } else ans = q.answer;
-  } else if(q.kind === "order"){
-    ans = q.mode === "time" ? q.answer.map(id => `${W[id].t}（${W[id].y}）`).join(" → ") : q.answer.map(id => `${W[id].t}（${fmt(area(W[id]))}cm²）`).join(" ＞ ");
-  }
+  if(q.kind === "order") ans = orderLine(q); else if(!ok) ans = optText(q, q.answer);
   const why = q.kind === "order" ? (q.mode === "time" ? "年が小さいほど古い作品。" : "面積は、たて×よこで求める。単位は cm²。") : q.why;
+  const showArt = q.work && (q.kind === "hint" || q.media);
   const last = isLast();
   sheetRoot.innerHTML = `<div class="sheet ${ok ? "ok" : "ng"}" role="status"><div class="sheet-in">
     <h3>${praise}${ok && Q.combo >= 3 ? `　${Q.combo}れんぞく` : ""}</h3>
     ${ans ? `<div class="ans">${ok ? "" : "正解　"}${esc(ans)}</div>` : ""}
+    ${showArt ? `<figure class="pic sm sheetpic">${imgTag(q.work)}</figure><div class="artcap">${esc(facts(W[q.work]))}</div>` : ""}
     <p class="why"><b>なぜ？</b>${esc(why)}</p>
     ${q.pg ? `<div class="pg">教科書 P.${q.pg} で確かめよう</div>` : ""}
-    ${q.kind === "hint" ? `<canvas class="sheet-art" data-work="${q.work}" role="img" aria-label="${esc(W[q.work].t)}の色と光のイメージ"></canvas><div class="artcap">色と光のイメージです。実物は教科書で。</div>` : ""}
-    <div class="sheetrow"><span class="pt">${ok ? "+" + gainText(q) + " XP" : ""}</span><button class="btn ${ok ? "primary" : "gold"}" id="next" data-act="next">${last ? "結果を見る" : "つぎへ"}</button></div>
+    <div class="sheetrow"><span class="pt">${ok ? "+" + (q._gain || 0) + " XP" : ""}</span><button class="btn ${ok ? "primary" : "gold"}" id="next" data-act="next">${last ? "結果を見る" : "つぎへ"}</button></div>
   </div></div>`;
-  paintAll(sheetRoot);
   app.style.paddingBottom = (sheetRoot.firstElementChild.offsetHeight + 24) + "px";
   const nb = document.getElementById("next"); if(nb) nb.focus({preventScroll:true});
 }
-function gainText(q){ return q._gain || 0; }
 function isLast(){ return Q.mode === "exam" ? (Q.hearts <= 0 || Q.i >= Q.qs.length - 1) : Q.i >= Q.qs.length - 1; }
 function closeSheet(){ sheetRoot.innerHTML = ""; app.style.paddingBottom = ""; }
 function next(){ closeSheet(); if(isLast()) return finish(); Q.i++; Q.quitArm = false; renderQuiz(); window.scrollTo(0, 0); }
 
 /* ================= 結果 ================= */
 function finish(){
-  closeSheet();
-  const total = Q.qs.length, answered = Q.ok + Q.miss, pct = answered ? Math.round(Q.ok*100/total) : 0;
+  stopTimers(); closeSheet();
+  const match = Q.mode === "match";
+  const total = match ? 6 + Q.miss : Q.qs.length, pct = Q.ok ? Math.round(Q.ok*100/total) : 0;
   const win = Q.mode === "exam" ? Q.hearts > 0 : true;
-  if(Q.mode.startsWith("lab:")){ const id = Q.mode.slice(4); if(Q.ok >= 2){ if(!S.labs[id]){ Q.xp += 30; } S.labs[id] = true; } }
+  if(Q.mode.startsWith("lab:")){ const id = Q.mode.slice(4); if(Q.ok >= 2){ if(!S.labs[id]) Q.xp += 30; S.labs[id] = true; } }
   else if(Q.mode !== "review"){ const b = S.rooms[Q.mode] || {best:0, plays:0}; b.best = Math.max(b.best, pct); b.plays++; S.rooms[Q.mode] = b; }
   if(Q.mode === "exam" && win) Q.xp += 50;
   S.xp += Q.xp; save();
-  const R = {mode:Q.mode, title:Q.title, ok:Q.ok, total, pct, maxCombo:Q.maxCombo, xp:Q.xp, lamps:Q.lamps.slice(), mistakes:Q.mistakes, unlocked:Q.unlocked.slice(), win, rankUp:rankInfo(S.xp).i > Q.rankBefore ? rankInfo(S.xp).name : ""};
+  const covered = [...new Set(Q.qs.flatMap(q => q.kind === "order" ? q.answer : q.kind === "match" ? q.cards.map(c => c.wid) : q.work ? [q.work] : []))];
+  const R = {mode:Q.mode, title:Q.title, ok:Q.ok, total, pct, maxCombo:Q.maxCombo, xp:Q.xp, lamps:Q.lamps.slice(), mistakes:Q.mistakes, covered, win, rankUp:rankInfo(S.xp).i > Q.rankBefore ? rankInfo(S.xp).name : ""};
   view = {name:"result", R}; Q = null; render(); window.scrollTo(0, 0);
   if((R.pct >= 80 && R.win) || R.rankUp){ SFX.win(); confetti(); }
 }
 function comment(R){
   if(R.mode === "exam" && !R.win) return "ライフがなくなった。まちがいノートで見直して、もう一度挑戦しよう。";
-  if(R.pct === 100) return "全問正解。館長もおどろく目のつけどころ。";
+  if(R.mode === "match") return R.total === 6 ? "ミスなしで全部見つけた。" : "ペアを全部見つけた。ミスを減らして、もう一度ためそう。";
+  if(R.pct === 100) return "全問正解。絵と題名がしっかりつながっている。";
   if(R.pct >= 80) return "よくできた。あとひと息で、全問正解。";
-  if(R.pct >= 50) return "半分以上は正解。まちがえた問題を見直そう。";
-  return "最初はこれでじゅうぶん。教科書を見ながら、もう一度挑戦しよう。";
+  if(R.pct >= 50) return "半分以上は正解。下の「今回の作品」で、絵と題名を見直そう。";
+  return "最初はこれでじゅうぶん。図鑑やフラッシュカードで見てから、もう一度挑戦しよう。";
 }
 function renderResult(){
   const R = view.R;
@@ -966,34 +972,22 @@ function renderResult(){
     <h2>${esc(R.title)}</h2><p class="mincho" style="margin:-8px 0 0;font-size:18px;color:var(--gold)">${R.mode === "exam" ? (R.win ? "合格！" : "もう少し") : "おつかれさま"}</p>
     ${lampsH}
     <p style="margin:0">${comment(R)}</p>
-    <div class="rstats"><div class="rstat"><b>${R.ok}/${R.total}</b><small>正解</small></div><div class="rstat"><b>${R.maxCombo}</b><small>最大れんぞく</small></div><div class="rstat"><b>+${R.xp}</b><small>XP</small></div></div>
-    ${R.rankUp || R.unlocked.length ? `<div class="news">${R.rankUp ? `<div class="new">ランクアップ。「${esc(R.rankUp)}」になった</div>` : ""}${R.unlocked.length ? `<div class="new">${R.unlocked.length}点の作品が展示室にかざられた</div>` : ""}</div>` : ""}
-    ${R.unlocked.length ? `<div class="ugrid">${R.unlocked.map(id => `<div class="ucard"><canvas data-work="${id}" role="img" aria-label="${esc(W[id].t)}"></canvas>${esc(W[id].t)}</div>`).join("")}</div>` : ""}
-    ${R.mistakes.length ? `<div class="mist"><h3 class="mincho" style="font-size:18px;margin-top:6px">まちがえた問題</h3>${R.mistakes.slice(0, 8).map(({q, given}) => `<div class="row"><small>${esc(q.tag)}</small><span>${esc(qText(q))}</span><span class="muted">あなたの答え　${esc(given || "")}</span><span><b>正解　${esc(q.kind === "order" ? q.answer.map(id => W[id].t).join(" → ") : q.answer)}</b></span></div>`).join("")}</div>` : ""}
+    <div class="rstats"><div class="rstat"><b>${R.mode === "match" ? "6ペア" : R.ok + "/" + R.total}</b><small>${R.mode === "match" ? "ミス " + (R.total - 6) : "正解"}</small></div><div class="rstat"><b>${R.maxCombo}</b><small>最大れんぞく</small></div><div class="rstat"><b>+${R.xp}</b><small>XP</small></div></div>
+    ${R.rankUp ? `<div class="news"><div class="new">ランクアップ。「${esc(R.rankUp)}」になった</div></div>` : ""}
+    ${R.covered.length ? `<div><h3 class="mincho" style="font-size:18px;margin:0 0 8px;text-align:left">今回の作品</h3><div class="ugrid">${R.covered.map(id => `<button class="ucard" data-act="work" data-id="${id}">${imgTag(id, "", "", true)}<span>${esc(W[id].t)}</span></button>`).join("")}</div></div>` : ""}
+    ${R.mistakes.length ? `<div class="mist"><h3 class="mincho" style="font-size:18px;margin-top:6px">まちがえた問題</h3>${R.mistakes.slice(0, 8).map(({q, given}) => `<div class="row"><small>${esc(q.tag)}</small><span>${esc(qText(q))}</span><span class="muted">あなたの答え　${esc(q.kind === "order" || q.kind === "light" ? given : optText(q, given) || "")}</span><span><b>正解　${esc(q.kind === "order" ? q.answer.map(id => W[id].t).join(" → ") : optText(q, q.answer))}</b></span></div>`).join("")}</div>` : ""}
     <div class="btnrow" style="justify-content:center"><button class="btn primary" data-act="again" data-m="${esc(R.mode)}">もう一度</button><button class="btn" data-go="home">展示室へ</button></div>
   </section>`;
-  paintAll();
 }
 
-/* ================= コレクション・ノート ================= */
-function renderCollection(){
-  const got = WORKS.filter(w => S.m[w.id] > 0).length;
-  app.innerHTML = `<div class="bar"><button class="link" data-go="home">← 展示室にもどる</button><span class="cnt">${got} / ${WORKS.length} 点</span></div>
-  <h2 class="sec" style="margin-top:6px">コレクション<small>正解した作品がかざられる。星は、正解した回数。</small></h2>
-  <div class="cgrid">${WORKS.map(w => S.m[w.id] > 0
-    ? `<button class="cc" data-act="work" data-id="${w.id}"><canvas data-work="${w.id}" role="img" aria-label="${esc(w.t)}"></canvas><b>${esc(w.t)}</b><small>${esc(ARTISTS[w.a].s)}　${esc(w.y)}</small><span class="st" aria-label="星${S.m[w.id]}個">${"★".repeat(S.m[w.id])}${"☆".repeat(3-S.m[w.id])}</span></button>`
-    : `<div class="cc lk"><div class="ph">？</div><b>まだ見つかっていない</b><small>${esc(w.k)}　P.${w.pg}</small></div>`).join("")}</div>
-  <p class="foot">絵は、色と光の配置をイメージで描いたものです。実物ではありません。</p>`;
-  paintAll();
-}
+/* ================= まちがいノート・作品の詳細 ================= */
 function openWork(id){
-  const w = W[id], A = ARTISTS[w.a];
-  modalRoot.innerHTML = `<div class="modal" data-act="close-modal"><div class="mpanel" role="dialog" aria-modal="true" aria-label="${esc(w.t)}"><canvas data-work="${id}" role="img" aria-label="${esc(w.t)}の色と光のイメージ"></canvas>
+  const w = W[id], A = ARTISTS[w.a], m = S.m[id] || 0;
+  modalRoot.innerHTML = `<div class="modal" data-act="close-modal"><div class="mpanel" role="dialog" aria-modal="true" aria-label="${esc(w.t)}"><figure class="pic">${imgTag(id)}</figure>
     <h3>${esc(w.t)}</h3><p style="margin:0">${esc(w.sum)}</p>
-    <dl class="dl"><dt>作者</dt><dd>${esc(A.n)}（${esc(A.yrs)}・${esc(A.land)}）</dd><dt>つくられた年</dt><dd>${esc(w.y)}</dd>${w.full ? `<dt>画材・形式</dt><dd>${esc(w.full)}</dd>` : ""}${w.size ? `<dt>大きさ</dt><dd>たて${w.size[0]}×よこ${w.size[1]}cm</dd>` : ""}<dt>ある場所</dt><dd>${esc(w.place)}（${esc(w.land)}）</dd><dt>教科書</dt><dd>P.${w.pg}</dd></dl>
-    <div class="artcap">絵は色と光のイメージです。実物は教科書で。</div>
+    <dl class="dl"><dt>作者</dt><dd>${esc(A.n)}（${esc(A.yrs)}・${esc(A.land)}）</dd><dt>つくられた年</dt><dd>${esc(w.y)}</dd>${w.full ? `<dt>画材・形式</dt><dd>${esc(w.full)}</dd>` : ""}${w.size ? `<dt>大きさ</dt><dd>たて${w.size[0]}×よこ${w.size[1]}cm</dd>` : ""}<dt>ある場所</dt><dd>${esc(w.place)}（${esc(w.land)}）</dd><dt>教科書</dt><dd>P.${w.pg}</dd><dt>覚えた度</dt><dd class="st" style="color:var(--gold);letter-spacing:2px">${"★".repeat(m)}${"☆".repeat(3 - m)}</dd></dl>
     <button class="btn" data-act="close-modal" id="mclose">とじる</button></div></div>`;
-  paintAll(modalRoot); const b = document.getElementById("mclose"); if(b) b.focus();
+  const b = document.getElementById("mclose"); if(b) b.focus();
 }
 function closeModal(){ modalRoot.innerHTML = ""; }
 function renderNotes(){
@@ -1001,7 +995,7 @@ function renderNotes(){
   app.innerHTML = `<div class="bar"><button class="link" data-go="home">← 展示室にもどる</button></div>
   <section class="labcard"><h3>まちがいノート</h3><p class="muted">まちがえた問題がたまる。復習して正解すると消える。</p>
   ${items.length ? `<button class="btn primary" style="justify-self:start" data-act="review">復習する（最大10問）</button>` : ""}
-  <div class="mist">${items.length ? items.map(q => `<div class="row"><small>${esc(q.tag)}</small><span>${esc(qText(q))}</span><span class="muted">正解　<b>${esc(q.answer)}</b></span></div>`).join("") : '<p class="muted">まだありません。展示室で問題に挑戦しよう。</p>'}</div></section>`;
+  <div class="mist">${items.length ? items.map(q => `<div class="row"><small>${esc(q.tag)}</small><span>${esc(qText(q))}</span><span class="muted">正解　<b>${esc(optText(q, q.answer))}</b></span></div>`).join("") : '<p class="muted">まだありません。展示室で問題に挑戦しよう。</p>'}</div></section>`;
 }
 
 /* ================= 技法ラボ ================= */
@@ -1137,23 +1131,35 @@ document.addEventListener("click", e => {
     return;
   }
   if(act === "start"){ startSession(a.dataset.m); return; }
-  if(act === "again"){ const m = a.dataset.m; if(m === "review" && !S.wrong.length) return go("home"); startSession(m); return; }
+  if(act === "again"){ startSession(a.dataset.m); return; }
   if(act === "review"){ startSession("review"); return; }
   if(act === "tab"){ SFX.tap(); view.tab = a.dataset.id; renderLab(); return; }
   if(act === "think-toggle"){ view.think = !view.think; renderLightLab(); return; }
   if(act === "work"){ openWork(a.dataset.id); return; }
+  if(act === "gal-tab"){ SFX.tap(); view.f = a.dataset.id; renderGallery(); return; }
+  if(act === "gal-hide"){ view.hide = !view.hide; view.rev = {}; renderGallery(); return; }
+  if(act === "gwork"){ const id = a.dataset.id; if(view.hide && !(view.rev || {})[id]){ (view.rev = view.rev || {})[id] = true; const sc = window.scrollY; renderGallery(); window.scrollTo(0, sc); } else openWork(id); return; }
+  if(act === "fc-start"){ SFX.tap(); startCards(); return; }
+  if(act === "fc-flip"){ view.flip = true; SFX.tap(); renderCards(); return; }
+  if(act === "fc-again"){ view.q.push(view.q.shift()); view.flip = false; renderCards(); return; }
+  if(act === "fc-know"){
+    view.q.shift(); view.known++; view.flip = false; S.xp += 3; save(); SFX.ok();
+    if(!view.q.length){ S.xp += 20; save(); SFX.win(); confetti(); }
+    renderCards(); window.scrollTo(0, 0); return;
+  }
   if(act === "share-toggle"){ view.share = !view.share; view.copied = false; renderHome(); return; }
   if(act === "settings-toggle"){ view.settings = !view.settings; view.resetArm = false; renderHome(); return; }
   if(act === "t-sound"){ S.sound = !S.sound; save(); renderHome(); SFX.tap(); return; }
   if(act === "reset"){ if(!view.resetArm){ view.resetArm = true; renderHome(); return; } S = defaults(); save(); view = {name:"home"}; render(); return; }
   if(act === "copy"){ const inp = document.getElementById("share-url"); try{ navigator.clipboard.writeText(APP_URL).then(() => { view.copied = true; a.textContent = "コピーしました"; }, () => inp.select()); }catch(err){ inp.select(); } return; }
-  if(act === "webshare"){ try{ navigator.share({title:"光とかげの美術館", text:"中1美術の鑑賞を、クイズと実験で楽しく覚えよう。", url:APP_URL}).catch(() => {}); }catch(err){} return; }
+  if(act === "webshare"){ try{ navigator.share({title:"光とかげの美術館", text:"中1美術の名画を、絵と題名で楽しく覚えよう。", url:APP_URL}).catch(() => {}); }catch(err){} return; }
   if(act === "install"){ if(installEvt){ installEvt.prompt(); installEvt.userChoice.finally(() => { installEvt = null; renderHome(); }); } return; }
   if(!Q) return;
   if(act === "quit"){
     if(!Q.quitArm){ Q.quitArm = true; a.textContent = "やめる？"; setTimeout(() => { if(Q && Q.quitArm){ Q.quitArm = false; const x = document.querySelector(".x"); if(x) x.textContent = "✕"; } }, 2500); return; }
     const m = Q.mode; Q = null; go(m.startsWith("lab:") ? "lab" : m === "light" ? "light" : "home", m.startsWith("lab:") ? {tab:m.slice(4)} : {}); return;
   }
+  if(act === "m-flip"){ flipCard(+a.dataset.i); return; }
   if(act === "ans"){ answerChoice(+a.dataset.k); return; }
   if(act === "hint-open"){ const q = cur(); if(q.used < 3){ q.used++; SFX.tap(); const sc = window.scrollY; renderQuiz(); window.scrollTo(0, sc); } return; }
   if(act === "next"){ next(); return; }
