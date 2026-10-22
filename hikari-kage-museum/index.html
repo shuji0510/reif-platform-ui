@@ -1,0 +1,1183 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>光とかげの美術館</title>
+<meta name="description" content="中学1年美術の鑑賞（レオナルド・ダ・ヴィンチと明暗のドラマ）を、ヒントクイズ・実験・コレクションで楽しく覚える無料のブラウザゲーム。">
+<meta name="theme-color" content="#171326">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png" type="image/png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="光とかげ">
+<meta property="og:type" content="website">
+<meta property="og:title" content="光とかげの美術館">
+<meta property="og:description" content="レオナルドと光の画家たちの作品を、ヒントクイズや光の実験で楽しく覚えよう。">
+<meta property="og:image" content="__SITE__/og.png">
+<meta property="og:url" content="__SITE__/">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@600;800&family=Zen+Maru+Gothic:wght@400;500;700;900&display=swap">
+<style>
+/* Layout: 暗い展示室の壁にスポットライトが動き、その下に展示室（クイズ）が並ぶ廊下型。問題画面は1枚の作品カード、答えは下からせり上がる解説パネル */
+:root{
+  --wall:#EDE9F5; --wall-2:#E1DCEE; --panel:#FFFFFF; --ink:#1C1833; --ink-soft:#5A5575; --line:#CDC6E0;
+  --gold:#A8680A; --gold-soft:#FBEBC8; --gold-ink:#4A2F00; --lamp:#F0B33A;
+  --ok:#1D7A55; --ok-soft:#D8F0E4; --ng:#B3382B; --ng-soft:#F9DEDA;
+  --hero-bg:#171326; --hero-ink:#F4ECDD; --hero-soft:#B9B1D1;
+  --f-display:"Shippori Mincho B1","Hiragino Mincho ProN","Yu Mincho",serif;
+  --f-body:"Zen Maru Gothic","Hiragino Maru Gothic ProN","Hiragino Sans","Yu Gothic",sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --wall:#12101D; --wall-2:#1A1730; --panel:#201C36; --ink:#F2EBDD; --ink-soft:#A9A2C0; --line:#383257;
+    --gold:#F2B544; --gold-soft:#3B2E12; --gold-ink:#FFE3A6; --lamp:#FFC95C;
+    --ok:#4CC995; --ok-soft:#10382B; --ng:#FF8470; --ng-soft:#40201C; --hero-bg:#0C0A16; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --wall:#12101D; --wall-2:#1A1730; --panel:#201C36; --ink:#F2EBDD; --ink-soft:#A9A2C0; --line:#383257;
+  --gold:#F2B544; --gold-soft:#3B2E12; --gold-ink:#FFE3A6; --lamp:#FFC95C;
+  --ok:#4CC995; --ok-soft:#10382B; --ng:#FF8470; --ng-soft:#40201C; --hero-bg:#0C0A16; color-scheme:dark;
+}
+@property --lx{syntax:"<percentage>";inherits:false;initial-value:50%}
+@property --ly{syntax:"<percentage>";inherits:false;initial-value:42%}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--wall);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.7;-webkit-font-smoothing:antialiased}
+#app{max-width:780px;margin:0 auto;padding-inline:16px;padding-block:16px 56px}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,input:focus-visible,canvas:focus-visible{outline:3px solid var(--lamp);outline-offset:2px}
+h1,h2,h3{margin:0;text-wrap:balance}
+.muted{color:var(--ink-soft)}
+.mincho{font-family:var(--f-display)}
+
+.btn{border:2px solid var(--ink);background:var(--panel);border-radius:999px;padding:10px 20px;font-weight:700;box-shadow:0 3px 0 var(--ink);transition:transform .08s}
+.btn:active{transform:translateY(3px);box-shadow:none}
+.btn.primary{background:var(--ink);color:var(--wall)}
+.btn.gold{background:var(--lamp);color:#2A1A00;border-color:#2A1A00;box-shadow:0 3px 0 #2A1A00}
+.btn.small{padding:6px 14px;font-size:14px}
+.btn:disabled{opacity:.4;cursor:not-allowed;transform:none}
+.link{background:none;border:0;padding:6px 2px;font-weight:700;color:var(--gold)}
+.btnrow{display:flex;gap:10px;flex-wrap:wrap}
+
+/* hero */
+.hero{--lx:50%;--ly:42%;position:relative;isolation:isolate;overflow:hidden;border-radius:22px;background:var(--hero-bg);color:var(--hero-ink);padding:30px 22px 22px;animation:sweep 9s ease-in-out infinite alternate;touch-action:pan-y}
+.hero.tracking{animation:none}
+.hero::before{content:"";position:absolute;inset:0;z-index:-1;background:radial-gradient(circle 240px at var(--lx) var(--ly),rgba(255,214,130,.38),rgba(255,214,130,.12) 55%,transparent 78%)}
+.hero::after{content:"";position:absolute;inset:0;z-index:-1;background:radial-gradient(ellipse at 50% 40%,transparent 45%,rgba(0,0,0,.55))}
+@keyframes sweep{from{--lx:20%;--ly:36%}to{--lx:80%;--ly:52%}}
+.kicker{font-size:12px;letter-spacing:.14em;font-weight:700;color:var(--hero-soft);margin:0 0 10px}
+.hero h1{font-family:var(--f-display);font-weight:800;font-size:clamp(42px,11vw,68px);line-height:1.18;letter-spacing:.04em}
+.hero h1 em{font-style:normal;color:var(--lamp)}
+.lead{margin:14px 0 0;max-width:34em;color:var(--hero-ink);opacity:.9;font-size:15px}
+.stats{display:grid;grid-template-columns:repeat(3,auto);justify-content:start;gap:8px 28px;margin-top:22px}
+.stats div{min-width:0}
+.stats small{display:block;font-size:11px;letter-spacing:.1em;color:var(--hero-soft)}
+.stats b{font-family:var(--f-display);font-size:19px;font-weight:800;font-variant-numeric:tabular-nums}
+.rankbar{grid-column:1/-1;height:6px;border-radius:99px;background:rgba(255,255,255,.14);overflow:hidden}
+.rankbar i{display:block;height:100%;background:var(--lamp);border-radius:99px}
+.ranknote{grid-column:1/-1;font-size:12px;color:var(--hero-soft);margin-top:-4px}
+@media (max-width:420px){.stats{grid-template-columns:repeat(2,auto)}}
+
+.sec{font-family:var(--f-display);font-weight:800;font-size:22px;margin:30px 0 12px;text-wrap:wrap}
+.sec small{font-family:var(--f-body);font-weight:500;font-size:13px;color:var(--ink-soft);margin-left:12px;display:inline-block}
+.mini{display:grid;grid-template-columns:repeat(auto-fill,minmax(56px,1fr));gap:8px}
+.mini canvas,.mini .lk{display:block;width:100%;aspect-ratio:3/2;border-radius:4px;border:2px solid var(--gold);background:var(--wall-2)}
+.mini .lk{display:grid;place-items:center;font-family:var(--f-display);color:var(--line);border-style:dashed;border-color:var(--line);font-size:16px}
+
+.rooms{display:grid;gap:12px;grid-template-columns:1fr}
+@media (min-width:640px){.rooms{grid-template-columns:1fr 1fr}}
+.room{display:grid;grid-template-columns:auto 1fr;gap:14px;align-items:center;text-align:left;background:var(--panel);border:1.5px solid var(--line);border-radius:16px;padding:14px 16px;transition:transform .12s,border-color .12s;min-width:0}
+.room:hover{transform:translateY(-2px);border-color:var(--gold)}
+.room:active{transform:translateY(1px)}
+.plate{width:46px;height:58px;border:3px double var(--gold);display:grid;place-items:center;font-family:var(--f-display);font-weight:800;font-size:26px;color:var(--gold);background:var(--gold-soft);flex:none}
+.room.done .plate{background:var(--lamp);color:#2A1A00;border-color:#2A1A00}
+.room b{display:block;font-family:var(--f-display);font-size:18px;line-height:1.35}
+.room small{display:block;color:var(--ink-soft);font-size:13px;line-height:1.55}
+.room .meta{margin-top:4px;font-size:12px;font-weight:700;color:var(--gold);font-variant-numeric:tabular-nums}
+.room > div{min-width:0}
+
+.util{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:16px}
+@media (min-width:640px){.util{grid-template-columns:repeat(4,1fr)}}
+.ub{background:var(--panel);border:1.5px solid var(--line);border-radius:14px;padding:12px;text-align:left;display:grid;gap:2px}
+.ub:hover{border-color:var(--gold)}
+.ub b{font-size:15px}
+.ub small{font-size:12px;color:var(--ink-soft);font-variant-numeric:tabular-nums}
+.panel{background:var(--panel);border:1.5px solid var(--line);border-radius:16px;padding:16px;margin-top:12px;display:grid;gap:12px}
+.toggle{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.switch{width:52px;height:30px;border-radius:99px;border:2px solid var(--ink);background:var(--wall-2);position:relative;padding:0;flex:none}
+.switch::after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:var(--ink-soft);transition:left .15s}
+.switch[aria-checked="true"]{background:var(--ok)}
+.switch[aria-checked="true"]::after{left:25px;background:#fff}
+.share{grid-template-columns:auto 1fr;align-items:start}
+@media (max-width:520px){.share{grid-template-columns:1fr}}
+.qr{background:#fff;padding:10px;border-radius:12px;border:2px solid var(--ink);width:max-content;max-width:100%;justify-self:center}
+.qr svg{display:block;width:150px;height:150px}
+.urlrow{display:flex;gap:8px;flex-wrap:wrap}
+.urlrow input{flex:1 1 200px;min-width:0;font-family:inherit;font-size:14px;border:2px solid var(--line);border-radius:10px;padding:8px 10px;background:var(--wall-2);color:var(--ink)}
+.howto{font-size:13px;color:var(--ink-soft);margin:0;line-height:1.7}
+.foot{font-size:12px;color:var(--ink-soft);margin-top:28px;line-height:1.8}
+
+/* quiz */
+.bar{display:flex;align-items:center;gap:12px;margin-block:4px 14px}
+.x{border:2px solid var(--line);background:var(--panel);border-radius:999px;height:36px;padding:0 14px;font-weight:700;font-size:14px;flex:none}
+.lamps{display:flex;gap:7px;flex:1;min-width:0;flex-wrap:wrap}
+.lamp{width:15px;height:15px;border-radius:50%;border:2px solid var(--line);transition:all .25s}
+.lamp.now{border-color:var(--ink)}
+.lamp.on{background:var(--lamp);border-color:var(--lamp);box-shadow:0 0 10px var(--lamp)}
+.lamp.bad{background:var(--ng);border-color:var(--ng)}
+.hearts{color:var(--ng);letter-spacing:2px;font-size:20px;flex:none}
+.hearts .off{color:var(--line)}
+.cnt{font-size:13px;color:var(--ink-soft);font-variant-numeric:tabular-nums;flex:none}
+.combo{display:inline-block;font-family:var(--f-display);font-weight:800;font-size:14px;background:var(--gold-soft);color:var(--gold-ink);border-radius:99px;padding:2px 14px;margin-bottom:8px}
+.qcard{background:var(--panel);border:1.5px solid var(--line);border-radius:20px;padding:20px;display:grid;gap:16px;box-shadow:0 14px 34px -22px rgba(20,10,40,.6)}
+.chip{justify-self:start;font-size:12px;font-weight:700;letter-spacing:.06em;border:1px solid var(--line);color:var(--ink-soft);border-radius:99px;padding:2px 12px;background:var(--wall-2)}
+.think{background:var(--gold-soft);color:var(--gold-ink);border-color:transparent}
+.prompt{font-family:var(--f-display);font-weight:800;font-size:21px;line-height:1.55}
+.sub{font-size:14px;color:var(--ink-soft);margin-top:-8px}
+.opts{display:grid;gap:10px}
+.opts.two{grid-template-columns:1fr 1fr}
+.opt{display:flex;align-items:center;gap:12px;text-align:left;background:var(--panel);border:1.5px solid var(--line);border-radius:14px;padding:12px 14px;font-weight:700;line-height:1.5;min-height:54px;box-shadow:0 3px 0 var(--line);min-width:0}
+.opt:hover{border-color:var(--gold)}
+.opt:active{transform:translateY(3px);box-shadow:none}
+.opt .k{flex:none;width:26px;height:26px;border-radius:50%;border:1.5px solid var(--line);display:grid;place-items:center;font-size:12px;color:var(--ink-soft)}
+.opt .t{min-width:0}
+.opts.two .opt{justify-content:center;font-size:24px;font-family:var(--f-display)}
+.opts.two .opt .k{display:none}
+.opt.is-ok{background:var(--ok-soft);border-color:var(--ok);box-shadow:0 3px 0 var(--ok)}
+.opt.is-ng{background:var(--ng-soft);border-color:var(--ng);box-shadow:0 3px 0 var(--ng)}
+.opt:disabled{cursor:default}
+.hints{display:grid;gap:8px}
+.hint{display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:start;border:1.5px dashed var(--line);border-radius:12px;padding:10px 14px;font-size:15px;line-height:1.6}
+.hint.open{border-style:solid;border-color:var(--gold);background:var(--gold-soft);color:var(--gold-ink);animation:glow .5s}
+.hint .hn{font-size:12px;font-weight:900;letter-spacing:.08em;color:var(--gold);padding-top:2px;white-space:nowrap}
+.hint.open .hn{color:var(--gold-ink)}
+.hint.shut{color:var(--ink-soft)}
+@keyframes glow{from{box-shadow:0 0 0 0 var(--lamp)}to{box-shadow:0 0 0 12px transparent}}
+.pt{font-size:13px;color:var(--ink-soft);font-weight:700}
+.shake{animation:shake .35s}
+@keyframes shake{25%{transform:translateX(-6px)}50%{transform:translateX(6px)}75%{transform:translateX(-3px)}}
+
+/* order */
+.slots{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.slot{display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:center;min-height:58px}
+.slot .no{width:28px;height:28px;border-radius:50%;background:var(--ink);color:var(--wall);display:grid;place-items:center;font-size:13px;font-weight:900}
+.slot .box{border:1.5px dashed var(--line);border-radius:12px;min-height:58px;display:flex;align-items:center;padding:4px;color:var(--ink-soft);font-size:13px;min-width:0}
+.slot .box .hole{padding-inline:10px}
+.oc{display:grid;gap:0;text-align:left;border:1.5px solid var(--gold);background:var(--gold-soft);color:var(--gold-ink);border-radius:12px;padding:8px 12px;line-height:1.4;min-width:0;width:100%}
+.oc b{font-family:var(--f-display);font-size:16px}
+.oc small{font-size:12px;opacity:.85}
+.pool{display:grid;gap:8px}
+.pool .oc{background:var(--panel);color:var(--ink);border-color:var(--line);box-shadow:0 3px 0 var(--line)}
+.pool .oc:hover{border-color:var(--gold)}
+.pool .oc.used{visibility:hidden}
+.orow{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+
+/* light lab */
+.stage{display:grid;justify-items:center;gap:12px}
+.stage canvas{width:min(100%,340px);aspect-ratio:1;border-radius:16px;border:2px solid var(--ink);touch-action:none;background:#1e1a30}
+.pad{display:grid;grid-template-columns:repeat(3,64px);gap:8px;justify-content:center}
+.pad button{height:56px;border:1.5px solid var(--line);background:var(--panel);border-radius:14px;font-size:22px;font-weight:700;box-shadow:0 3px 0 var(--line)}
+.pad button:hover{border-color:var(--gold)}
+.pad button:active{transform:translateY(3px);box-shadow:none}
+.pad button.is-ok{background:var(--ok-soft);border-color:var(--ok)}
+.pad button.is-ng{background:var(--ng-soft);border-color:var(--ng)}
+.pad .mid{display:grid;place-items:center;color:var(--ink-soft);font-size:11px}
+
+/* lab */
+.tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:14px}
+.tab{border:1.5px solid var(--line);background:var(--panel);border-radius:12px;padding:8px 4px;font-size:13px;font-weight:700;text-align:center;line-height:1.35;position:relative}
+.tab[aria-selected="true"]{background:var(--ink);color:var(--wall);border-color:var(--ink)}
+.tab .ck{position:absolute;top:-6px;right:-4px;background:var(--lamp);color:#2A1A00;border-radius:99px;font-size:10px;padding:0 6px;font-weight:900}
+.labcard{background:var(--panel);border:1.5px solid var(--line);border-radius:20px;padding:20px;display:grid;gap:14px}
+.labcard h3{font-family:var(--f-display);font-size:22px;font-weight:800}
+.labcard p{margin:0}
+.labcard canvas{width:100%;max-width:420px;justify-self:center;border-radius:14px;border:2px solid var(--ink);touch-action:none;background:#1e1a30}
+.range{display:grid;gap:4px}
+.range input{width:100%;accent-color:var(--gold);height:32px}
+.range div{display:flex;justify-content:space-between;font-size:12px;color:var(--ink-soft);font-weight:700}
+.note{background:var(--gold-soft);color:var(--gold-ink);border-radius:12px;padding:10px 14px;font-size:14px}
+.note b{display:block;font-size:12px;letter-spacing:.08em}
+.mirror{display:grid;grid-template-columns:1fr auto 1fr;gap:10px;align-items:center;background:var(--hero-bg);color:var(--hero-ink);border-radius:14px;padding:18px 12px;min-height:90px}
+.mirror span{display:block;font-family:var(--f-display);font-weight:800;font-size:clamp(20px,6vw,30px);overflow-wrap:anywhere;min-width:0}
+.mirror .flipped{transform:scaleX(-1);text-align:left}
+.mirror .line{width:6px;align-self:stretch;border-radius:3px;background:linear-gradient(var(--lamp),#fff,var(--lamp))}
+.field input{width:100%;font:inherit;font-size:18px;border:2px solid var(--ink);border-radius:12px;padding:8px 12px;background:var(--panel);color:var(--ink)}
+.field label{font-size:13px;font-weight:700;color:var(--ink-soft)}
+.field{display:grid;gap:4px}
+
+/* sheet */
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:20;padding:16px 16px calc(16px + env(safe-area-inset-bottom,0px));border-top:3px solid var(--ink);max-height:68vh;overflow:auto;animation:up .2s ease-out}
+.sheet.ok{background:var(--ok-soft)}
+.sheet.ng{background:var(--ng-soft)}
+.sheet-in{max-width:780px;margin:0 auto;display:grid;gap:8px}
+.sheet h3{font-family:var(--f-display);font-weight:800;font-size:24px}
+.sheet.ok h3{color:var(--ok)}
+.sheet.ng h3{color:var(--ng)}
+.ans{font-weight:700;font-size:17px}
+.why{margin:0;font-size:15px}
+.why b{font-size:12px;letter-spacing:.06em;color:var(--ink-soft);margin-right:6px}
+.pg{font-size:13px;font-weight:700;color:var(--gold)}
+.sheet-art{width:min(100%,260px);border-radius:10px;border:2px solid var(--ink);aspect-ratio:3/2}
+.artcap{font-size:11px;color:var(--ink-soft)}
+.sheetrow{display:flex;justify-content:space-between;align-items:end;gap:12px}
+@keyframes up{from{transform:translateY(100%)}to{transform:none}}
+
+/* result */
+.result{background:var(--panel);border:1.5px solid var(--line);border-radius:22px;padding:22px;display:grid;gap:16px;text-align:center}
+.result h2{font-family:var(--f-display);font-weight:800;font-size:clamp(24px,6vw,32px);line-height:1.4}
+.result .lamps{justify-content:center;flex:none}
+.rstats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.rstat{background:var(--wall-2);border-radius:12px;padding:10px 6px}
+.rstat b{display:block;font-family:var(--f-display);font-size:24px;font-weight:800;font-variant-numeric:tabular-nums}
+.rstat small{font-size:12px;color:var(--ink-soft)}
+.news{display:grid;gap:6px}
+.new{background:var(--gold-soft);color:var(--gold-ink);border-radius:10px;padding:8px 12px;font-weight:700;font-size:14px}
+.ugrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px}
+.ucard{display:grid;gap:4px;text-align:left;font-size:12px;font-weight:700}
+.ucard canvas{width:100%;aspect-ratio:3/2;border-radius:6px;border:2px solid var(--gold)}
+.mist{text-align:left;display:grid;gap:8px}
+.mist .row{border:1.5px solid var(--line);border-radius:12px;padding:8px 12px;display:grid;gap:2px;font-size:14px}
+.mist .row small{color:var(--ink-soft);font-size:12px}
+
+/* collection */
+.cgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px}
+.cc{display:grid;grid-template-columns:minmax(0,1fr);gap:6px;text-align:left;background:var(--panel);border:1.5px solid var(--gold);border-radius:14px;padding:8px;min-width:0}
+.cc canvas{width:100%;aspect-ratio:3/2;border-radius:8px;display:block}
+.cc b{font-family:var(--f-display);font-size:15px;line-height:1.4}
+.cc small{font-size:12px;color:var(--ink-soft)}
+.cc .st{color:var(--gold);letter-spacing:2px;font-size:13px}
+.cc.lk{border:1.5px dashed var(--line);cursor:default}
+.cc.lk .ph{width:100%;aspect-ratio:3/2;border-radius:8px;background:var(--wall-2);display:grid;place-items:center;font-family:var(--f-display);font-size:30px;color:var(--line)}
+.modal{position:fixed;inset:0;z-index:40;background:rgba(10,8,20,.7);display:grid;place-items:center;padding:16px}
+.mpanel{background:var(--panel);border-radius:20px;max-width:520px;width:100%;max-height:90vh;overflow:auto;padding:16px;display:grid;gap:12px;border:2px solid var(--gold)}
+.mpanel canvas{width:100%;aspect-ratio:3/2;border-radius:10px;border:2px solid var(--ink)}
+.mpanel h3{font-family:var(--f-display);font-size:22px;font-weight:800}
+.dl{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;margin:0;font-size:14px}
+.dl dt{color:var(--ink-soft);font-weight:700;font-size:12px;padding-top:2px}
+.dl dd{margin:0;min-width:0;overflow-wrap:anywhere}
+
+canvas#fx{position:fixed;inset:0;pointer-events:none;z-index:50;width:100%;height:100%}
+@media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div id="sheet"></div>
+<div id="modal"></div>
+<canvas id="fx" hidden></canvas>
+<script src="qrcode.js"></script>
+<script>
+"use strict";
+/* ================= 教材データ（教科書 P.110〜113 の記述にそって作成） ================= */
+const ARTISTS = {
+  leo:{n:"レオナルド・ダ・ヴィンチ", s:"レオナルド", yrs:"1452〜1519年", land:"イタリア"},
+  rem:{n:"レンブラント・ファン・レイン", s:"レンブラント", yrs:"1606〜69年", land:"オランダ"},
+  man:{n:"エドゥワール・マネ", s:"マネ", yrs:"1832〜83年", land:"フランス"},
+  tou:{n:"ジョルジュ・ド・ラ・トゥール", s:"ラ・トゥール", yrs:"1593〜1652年", land:"フランス"},
+  ver:{n:"ヨハネス・フェルメール", s:"フェルメール", yrs:"1632〜75年", land:"オランダ"},
+  tai:{n:"横山大観", s:"横山大観", yrs:"1868〜1958年", land:"茨城県"}
+};
+const P = (bg, mid, hi, acc, ink) => ({bg, mid, hi, acc, ink});
+const WORKS = [
+ {id:"mona", t:"モナ・リザ", a:"leo", k:"絵画", y:"1503〜06年ごろ", y0:1503, tech:"油彩", full:"油彩、板", size:[77,53], place:"ルーヴル美術館", land:"フランス", pg:110, motif:"portrait", l:[.5,.36], pal:P("#1F1F14","#5C5A36","#E2C58E","#7FA39C"),
+  sum:"輪郭線を描かないスフマートと、青みを帯びる空気遠近法でえがかれた肖像画。",
+  hints:["レオナルドの作品。画材は油彩で、板に描かれている。","輪郭線を描かないぼかし技法で立体感を出し、背景は遠ざかるほど淡く青みを帯びる。","ルーヴル美術館（フランス）にあり、大きさは77×53cm。1503〜06年ごろの作品。"]},
+ {id:"last", t:"最後の晩餐", a:"leo", k:"絵画", y:"1495〜98年", y0:1495, tech:"テンペラ", full:"テンペラ、壁", size:[420,910], place:"サンタ・マリア・デッレ・グラツィエ教会", land:"イタリア", pg:110, motif:"hall", l:[.5,.45], pal:P("#2E2820","#8A7F6A","#EBE1C8","#7C90B6"),
+  sum:"一点透視図法で空間をえがき、人物を三人一組で演出した壁画。世界遺産。",
+  hints:["壁に描かれた、横が9m以上もある大作。","一点透視図法で空間を表し、人物を三人一組で劇的に演出している。視線と手の表情で心理を描く。","イタリアのサンタ・マリア・デッレ・グラツィエ教会にあり、世界遺産。1495〜98年の作品。"]},
+ {id:"annun", t:"受胎告知", a:"leo", k:"絵画", y:"1472〜75年ごろ", y0:1472, tech:null, full:null, size:null, place:"ウフィツィ美術館", land:"イタリア", pg:110, motif:"portrait", l:[.62,.38], pal:P("#233322","#587049","#EADDB0","#A8433D"),
+  sum:"20歳のころの作品。人物や植物、背景の表現にレオナルドの特徴が表れている。",
+  hints:["レオナルドが20歳のころに描いた作品。","人物や植物、背景の表現に、レオナルドの作品の特徴が確認できる。","ウフィツィ美術館（イタリア）にある。1472〜75年ごろ。"]},
+ {id:"jerome", t:"聖ヒエロニムス", a:"leo", k:"絵画", y:"1480〜82年ごろ", y0:1480, tech:null, full:null, size:null, place:"バチカン美術館", land:"バチカン", pg:110, motif:"portrait", l:[.46,.34], pal:P("#3A2418","#9A5B2A","#E8B56C","#6E7B8B"),
+  sum:"28歳ごろの未完の作品。人物表現に解剖学の成果が見られる。",
+  hints:["レオナルドが28歳ごろに手がけた未完の作品。","砂漠で苦行する聖人に、レオナルド自身の姿を投影している。人物表現に解剖学の成果が見られる。","バチカン美術館（バチカン）にある。1480〜82年ごろ。"]},
+ {id:"ermine", t:"白貂を抱く婦人", a:"leo", k:"絵画", y:"1485〜90年ごろ", y0:1485, tech:null, full:null, size:null, place:"チャルトリスキ美術館", land:"ポーランド", pg:111, motif:"portrait", l:[.44,.4], pal:P("#14110F","#3A2A24","#E8C9A5","#EFE9DF"),
+  sum:"優美で気品がある肖像画。手や動物の表現に観察眼の鋭さがうかがえる。",
+  hints:["レオナルドが33〜38歳ごろに描いた、優美で気品のある肖像画。","手や動物の表現に、レオナルドの観察眼の鋭さがうかがえる。","ポーランドのチャルトリスキ美術館にある。女性がかかえているのは白い貂（てん）。"]},
+ {id:"anne", t:"聖アンナと聖母子", a:"leo", k:"絵画", y:"1510年ごろ", y0:1510, tech:null, full:null, size:null, place:"ルーヴル美術館", land:"フランス", pg:111, motif:"triangle", l:[.5,.3], pal:P("#43362A","#788A76","#E3CB9C","#5E7FA3"),
+  sum:"マリアとアンナと幼いキリストが、三角形にまとまった構図でえがかれている。",
+  hints:["レオナルドが58歳ごろ（1510年ごろ）に描いた作品。","幼いキリストを抱き寄せるマリアと、二人を見つめるアンナが、三角形にまとまった構図で描かれている。","ルーヴル美術館（フランス）にある。"]},
+ {id:"john", t:"洗礼者ヨハネ", a:"leo", k:"絵画", y:"1513〜16年ごろ", y0:1513, tech:null, full:null, size:null, place:"ルーヴル美術館", land:"フランス", pg:111, motif:"portrait", l:[.52,.36], pal:P("#1B1410","#6B4A2B","#E6B979","#C4A07A"),
+  sum:"レオナルド最後の作品。不思議な笑みをスフマートの技法で表現している。",
+  hints:["レオナルド最後の作品。61〜64歳ごろに描かれた。","不思議な笑みをたたえた表情が、スフマートの技法で表現されている。","ルーヴル美術館（フランス）にある。1513〜16年ごろ。"]},
+ {id:"self", t:"自画像（部分）", a:"leo", k:"素描", y:"1512〜13年ごろ", y0:1512, tech:null, full:null, size:null, place:"トリノ王立図書館", land:"イタリア", pg:110, motif:"sk-chalk", l:[.5,.4], pal:P("#E7CFA8","#D2AE7C","#F6E9CF","#9A4A2C","#8A3F25"),
+  sum:"60歳前後のレオナルドの姿。赤茶色の線でえがかれている。",
+  hints:["レオナルド自身の姿をえがいた作品（部分）。","1512〜13年ごろ、レオナルドが60歳前後のころの作品。","トリノ王立図書館（イタリア）にある。"]},
+ {id:"anat", t:"肩の筋肉の解剖図", a:"leo", k:"素描", y:"1510〜11年ごろ", y0:1510, tech:"ペン・インク", full:"ペン・インク、紙", size:[29.2,19.8], place:"ウィンザー城王立図書館", land:"イギリス", pg:111, motif:"sk-anatomy", l:[.4,.4], pal:P("#E6D3AC","#CDB083","#F4E8CB","#6B3F20","#5A3418"),
+  sum:"体のしくみを観察して記録した手稿。まわりに鏡文字の書き込みがある。",
+  hints:["ペンとインクで紙に描かれた手稿のひとつ。","肩の筋肉のようすを観察して描いた図。まわりに鏡文字の書き込みがある。","ウィンザー城王立図書館（イギリス）にある。1510〜11年ごろ。"]},
+ {id:"heli", t:"ヘリコプターの習作（部分）", a:"leo", k:"素描", y:"1483〜90年ごろ", y0:1483, tech:"ペン・インク", full:"ペン・インク、紙", size:[23.3,16.6], place:"国立レオナルド・ダ・ヴィンチ科学技術博物館", land:"イタリア", pg:111, motif:"sk-spiral", l:[.42,.4], pal:P("#E8D6AF","#D0B484","#F5EACB","#5E3A1E","#503119"),
+  sum:"時代を先取りした発明家の一面を示すスケッチ。のちに模型が再現された。",
+  hints:["レオナルドが考えた、空を飛ぶ機械のスケッチ。","ペン・インクで紙に描かれた。この図をもとに模型が再現されている。","国立レオナルド・ダ・ヴィンチ科学技術博物館（イタリア）にある。1483〜90年ごろ。"]},
+ {id:"water", t:"水流のスケッチ（部分）", a:"leo", k:"素描", y:"1508〜10年ごろ", y0:1508, tech:"ペン・インク", full:"ペン・インク、紙", size:[29,20.2], place:"ウィンザー城王立図書館", land:"イギリス", pg:111, motif:"sk-swirl", l:[.5,.5], pal:P("#E5D2AA","#CBAE80","#F3E7C8","#5B3A22","#4B2F1B"),
+  sum:"うずまく水を観察して描いたスケッチ。レオナルドの探究心を示す。",
+  hints:["レオナルドが自然を観察して描いたスケッチ。","うずを巻いて流れる水のようすを、ペン・インクで描いている。","ウィンザー城王立図書館（イギリス）にある。1508〜10年ごろ。"]},
+ {id:"pump", t:"揚水機のスケッチ（部分）", a:"leo", k:"素描", y:"1480〜82年ごろ", y0:1480, tech:"ペン・インク", full:"ペン・インク、紙", size:null, place:"アンブロジアーナ図書館", land:"イタリア", pg:111, motif:"sk-wheel", l:[.4,.5], pal:P("#E6D4AD","#CDB284","#F4E9CC","#5A381D","#4D301A"),
+  sum:"水をくみ上げる機械を考えたスケッチ。工学への関心を示す。",
+  hints:["水をくみ上げる機械を考えた手稿。","歯車や水車のような部品が、ペン・インクで描かれている。","アンブロジアーナ図書館（イタリア）にある。1480〜82年ごろ。"]},
+ {id:"dogcat", t:"犬と猫の習作（部分）", a:"leo", k:"素描", y:"1467〜1519年", y0:1467, tech:"メタルポイント", full:"メタルポイント、紙", size:[13.9,10.4], place:"大英博物館", land:"イギリス", pg:111, motif:"sk-animals", l:[.45,.5], pal:P("#E7D5B0","#CFB487","#F5EACD","#6A4526","#5A3A20"),
+  sum:"動物のさまざまなポーズを観察した小さな習作。",
+  hints:["動物をじっくり観察して描いた習作。","メタルポイントという画材で、紙に小さく描かれている。","大英博物館（イギリス）にある。大きさは13.9×10.4cm。"]},
+ {id:"study", t:"「最後の晩餐」のための習作", a:"leo", k:"素描", y:"1495〜97年ごろ", y0:1495, tech:"サンギュイン", full:"サンギュイン、紙", size:null, place:"アカデミア美術館", land:"イタリア", pg:111, motif:"sk-chalk2", l:[.5,.5], pal:P("#EAD8B9","#D6B88C","#F7EBD2","#A5472F","#9B3F29"),
+  sum:"名画をつくるための下絵。人物の配置や表情を練っている。",
+  hints:["大きな壁画をつくる前に描いた下絵（習作）。","サンギュインという赤茶色の画材で、紙に描かれた。","アカデミア美術館（イタリア）にある。1495〜97年ごろ。"]},
+ {id:"night", t:"夜警", a:"rem", k:"絵画", y:"1642年", y0:1642, tech:"油彩", full:"油彩、キャンヴァス", size:[379.5,453.5], place:"アムステルダム国立美術館", land:"オランダ", pg:112, motif:"group", l:[.5,.52], pal:P("#1A1510","#5A4730","#F0C45A","#B23A2E"),
+  sum:"出動する自警団を、スポットライトを当てたように浮かび上がらせた集団肖像画。",
+  hints:["1642年にオランダの画家が描いた、縦横3m以上の大きな作品。","今まさに出動しようとする自警団を描いた集団肖像画。","スポットライトを当てたように人物を浮かび上がらせている。アムステルダム国立美術館にある。"]},
+ {id:"folies", t:"フォリー・ベルジェールのバー", a:"man", k:"絵画", y:"1882年", y0:1882, tech:"油彩", full:"油彩、キャンヴァス", size:[96,130], place:"コートールド美術館", land:"イギリス", pg:113, motif:"bar", l:[.5,.2], pal:P("#241C33","#5B4A67","#F4E3C4","#E8892B"),
+  sum:"背後ににぎやかな店内が鏡に映る。ガラスやシャンデリアの輝きが華やかさを盛り上げる。",
+  hints:["1882年に描かれた、フランスの画家の作品。","カウンターにたたずむ女性の背後に、鏡に映ったにぎやかな店内が描かれている。","ガラスやシャンデリアの輝きが場の華やかさを盛り上げる。コートールド美術館（イギリス）にある。"]},
+ {id:"joseph", t:"大工の聖ヨセフ", a:"tou", k:"絵画", y:"1640年ころ", y0:1640, tech:"油彩", full:"油彩、キャンヴァス", size:[137,102], place:"ルーヴル美術館", land:"フランス", pg:113, motif:"candle", l:[.52,.5], pal:P("#0C0A09","#2A1810","#FF9E3D","#FFD08A"),
+  sum:"闇の中で、ろうそくの光が人物を照らし出している。",
+  hints:["1640年ころにフランスの画家が描いた作品。","まわりは闇で、ろうそくの光が人物を照らし出している。","ルーヴル美術館（フランス）にある。大きさは137×102cm。"]},
+ {id:"milk", t:"牛乳を注ぐ女", a:"ver", k:"絵画", y:"1658〜59年", y0:1658, tech:"油彩", full:"油彩、キャンヴァス", size:[45.5,41], place:"アムステルダム国立美術館", land:"オランダ", pg:113, motif:"window", l:[.16,.3], pal:P("#B9AE94","#D3C8AE","#FBEFC8","#2F4F9B"),
+  sum:"45.5×41cmの小さな画面に、台所の静かな光をとらえた作品。",
+  hints:["1658〜59年ごろに描かれた、45.5×41cmの小さな作品。","オランダの画家の作品。台所で女性が壺から器へ、何かをそそいでいる。","アムステルダム国立美術館にある。作者はヨハネス・フェルメール。"]},
+ {id:"yoz", t:"夜桜", a:"tai", k:"絵画", y:"1929年", y0:1929, tech:"紙本着色", full:"紙本着色／六曲一双のうち左隻", size:[177.5,376.8], place:"大倉集古館", land:"日本（東京都）", pg:113, motif:"blossom", l:[.82,.16], pal:P("#0F1A22","#1F3340","#F4E6A8","#2F6B4B"),
+  sum:"満月とかがり火に照らされ、桜の花が白く幻想的に浮かび上がる。",
+  hints:["日本の画家が1929年に描いた、紙本着色の作品。","六曲一双の屏風のうち左隻。満月のもと、かがり火に照らされて花が白く浮かび上がる。","東京都の大倉集古館にある。作者は横山大観。"]}
+];
+const W = Object.fromEntries(WORKS.map(w => [w.id, w]));
+const PAINT = WORKS.filter(w => w.k === "絵画");
+const SIZED = PAINT.filter(w => w.size);
+const area = w => w.size[0] * w.size[1];
+const ERA = (y) => y < 1868 ? "江戸時代" : y < 1912 ? "明治時代" : y < 1926 ? "大正時代" : "昭和時代";
+
+/* ----- 4択・○×の固定問題（x は不正解の選択肢。x が1つなら○×） ----- */
+const BANKS = {
+leo:[
+ {q:"レオナルド・ダ・ヴィンチが生まれた国は？", a:"イタリア", x:["フランス","オランダ","イギリス"], why:"1452年、イタリアのトスカーナ地方のヴィンチ村に生まれた。", pg:110},
+ {q:"レオナルドが生まれたのは何年？", a:"1452年", x:["1503年","1519年","1495年"], why:"レオナルドは1452年から1519年まで生きた。", pg:110},
+ {q:"「レオナルド・ダ・ヴィンチ」という名前には、どんな意味がある？", a:"「ヴィンチ村のレオナルド」", x:["「万能の天才レオナルド」","「光をえがくレオナルド」","「ヴェロッキオの弟子レオナルド」"], why:"ヴィンチ村に生まれたので、「ヴィンチ村のレオナルド」という意味になる。", pg:110},
+ {q:"14歳のころ、フィレンツェに出て弟子入りした師匠はだれ？", a:"ヴェロッキオ", x:["ミケランジェロ","ラファエロ","レンブラント"], why:"14歳のころフィレンツェに出て、ヴェロッキオに弟子入りした。", pg:110},
+ {q:"30歳のころ、活躍の舞台を求めて移り住んだ都市は？", a:"ミラノ", x:["パリ","アムステルダム","ロンドン"], why:"30歳のころ、活躍の舞台を求めてミラノに移住した。", pg:110},
+ {q:"教科書にあげられている、レオナルドが関心をもった分野はどれ？", a:"解剖学", x:["経済学","心理学","法学"], why:"建築、彫刻、生物学、物理学、天文学、地質学、解剖学、工学など、幅広い分野に関心をもった。", pg:110},
+ {q:"レオナルドが考案した、時代を先取りした発明は？", a:"ヘリコプター", x:["電話","電球","テレビ"], why:"ヘリコプターの考案といった、時代を先取りした発明家でもあった。", pg:110},
+ {q:"レオナルドが手帳に書いた文字には、どんな特徴がある？", a:"左右が逆の鏡文字", x:["たて書きの文字","点で表す文字","絵で表す文字"], why:"手稿は、左右逆の鏡文字で記されている。", pg:111},
+ {q:"レオナルドの手稿は、どれくらいの数になる？", a:"数千枚", x:["数枚","数十枚","数百万枚"], why:"その数は数千枚にもおよぶ。観察と記録、考察を重ねたことから、計り知れない探究心がうかがえる。", pg:111},
+ {q:"レオナルド最後の作品は？", a:"洗礼者ヨハネ", x:["モナ・リザ","最後の晩餐","受胎告知"], why:"「洗礼者ヨハネ」は1513〜16年ごろ、61〜64歳ごろの作品で、レオナルド最後の作品。", work:"john", pg:111},
+ {q:"「受胎告知」は、何歳ごろの作品？", a:"20〜23歳ごろ", x:["33〜38歳ごろ","58歳ごろ","61〜64歳ごろ"], why:"1472〜75年ごろ、20歳のころに描かれた。", work:"annun", pg:110},
+ {q:"28歳ごろに描かれた未完の作品は？", a:"聖ヒエロニムス", x:["白貂を抱く婦人","聖アンナと聖母子","最後の晩餐"], why:"砂漠で苦行する聖人にレオナルド自身の姿を投影した、内面表現の作品。", work:"jerome", pg:110},
+ {q:"○か×か。レオナルドが関心をもったのは、絵画だけだった。", a:"×", x:["○"], why:"絵画のほか、建築、彫刻、生物学、天文学、解剖学、工学など、幅広い分野に関心をもった。", pg:110},
+ {q:"○か×か。レオナルドは、自然や人間を科学的な見方でとらえ、新しい絵画表現を追求した。", a:"○", x:["×"], why:"自然や人間を科学的な見方でとらえ、新しい絵画表現を追求していった。", pg:110},
+ {q:"1452年生まれのレオナルドが「最後の晩餐」（1495〜98年）を描いたころ、何歳ぐらい？", sub:"年のさを計算してみよう。", a:"43〜46歳ごろ", x:["33〜36歳ごろ","53〜56歳ごろ","23〜26歳ごろ"], why:"1495−1452＝43、1498−1452＝46。43〜46歳ごろに描いたことになる。", work:"last", pg:110},
+ {q:"レオナルドは1452年に生まれ、1519年に亡くなった。何歳で亡くなった？", a:"67歳", x:["57歳","77歳","61歳"], why:"1519−1452＝67。", pg:110}
+],
+tech:[
+ {q:"輪郭線を描かず、明暗によってぼかして立体感を出す技法は？", a:"スフマート", x:["空気遠近法","一点透視図法","点描"], why:"輪郭線を描かない明暗によるぼかし技法を、スフマートという。", pg:110, lab:"sfu"},
+ {q:"「洗礼者ヨハネ」の不思議な笑みは、どの技法で表現されている？", a:"スフマート", x:["一点透視図法","点描","鏡文字"], why:"不思議な笑みをたたえた表情が、スフマートの技法で表現されている。", work:"john", pg:111, lab:"sfu"},
+ {q:"スフマートの「ぼかし」で、どんな効果が生まれる？", a:"立体感が出る", x:["色が消える","遠くのものが近く見える","字が読みやすくなる"], why:"輪郭線を描かない明暗によるぼかし技法で、立体感を表現している。", pg:110, lab:"sfu"},
+ {q:"遠ざかるにつれて色調が淡く、青みを帯びるように描く方法は？", a:"空気遠近法", x:["スフマート","一点透視図法","黄金比"], why:"遠ざかるにつれて色調が淡く青みを帯びる表現を、空気遠近法という。", pg:110, lab:"air"},
+ {q:"「モナ・リザ」の背景は、どんな方法で表現されている？", a:"空気遠近法", x:["一点透視図法","鏡文字","テンペラ"], why:"背景は、遠ざかるにつれて色調が淡く青みを帯びる、空気遠近法で表現されている。", work:"mona", pg:110, lab:"air"},
+ {q:"空気遠近法で、遠くの山はどう描く？", a:"色調を淡く、青みを帯びさせる", x:["色を濃く、赤みを帯びさせる","黒い輪郭線ではっきり描く","手前の山と同じ色にする"], why:"遠ざかるにつれて、色調が淡く青みを帯びるように描く。", pg:110, lab:"air"},
+ {q:"「最後の晩餐」で、空間を表すために使われた方法は？", a:"一点透視図法", x:["空気遠近法","スフマート","鏡文字"], why:"一点透視図法による空間表現が使われている。", work:"last", pg:111, lab:"vp"},
+ {q:"一点透視図法で、ななめの線が集まる一点を何という？", a:"消失点", x:["中心点","黄金点","交差点"], why:"奥行きを表す線が集まる一点を、消失点という。", pg:111, lab:"vp"},
+ {q:"考えよう。「最後の晩餐」の消失点は、画面のどのあたりにある？", think:true, a:"中央にいるイエスの頭のあたり", x:["左はしの窓","天井の左すみ","テーブルの手前"], why:"画面の中央に線が集まっている。見る人の視線が、自然と中心の人物に向かうしくみになっている。", work:"last", pg:111, lab:"vp"},
+ {q:"「最後の晩餐」で、人物はどのように演出されている？", a:"三人一組で劇的に", x:["全員が正面を向いて一列に","一人ずつ別の絵に","全員が同じポーズで"], why:"三人一組で劇的に演出し、視線と手の表情で各人の心理を描いている。", work:"last", pg:111, lab:"vp"},
+ {q:"「最後の晩餐」は、何に描かれている？", a:"教会の壁", x:["木の板","キャンヴァス","紙"], why:"画材はテンペラで、サンタ・マリア・デッレ・グラツィエ教会の壁に描かれている。", work:"last", pg:110},
+ {q:"「モナ・リザ」が描かれているのは？", a:"板", x:["壁","キャンヴァス","紙"], why:"「モナ・リザ」は油彩で、板に描かれている。", work:"mona", pg:110},
+ {q:"「聖アンナと聖母子」の構図の特徴は？", a:"三角形にまとまっている", x:["円形に並んでいる","一直線に並んでいる","左右が逆になっている"], why:"幼いキリストを抱き寄せるマリアと、二人を見つめるアンナが、三角形にまとまった構図で描かれている。", work:"anne", pg:111},
+ {q:"「白貂を抱く婦人」で、レオナルドの観察眼の鋭さがうかがえるのは？", a:"手や動物の表現", x:["背景の建物","文字の大きさ","額縁のかざり"], why:"優美で気品がある肖像画で、手や動物の表現に観察眼の鋭さがうかがえる。", work:"ermine", pg:111},
+ {q:"「聖ヒエロニムス」の人物表現に見られる学問の成果は？", a:"解剖学", x:["天文学","地質学","経済学"], why:"人物表現に解剖学の成果が見られる。", work:"jerome", pg:110},
+ {q:"レオナルドの手稿を読むには、どうすればよい？", a:"鏡に映す", x:["さかさまにする","暗い所で見る","水にぬらす"], why:"左右逆の鏡文字なので、鏡に映すと読める。", pg:111, lab:"mir"},
+ {q:"鏡文字とは、どんな文字？", a:"左右が逆になった文字", x:["上下が逆になった文字","色がうすい文字","とても小さい文字"], why:"左右が逆になった文字を、鏡文字という。", pg:111, lab:"mir"},
+ {q:"手稿が数千枚もあることから、うかがえることは？", a:"計り知れない探究心", x:["絵が苦手だったこと","あまり関心がなかったこと","いそがしかったこと"], why:"観察と記録、考察を重ねたことから、計り知れない探究心がうかがえる。", pg:111, lab:"mir"}
+],
+light:[
+ {q:"西洋で、明暗の調子による立体感や遠近感の表現がされてきたのは、いつごろから？", a:"15世紀ごろ", x:["12世紀ごろ","18世紀ごろ","20世紀ごろ"], why:"西洋では15世紀ごろから、明暗の調子によって、意図して立体感や遠近感が表現されてきた。", pg:112},
+ {q:"光とかげの表現を工夫すると、どんなことができると教科書に書かれている？", a:"主題を強調したり、情景を演出したりする", x:["絵の具を節約する","作品を早く仕上げる","見る人に何も感じさせない"], why:"光とかげの表現を工夫することで、主題を強調したり、情景を演出したりしている。", pg:112},
+ {q:"「夜警」に描かれているのは？", a:"今まさに出動しようとする自警団", x:["音楽会に集まる人々","畑ではたらく農民","市場でにぎわう商人"], why:"今まさに出動しようとする自警団を描いた集団肖像画。", work:"night", pg:112},
+ {q:"「夜警」のように、大ぜいの人を描いた肖像画を何という？", a:"集団肖像画", x:["自画像","風景画","静物画"], why:"自警団を描いた「夜警」は、集団肖像画。", work:"night", pg:112},
+ {q:"レンブラントは「夜警」で、光をどのように使っている？", a:"スポットライトを当てたように人物を浮かび上がらせる", x:["画面全体をまんべんなく明るくする","光をまったく使わない","人物を輪郭線だけで描く"], why:"スポットライトを当てたように人物を浮かび上がらせ、画面をドラマチックに表現している。", work:"night", pg:112},
+ {q:"「夜警」は、西洋のどの時代の美術？", a:"バロック", x:["ロココ","印象主義","古代ギリシャ"], why:"教科書の年表では、「夜警」はバロックの時期にある。", work:"night", pg:112},
+ {q:"「夜警」が描かれた1642年、日本は何時代？", a:"江戸時代", x:["室町時代","明治時代","平安時代"], why:"1642年は江戸時代。江戸時代は1603年から1868年まで続いた。", work:"night", pg:112},
+ {q:"「フォリー・ベルジェールのバー」で、女性の背後ににぎやかな店内が見えるのはなぜ？", a:"鏡に映し出されているから", x:["窓の外が見えているから","別の部屋の絵だから","かべに絵がはってあるから"], why:"よく見ると、それは鏡に映し出されたもののようだと教科書に書かれている。", work:"folies", pg:113},
+ {q:"「フォリー・ベルジェールのバー」で、場の華やかさを盛り上げているのは？", a:"ガラスやシャンデリアの輝き", x:["雪あかり","画面いっぱいの黒いかげ","たき火のけむり"], why:"ガラスやシャンデリアの輝きが、この場の華やかさを盛り上げている。", work:"folies", pg:113},
+ {q:"考えよう。「フォリー・ベルジェールのバー」の光は、どこから照らされていると考えられる？", think:true, a:"店内のシャンデリアなど、上のほうの灯り", x:["画面の外の夕日だけ","足もとのろうそくだけ","光はなく、すべてかげ"], why:"天井のシャンデリアなど店内の灯りが、女性の顔や胸もとを照らし、ガラスを輝かせている。これはひとつの考え方。友だちの意見も聞いてみよう。", work:"folies", pg:113},
+ {q:"絵をよく見よう。「大工の聖ヨセフ」で、人物を照らしている光は？", think:true, a:"ろうそくの光", x:["昼の太陽の光","満月の光","雷の光"], why:"闇の中で、ろうそくの光が人物を照らし出している。", work:"joseph", pg:113},
+ {q:"「夜桜」で、桜の花が白く浮かび上がって見えるのはなぜ？", a:"満月とかがり火に照らされているから", x:["昼の太陽に照らされているから","電灯に照らされているから","雪がつもっているから"], why:"満月のもと、かがり火に照らし出されて、桜の花が白く幻想的に浮かび上がっている。", work:"yoz", pg:113},
+ {q:"日本の絵画にも見られる光の表現として、教科書があげているものは？", a:"ほのかな月明かりや、ゆらめくかがり火", x:["まぶしい蛍光灯","ネオンサイン","フラッシュ撮影"], why:"ほのかな月明かりや揺らめくかがり火などの光によって、闇の中に浮かび上がるような光の表現が見られる。", work:"yoz", pg:113},
+ {q:"「フォリー・ベルジェールのバー」（1882年）が描かれたころ、日本は何時代？", a:"明治時代", x:["江戸時代","大正時代","昭和時代"], why:"1882年は明治15年。明治時代は1868年から1912年まで。", work:"folies", pg:112},
+ {q:"「夜桜」（1929年）が描かれたころ、日本は何時代？", a:"昭和時代", x:["明治時代","大正時代","江戸時代"], why:"1929年は昭和4年。昭和時代は1926年に始まった。", work:"yoz", pg:112}
+]};
+const TAGNAME = {leo:"レオナルド", tech:"技法", light:"光とかげ", g:"作品データ", h:"ヒントクイズ", o:"ならべかえ", l:"光のラボ"};
+const LABS = [
+  {id:"sfu", n:"スフマート", t:"輪郭線を消して、ぼかしてみよう"},
+  {id:"air", n:"空気遠近法", t:"遠くの山を、かすませてみよう"},
+  {id:"vp", n:"一点透視図法", t:"消失点を動かしてみよう"},
+  {id:"mir", n:"鏡文字", t:"レオナルド流に書いてみよう"}
+];
+const DIRS = ["右","右上","上","左上","左","左下","下","右下"];
+const ARROW = {"右":"→","右上":"↗","上":"↑","左上":"↖","左":"←","左下":"↙","下":"↓","右下":"↘"};
+const OPP = {"右":"左","右上":"左下","上":"下","左上":"右下","左":"右","左下":"右上","下":"上","右下":"左上"};
+const RANKS = [[0,"見習い学芸員"],[120,"学芸員補"],[320,"学芸員"],[600,"主任学芸員"],[1000,"館長"]];
+const ROOMS = [
+  {id:"hint", n:1, t:"この作品なーんだ", d:"ヒントを1つずつひらいて、作品名を当てる。少ないヒントで当てるほど高得点。", meta:"6問"},
+  {id:"leo", n:2, t:"レオナルドの人生", d:"生い立ち、発明、手稿。○×と4択で確かめる。", meta:"8問"},
+  {id:"data", n:3, t:"作者・美術館・年代", d:"作品のデータを、ぬけなく覚える。", meta:"10問"},
+  {id:"order", n:4, t:"ならべかえ", d:"年代順と大きさ順に、カードをならべる。", meta:"4回"},
+  {id:"lab", n:5, t:"技法ラボ", d:"スフマートや透視図法を、さわって試す。", meta:"4つの実験"},
+  {id:"light", n:6, t:"光のラボ", d:"光を動かして、かげの向きを読みとる。", meta:"6問"},
+  {id:"exam", n:7, t:"学芸員試験", d:"全室の総まとめ。ライフは3つ。", meta:"12問"}
+];
+
+/* ================= 小道具 ================= */
+const app = document.getElementById("app"), sheetRoot = document.getElementById("sheet"), modalRoot = document.getElementById("modal");
+const esc = s => String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+function shuffle(a){ a = a.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+const sample = (a, n) => shuffle(a).slice(0, n);
+const pick = a => a[Math.floor(Math.random()*a.length)];
+const range = n => Array.from({length:n}, (_, i) => i);
+const KANA = ["ア","イ","ウ","エ"];
+const fmt = n => Math.round(n).toLocaleString("ja-JP");
+function rankInfo(xp){
+  let i = 0; RANKS.forEach((r, k) => { if(xp >= r[0]) i = k; });
+  const nx = RANKS[i+1];
+  return {i, name:RANKS[i][1], next:nx, pct:nx ? (xp-RANKS[i][0])*100/(nx[0]-RANKS[i][0]) : 100, toNext:nx ? nx[0]-xp : 0};
+}
+
+/* ================= 保存 ================= */
+const KEY = "hkm-v1";
+const defaults = () => ({xp:0, m:{}, rooms:{}, labs:{}, wrong:[], sound:true});
+function load(){
+  const d = defaults();
+  try{ const s = JSON.parse(localStorage.getItem(KEY) || "null"); if(s) Object.assign(d, s); }catch(e){}
+  return d;
+}
+let S = load();
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} }
+
+/* ================= 効果音 ================= */
+let AC = null;
+function tone(seq){
+  if(!S.sound) return;
+  try{
+    AC = AC || new (window.AudioContext || window.webkitAudioContext)();
+    const t0 = AC.currentTime;
+    seq.forEach(([f, d, st, type, vol]) => {
+      const o = AC.createOscillator(), g = AC.createGain();
+      o.type = type || "triangle"; o.frequency.value = f;
+      g.gain.setValueAtTime(0.0001, t0+st);
+      g.gain.exponentialRampToValueAtTime(vol || 0.15, t0+st+0.01);
+      g.gain.exponentialRampToValueAtTime(0.0001, t0+st+d);
+      o.connect(g); g.connect(AC.destination); o.start(t0+st); o.stop(t0+st+d+0.03);
+    });
+  }catch(e){}
+}
+const SFX = {
+  ok:() => tone([[660,.12,0],[990,.22,.09]]),
+  ng:() => tone([[196,.28,0,"sawtooth",.06],[147,.32,.1,"sawtooth",.05]]),
+  win:() => tone([[523,.15,0],[659,.15,.12],[784,.15,.24],[1047,.45,.36]]),
+  tap:() => tone([[880,.05,0,"sine",.07]]),
+  lamp:() => tone([[440,.08,0,"sine",.08],[587,.1,.06,"sine",.08]])
+};
+
+/* ================= 作品の「色と光のイメージ」（実物ではなく、色と光の配置を描いたもの） ================= */
+function rng(seed){ let a = seed >>> 0; return () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+function hashStr(s){ let h = 2166136261; for(const ch of s){ h ^= ch.charCodeAt(0); h = Math.imul(h, 16777619); } return h >>> 0; }
+const hexRGB = h => { const n = parseInt(h.slice(1), 16); return [n>>16&255, n>>8&255, n&255]; };
+const rgba = (h, a) => { const [r,g,b] = hexRGB(h); return `rgba(${r},${g},${b},${a})`; };
+const mix = (h1, h2, t) => { const a = hexRGB(h1), b = hexRGB(h2); return `rgb(${a.map((v,i)=>Math.round(v+(b[i]-v)*t)).join(",")})`; };
+function vgrad(c, W, H, top, bot){ const g = c.createLinearGradient(0,0,0,H); g.addColorStop(0, top); g.addColorStop(1, bot); c.fillStyle = g; c.fillRect(0,0,W,H); }
+function glow(c, W, H, x, y, rad, col, a){ const g = c.createRadialGradient(x,y,0,x,y,rad); g.addColorStop(0, rgba(col, a)); g.addColorStop(1, rgba(col, 0)); c.fillStyle = g; c.fillRect(0,0,W,H); }
+const TAU = Math.PI * 2;
+function ell(c, x, y, rx, ry){ c.beginPath(); c.ellipse(x, y, rx, ry, 0, 0, TAU); }
+function parch(c, W, H, p, r){ vgrad(c, W, H, p.mid, p.bg); for(let i=0;i<260;i++){ c.fillStyle = rgba(p.ink, .04 + .05*r()); c.fillRect(r()*W, r()*H, 1 + r()*2, 1 + r()*2); } }
+function mirrorText(c, x, y, w, n, p, r){
+  c.strokeStyle = rgba(p.ink, .55); c.lineWidth = 1.2;
+  for(let i=0;i<n;i++){ const yy = y + i*9; let len = 0; c.beginPath(); while(len < w-6){ const s = 3 + r()*9; c.moveTo(x+w-len, yy); c.lineTo(x+w-len-s, yy + (r()-.5)*2); len += s + 3; } c.stroke(); }
+}
+const MOTIF = {
+ portrait(c,W,H,p,r,lx,ly){
+  vgrad(c,W,H,p.mid,p.bg);
+  for(let k=0;k<3;k++){ c.fillStyle = rgba(p.acc, .16 + .08*k); c.beginPath(); c.moveTo(0,H*.75); for(let x=0;x<=W;x+=20) c.lineTo(x, H*(.5+.06*k) - 18*r()); c.lineTo(W,H*.75); c.fill(); }
+  glow(c,W,H,lx,ly,H*.75,p.hi,.55);
+  c.fillStyle = mix(p.bg,"#000000",.35); ell(c,W*.5,H*1.02,W*.3,H*.36); c.fill();
+  c.fillStyle = rgba(p.acc,.75); ell(c,W*.5,H*1.05,W*.26,H*.3); c.fill();
+  const g = c.createRadialGradient(lx,ly,4,W*.5,H*.42,H*.26); g.addColorStop(0,p.hi); g.addColorStop(1,mix(p.hi,p.bg,.7));
+  c.fillStyle = g; ell(c,W*.5,H*.42,W*.095,H*.19); c.fill();
+  c.fillStyle = mix(p.bg,"#000000",.5); c.beginPath(); c.ellipse(W*.5,H*.3,W*.11,H*.13,0,Math.PI,0); c.fill();
+ },
+ hall(c,W,H,p,r){
+  vgrad(c,W,H,p.mid,p.bg);
+  c.fillStyle = mix(p.mid,p.hi,.25); c.fillRect(W*.3,H*.18,W*.4,H*.38);
+  for(let i=0;i<3;i++){ c.fillStyle = rgba(p.acc,.8); c.fillRect(W*(.36+i*.11),H*.24,W*.07,H*.17); }
+  c.strokeStyle = rgba(p.hi,.35); c.lineWidth = 1.5;
+  [[0,0,W*.3,H*.18],[W,0,W*.7,H*.18],[0,H,W*.3,H*.56],[W,H,W*.7,H*.56]].forEach(l => { c.beginPath(); c.moveTo(l[0],l[1]); c.lineTo(l[2],l[3]); c.stroke(); });
+  c.fillStyle = mix(p.hi,p.bg,.15); c.fillRect(W*.1,H*.6,W*.8,H*.1);
+  const cols = [p.acc,p.mid,p.hi,"#9A6F4A"];
+  for(let i=0;i<13;i++){ const x = W*(.14+i*.06), c0 = cols[i%4]; c.fillStyle = c0; c.fillRect(x-6,H*.5,12,H*.12); c.fillStyle = p.hi; c.beginPath(); c.arc(x,H*.47,5,0,TAU); c.fill(); }
+  glow(c,W,H,W*.5,H*.5,H*.5,p.hi,.45);
+ },
+ triangle(c,W,H,p,r,lx,ly){
+  vgrad(c,W,H,p.mid,p.bg);
+  for(let k=0;k<2;k++){ c.fillStyle = rgba(p.acc,.18+.1*k); c.beginPath(); c.moveTo(0,H*.7); for(let x=0;x<=W;x+=24) c.lineTo(x,H*(.45+.08*k)-16*r()); c.lineTo(W,H*.7); c.fill(); }
+  glow(c,W,H,lx,ly,H*.8,p.hi,.5);
+  c.fillStyle = rgba(p.acc,.75); c.beginPath(); c.moveTo(W*.12,H*1.02); c.lineTo(W*.5,H*.34); c.lineTo(W*.88,H*1.02); c.fill();
+  [[.5,.28,17],[.38,.55,13],[.64,.62,9]].forEach(([x,y,rr]) => { c.fillStyle = p.hi; c.beginPath(); c.arc(W*x,H*y,rr,0,TAU); c.fill(); });
+ },
+ group(c,W,H,p,r){
+  vgrad(c,W,H,p.mid,p.bg);
+  c.strokeStyle = rgba(p.hi,.3); c.lineWidth = 1.2;
+  for(let i=0;i<7;i++){ c.beginPath(); c.moveTo(W*(.1+r()*.8),H*.85); c.lineTo(W*(.1+r()*.8),H*.05); c.stroke(); }
+  for(let i=0;i<16;i++){ const x = W*(.06+r()*.88), y = H*(.42+r()*.12); c.fillStyle = mix(p.bg,"#000000",.3+.3*r()); c.fillRect(x-8,y,16,H*.4); c.fillStyle = mix(p.mid,p.bg,.4); c.beginPath(); c.arc(x,y-4,6,0,TAU); c.fill(); }
+  glow(c,W,H,W*.5,H*.58,W*.42,p.hi,.7);
+  c.fillStyle = "#15110d"; c.fillRect(W*.37,H*.5,W*.1,H*.46); c.fillStyle = p.acc; c.fillRect(W*.37,H*.56,W*.1,10);
+  c.fillStyle = p.hi; c.fillRect(W*.5,H*.52,W*.1,H*.44);
+  c.fillStyle = mix(p.hi,p.bg,.2); c.beginPath(); c.arc(W*.42,H*.45,9,0,TAU); c.arc(W*.55,H*.47,9,0,TAU); c.fill();
+ },
+ bar(c,W,H,p,r){
+  vgrad(c,W,H,p.mid,p.bg);
+  c.fillStyle = rgba(p.hi,.18); c.fillRect(W*.05,H*.08,W*.9,H*.45);
+  for(let i=0;i<40;i++){ c.fillStyle = rgba(p.hi,.25 + .3*r()); c.beginPath(); c.arc(W*(.08+r()*.84),H*(.22+r()*.28),2+r()*3,0,TAU); c.fill(); }
+  for(let i=0;i<9;i++){ glow(c,W,H,W*(.2+i*.075),H*.12+ (i%3)*6,26,p.hi,.8); c.fillStyle = p.hi; c.beginPath(); c.arc(W*(.2+i*.075),H*.12+(i%3)*6,3.5,0,TAU); c.fill(); }
+  c.fillStyle = mix(p.mid,p.hi,.2); c.fillRect(0,H*.64,W,H*.36);
+  c.fillStyle = mix(p.bg,"#000000",.4); ell(c,W*.5,H*.8,W*.13,H*.3); c.fill();
+  c.fillStyle = p.hi; c.beginPath(); c.arc(W*.5,H*.4,14,0,TAU); c.fill();
+  for(let i=0;i<5;i++){ c.fillStyle = i%2 ? "#3C5A2C" : "#6A2A20"; c.fillRect(W*(.06+i*.055),H*.5,12,H*.2); }
+  for(let i=0;i<6;i++){ c.fillStyle = p.acc; c.beginPath(); c.arc(W*(.72+(i%3)*.05),H*(.68-Math.floor(i/3)*.06),8,0,TAU); c.fill(); }
+ },
+ candle(c,W,H,p,r){
+  c.fillStyle = "#070605"; c.fillRect(0,0,W,H);
+  glow(c,W,H,W*.52,H*.5,W*.34,p.hi,.95);
+  glow(c,W,H,W*.52,H*.5,W*.12,p.acc,.95);
+  c.fillStyle = "#1a0f0a"; ell(c,W*.3,H*.78,W*.22,H*.32); c.fill();
+  c.fillStyle = mix(p.hi,"#000000",.55); c.beginPath(); c.arc(W*.34,H*.38,17,0,TAU); c.fill();
+  c.fillStyle = "#24140c"; ell(c,W*.7,H*.85,W*.14,H*.25); c.fill();
+  c.fillStyle = p.acc; c.beginPath(); c.arc(W*.64,H*.52,11,0,TAU); c.fill();
+  c.fillStyle = "#FFF3C4"; ell(c,W*.52,H*.46,3.5,8); c.fill();
+ },
+ window(c,W,H,p,r){
+  vgrad(c,W,H,p.bg,p.mid);
+  c.fillStyle = "#F9EFCB"; c.fillRect(W*.05,H*.06,W*.2,H*.5);
+  c.strokeStyle = "#7A6D55"; c.lineWidth = 3; c.strokeRect(W*.05,H*.06,W*.2,H*.5);
+  c.fillStyle = rgba("#FFF6D6",.35); c.beginPath(); c.moveTo(W*.25,H*.06); c.lineTo(W*.75,H*.5); c.lineTo(W*.75,H*.95); c.lineTo(W*.25,H*.56); c.fill();
+  c.fillStyle = p.hi; c.beginPath(); c.moveTo(W*.44,H*.3); c.lineTo(W*.66,H*.3); c.lineTo(W*.7,H*.6); c.lineTo(W*.4,H*.6); c.fill();
+  c.fillStyle = p.acc; c.beginPath(); c.moveTo(W*.4,H*.58); c.lineTo(W*.7,H*.58); c.lineTo(W*.78,H*1.0); c.lineTo(W*.32,H*1.0); c.fill();
+  c.fillStyle = "#E6C7A0"; c.beginPath(); c.arc(W*.55,H*.22,13,0,TAU); c.fill();
+  c.fillStyle = "#FFFFFF"; c.beginPath(); c.ellipse(W*.55,H*.17,16,9,0,Math.PI,0); c.fill();
+  c.fillStyle = "#2E4A66"; c.fillRect(W*.7,H*.72,W*.28,H*.28);
+  for(let i=0;i<4;i++){ c.fillStyle = "#A8743A"; c.beginPath(); c.arc(W*(.74+i*.06),H*.7,9,0,TAU); c.fill(); }
+ },
+ blossom(c,W,H,p,r,lx,ly){
+  vgrad(c,W,H,p.bg,p.mid);
+  glow(c,W,H,lx,ly,60,p.hi,.8); c.fillStyle = p.hi; c.beginPath(); c.arc(lx,ly,14,0,TAU); c.fill();
+  c.fillStyle = "#16100C"; c.fillRect(0,H*.88,W,H*.12);
+  [[.1,.5,.18],[.9,.5,.2]].forEach(([x,y,s]) => { for(let k=0;k<4;k++){ c.fillStyle = mix(p.acc,"#000000",.1*k); c.beginPath(); c.moveTo(W*x,H*(y+k*.07)-H*.3*s*4); c.lineTo(W*(x-s),H*(y+k*.1+.25)); c.lineTo(W*(x+s),H*(y+k*.1+.25)); c.fill(); } });
+  c.fillStyle = "#2A1A10"; c.fillRect(W*.5-3,H*.5,6,H*.4);
+  for(let i=0;i<260;i++){ const a = r()*TAU, d = Math.sqrt(r()); const x = W*.52 + Math.cos(a)*d*W*.3, y = H*.42 + Math.sin(a)*d*H*.3; c.fillStyle = rgba("#FFFFFF",.55+.45*r()); c.beginPath(); c.arc(x,y,1+r()*2.4,0,TAU); c.fill(); }
+  glow(c,W,H,W*.18,H*.92,50,"#FF8A2A",.8); glow(c,W,H,W*.84,H*.92,50,"#FF8A2A",.8);
+ },
+ "sk-anatomy"(c,W,H,p,r){
+  parch(c,W,H,p,r); c.strokeStyle = rgba(p.ink,.8); c.lineWidth = 1.3;
+  for(let k=0;k<12;k++){ c.beginPath(); c.moveTo(W*.1+k*9,H*.12); c.bezierCurveTo(W*.3+r()*30,H*.3,W*.2+r()*50,H*.6,W*.45+r()*30,H*.88); c.stroke(); }
+  c.beginPath(); c.arc(W*.62,H*.3,20,0,TAU); c.stroke(); c.beginPath(); c.arc(W*.62,H*.3,12,0,TAU); c.stroke();
+  mirrorText(c,W*.58,H*.55,W*.38,6,p,r);
+ },
+ "sk-spiral"(c,W,H,p,r){
+  parch(c,W,H,p,r); c.strokeStyle = rgba(p.ink,.85); c.lineWidth = 1.4;
+  c.beginPath(); c.moveTo(W*.42,H*.1); c.lineTo(W*.42,H*.86); c.stroke();
+  for(let i=0;i<3;i++){ c.beginPath(); c.ellipse(W*.42,H*(.3+.13*i),78-16*i,16-3*i,0,0,TAU); c.stroke(); }
+  c.beginPath(); c.moveTo(W*.2,H*.9); c.lineTo(W*.42,H*.62); c.lineTo(W*.64,H*.9); c.stroke();
+  mirrorText(c,W*.04,H*.1,W*.28,5,p,r); mirrorText(c,W*.7,H*.7,W*.26,4,p,r);
+ },
+ "sk-swirl"(c,W,H,p,r){
+  parch(c,W,H,p,r); c.strokeStyle = rgba(p.ink,.75); c.lineWidth = 1.1;
+  for(let i=0;i<70;i++){ const x = W*(.15+r()*.55), y = H*(.15+r()*.7), rad = 5+r()*18, s = r()*TAU; c.beginPath(); c.arc(x,y,rad,s,s+3+r()*2.5); c.stroke(); }
+  mirrorText(c,W*.7,H*.12,W*.26,4,p,r);
+ },
+ "sk-wheel"(c,W,H,p,r){
+  parch(c,W,H,p,r); c.strokeStyle = rgba(p.ink,.85); c.lineWidth = 1.4;
+  c.beginPath(); c.arc(W*.38,H*.56,54,0,TAU); c.stroke(); c.beginPath(); c.arc(W*.38,H*.56,40,0,TAU); c.stroke();
+  for(let i=0;i<8;i++){ c.beginPath(); c.moveTo(W*.38,H*.56); c.lineTo(W*.38+Math.cos(i*TAU/8)*54,H*.56+Math.sin(i*TAU/8)*54); c.stroke(); }
+  c.beginPath(); c.arc(W*.14,H*.3,22,0,TAU); c.stroke();
+  c.beginPath(); c.moveTo(W*.5,H*.12); c.lineTo(W*.88,H*.5); c.moveTo(W*.56,H*.1); c.lineTo(W*.94,H*.48); c.stroke();
+  mirrorText(c,W*.62,H*.66,W*.34,4,p,r);
+ },
+ "sk-animals"(c,W,H,p,r){
+  parch(c,W,H,p,r); c.strokeStyle = rgba(p.ink,.85); c.lineWidth = 1.4;
+  ell(c,W*.4,H*.4,44,24); c.stroke(); c.beginPath(); c.arc(W*.62,H*.28,17,0,TAU); c.stroke();
+  c.beginPath(); c.moveTo(W*.58,H*.14); c.lineTo(W*.55,H*.28); c.moveTo(W*.68,H*.15); c.lineTo(W*.7,H*.28); c.stroke();
+  [.3,.36,.46,.5].forEach(x => { c.beginPath(); c.moveTo(W*x,H*.55); c.lineTo(W*x,H*.72); c.stroke(); });
+  c.beginPath(); c.arc(W*.3,H*.82,20,Math.PI*.9,Math.PI*2.2); c.stroke(); c.beginPath(); c.arc(W*.72,H*.78,24,0,TAU); c.stroke();
+ },
+ "sk-chalk"(c,W,H,p,r){
+  parch(c,W,H,p,r); c.strokeStyle = rgba(p.ink,.85); c.lineWidth = 1.5;
+  ell(c,W*.5,H*.42,36,50); c.stroke();
+  for(let i=0;i<14;i++){ c.beginPath(); c.moveTo(W*.5-32+i*5,H*.14+ i); c.lineTo(W*.5-26+i*5,H*.6); c.stroke(); }
+  c.beginPath(); c.moveTo(W*.3,H*.9); c.quadraticCurveTo(W*.5,H*.62,W*.7,H*.9); c.stroke();
+ },
+ "sk-chalk2"(c,W,H,p,r){
+  parch(c,W,H,p,r); c.strokeStyle = rgba(p.ink,.85); c.lineWidth = 1.5;
+  for(let i=0;i<6;i++){ const x = W*(.16+i*.13), y = H*(i%2 ? .36 : .3); c.beginPath(); c.arc(x,y,12,0,TAU); c.stroke(); c.beginPath(); c.moveTo(x-18,H*.62); c.quadraticCurveTo(x,H*.4,x+18,H*.62); c.stroke(); }
+  c.beginPath(); c.moveTo(W*.06,H*.7); c.lineTo(W*.94,H*.7); c.stroke();
+  for(let i=0;i<24;i++){ c.beginPath(); c.moveTo(W*.1+i*8,H*.72); c.lineTo(W*.1+i*8-5,H*.9); c.stroke(); }
+ }
+};
+const DECO = {
+ mona(c,W,H,p){ c.strokeStyle = rgba(p.hi,.38); c.lineWidth = 4; c.lineCap = "round"; c.beginPath(); c.moveTo(W*.64,H*.52); c.bezierCurveTo(W*.7,H*.58,W*.62,H*.64,W*.8,H*.74); c.stroke();
+   c.fillStyle = mix(p.hi,p.bg,.35); ell(c,W*.46,H*.88,26,10); c.fill(); ell(c,W*.55,H*.9,24,9); c.fill(); },
+ ermine(c,W,H,p){ c.save(); c.translate(W*.6,H*.78); c.rotate(-.45); c.fillStyle = "#F3EEE4"; ell(c,0,0,40,11); c.fill(); c.restore();
+   c.fillStyle = "#F3EEE4"; c.beginPath(); c.arc(W*.73,H*.66,8,0,TAU); c.fill(); c.fillStyle = "#2A1F1A"; c.beginPath(); c.arc(W*.755,H*.67,2,0,TAU); c.fill(); },
+ john(c,W,H,p){ c.strokeStyle = p.hi; c.lineWidth = 8; c.lineCap = "round"; c.beginPath(); c.moveTo(W*.6,H*.7); c.lineTo(W*.69,H*.36); c.stroke();
+   c.fillStyle = p.hi; c.beginPath(); c.arc(W*.69,H*.33,5,0,TAU); c.fill();
+   for(let i=0;i<12;i++){ const a = i*TAU/12; c.fillStyle = mix(p.bg,"#000000",.35); c.beginPath(); c.arc(W*.5+Math.cos(a)*W*.115,H*.42+Math.sin(a)*H*.2,9,0,TAU); c.fill(); }
+   c.fillStyle = mix(p.hi,p.bg,.15); ell(c,W*.5,H*.42,W*.085,H*.17); c.fill(); },
+ jerome(c,W,H,p){ c.fillStyle = "rgba(0,0,0,.6)"; c.beginPath(); c.moveTo(0,0); c.lineTo(W*.3,0); c.lineTo(W*.17,H); c.lineTo(0,H); c.fill(); c.beginPath(); c.moveTo(W,0); c.lineTo(W*.72,0); c.lineTo(W*.85,H); c.lineTo(W,H); c.fill();
+   c.strokeStyle = p.hi; c.lineWidth = 3; c.beginPath(); c.moveTo(W*.74,H*.3); c.lineTo(W*.74,H*.58); c.moveTo(W*.7,H*.38); c.lineTo(W*.78,H*.38); c.stroke(); },
+ annun(c,W,H,p){ c.fillStyle = rgba(p.hi,.5); c.beginPath(); c.moveTo(W*.04,H*.6); c.lineTo(W*.26,H*.22); c.lineTo(W*.3,H*.72); c.fill();
+   c.strokeStyle = "#FFFFFF"; c.lineWidth = 2.5; c.beginPath(); c.moveTo(W*.84,H*.95); c.lineTo(W*.84,H*.55); c.stroke(); c.fillStyle = "#FFFFFF"; ell(c,W*.84,H*.52,6,10); c.fill(); }
+};
+function drawWork(cv, w){
+  const c = cv.getContext("2d"), Wd = cv.width = 320, Hd = cv.height = 214;
+  const r = rng(hashStr(w.id)), lx = (w.l ? w.l[0] : .5) * Wd, ly = (w.l ? w.l[1] : .4) * Hd;
+  (MOTIF[w.motif] || MOTIF.portrait)(c, Wd, Hd, w.pal, r, lx, ly);
+  if(DECO[w.id]) DECO[w.id](c, Wd, Hd, w.pal);
+  const v = c.createRadialGradient(Wd/2, Hd/2, Hd*.25, Wd/2, Hd/2, Wd*.62);
+  v.addColorStop(0, "rgba(0,0,0,0)"); v.addColorStop(1, w.motif.startsWith("sk") ? "rgba(70,40,15,.25)" : "rgba(0,0,0,.5)");
+  c.fillStyle = v; c.fillRect(0, 0, Wd, Hd);
+}
+function paintAll(root){ (root || document).querySelectorAll("canvas[data-work]").forEach(cv => drawWork(cv, W[cv.dataset.work])); }
+
+/* ================= 問題づくり ================= */
+function buildStatic(bank, i){
+  const b = BANKS[bank][i], tf = b.x.length === 1;
+  return {key:`b:${bank}:${i}`, kind:"choice", tag:TAGNAME[bank], prompt:b.q, sub:b.sub || "", think:!!b.think, options:tf ? ["○","×"] : shuffle([b.a, ...b.x]), tf, answer:b.a, why:b.why, work:b.work, pg:b.pg};
+}
+const GENS = {
+  artist:{ok:w => true, f(w){ const A = ARTISTS[w.a]; return {prompt:`「${w.t}」をつくったのはだれ？`, options:shuffle([A.n, ...sample(Object.keys(ARTISTS).filter(k => k !== w.a), 3).map(k => ARTISTS[k].n)]), answer:A.n, why:`「${w.t}」は${A.n}（${A.yrs}・${A.land}）の作品。`}; }},
+  museum:{ok:w => true, f(w){ const others = [...new Set(WORKS.filter(x => x.place !== w.place).map(x => x.place))]; return {prompt:`「${w.t}」がある美術館（図書館・教会など）は？`, options:shuffle([w.place, ...sample(others, 3)]), answer:w.place, why:`「${w.t}」は${w.place}（${w.land}）にある。`}; }},
+  land:{ok:w => true, f(w){ const L = [...new Set(WORKS.map(x => x.land).filter(l => l !== w.land))]; return {prompt:`「${w.t}」を所蔵している場所があるのは、どこ？`, options:shuffle([w.land, ...sample(L, 3)]), answer:w.land, why:`「${w.t}」は${w.place}（${w.land}）にある。`}; }},
+  year:{ok:w => w.id !== "dogcat", f(w){ const cand = WORKS.filter(x => x.id !== w.id && x.id !== "dogcat" && x.y !== w.y && Math.abs(x.y0 - w.y0) >= 10); const uniq = [...new Map(cand.map(x => [x.y, x])).values()]; return {prompt:`「${w.t}」がつくられたのは、いつ？`, options:shuffle([w.y, ...sample(uniq, 3).map(x => x.y)]), answer:w.y, why:`「${w.t}」は${w.y}の作品。`}; }},
+  tech:{ok:w => !!w.tech, f(w){ const T = ["油彩","テンペラ","ペン・インク","メタルポイント","紙本着色","サンギュイン"].filter(t => t !== w.tech); return {prompt:`「${w.t}」の画材・技法は？`, options:shuffle([w.tech, ...sample(T, 3)]), answer:w.tech, why:`「${w.t}」の画材は「${w.full}」。`}; }}
+};
+function buildGen(type, wid){
+  const w = W[wid], g = GENS[type].f(w);
+  return Object.assign({key:`g:${type}:${wid}`, kind:"choice", tag:TAGNAME.g, sub:"", options:[], tf:false, work:wid, pg:w.pg}, g);
+}
+function buildArtistQ(type, ak){
+  const A = ARTISTS[ak], others = Object.keys(ARTISTS).filter(k => k !== ak);
+  if(type === "life") return {key:`g:life:${ak}`, kind:"choice", tag:TAGNAME.g, prompt:`${A.n}が生きたのは、いつ？`, sub:"", options:shuffle([A.yrs, ...sample(others, 3).map(k => ARTISTS[k].yrs)]), answer:A.yrs, why:`${A.n}は${A.yrs}（${A.land}）。`, pg:ak === "leo" ? 110 : ak === "rem" ? 112 : 113};
+  const lands = ["イタリア","フランス","オランダ","茨城県"];
+  return {key:`g:aland:${ak}`, kind:"choice", tag:TAGNAME.g, prompt:`${A.n}は、どこの出身（国・県）？`, sub:"", options:shuffle(lands.includes(A.land) ? lands : [A.land, ...lands.slice(0,3)]), answer:A.land, why:`${A.n}は${A.yrs}（${A.land}）。`, pg:ak === "leo" ? 110 : ak === "rem" ? 112 : 113};
+}
+function buildHint(wid){
+  const w = W[wid], same = WORKS.filter(x => x.id !== wid && x.a === w.a), diff = WORKS.filter(x => x.id !== wid && x.a !== w.a);
+  const ds = [...sample(same, 2), ...sample(diff, 3)].slice(0, 3);
+  return {key:`h:${wid}`, kind:"hint", tag:TAGNAME.h, prompt:"この作品は、どれ？", options:shuffle([w.t, ...ds.map(d => d.t)]), answer:w.t, why:w.sum, work:wid, hints:w.hints, used:1, pg:w.pg};
+}
+function buildOrder(mode){
+  if(mode === "time"){
+    let ids; do{ ids = sample(PAINT, 4).map(w => w.id); }while(new Set(ids.map(i => W[i].y0)).size < 4);
+    const ans = ids.slice().sort((a,b) => W[a].y0 - W[b].y0);
+    return {key:"o:time", kind:"order", tag:TAGNAME.o, mode, prompt:"つくられた年が古い順に、ならべよう。", sub:"古いものから上にならべる。", items:shuffle(ids), placed:[], answer:ans, labels:["いちばん古い","2番め","3番め","いちばん新しい"]};
+  }
+  let ids, ok = false;
+  while(!ok){ ids = sample(SIZED, 4).map(w => w.id); const s = ids.slice().sort((a,b) => area(W[b]) - area(W[a])); ok = s.every((id, i) => i === 0 || area(W[s[i-1]]) / area(W[id]) >= 1.2); }
+  const ans = ids.slice().sort((a,b) => area(W[b]) - area(W[a]));
+  return {key:"o:size", kind:"order", tag:TAGNAME.o, mode, prompt:"画面の大きさが大きい順に、ならべよう。", sub:"たて×よこの面積で考える。大きいものから上にならべる。", items:shuffle(ids), placed:[], answer:ans, labels:["いちばん大きい","2番め","3番め","いちばん小さい"]};
+}
+function buildLight(i){ return {key:"l", kind:"light", tag:TAGNAME.l, idx:Math.floor(Math.random()*8), variant:i % 2 ? "b" : "a", prompt:"", answer:""}; }
+const qText = q => q.kind === "hint" ? `ヒントクイズ「${q.hints[0]}」` : q.kind === "light" ? "光の向きの問題" : q.prompt;
+function fromKey(key){
+  const [t, a, b] = key.split(":");
+  try{
+    if(t === "b" && BANKS[a] && BANKS[a][+b]) return buildStatic(a, +b);
+    if(t === "g" && (a === "life" || a === "aland") && ARTISTS[b]) return buildArtistQ(a, b);
+    if(t === "g" && GENS[a] && W[b]) return buildGen(a, b);
+    if(t === "h" && W[a]) return buildHint(a);
+  }catch(e){}
+  return null;
+}
+
+/* ================= セッション ================= */
+let Q = null, view = {name:"home"};
+function allStatic(banks){ return banks.flatMap(bk => range(BANKS[bk].length).map(i => ({bk, i}))); }
+function genPool(n){
+  const types = shuffle(["artist","museum","land","year","tech","life","aland","artist","museum","year"]);
+  const used = new Set(), out = [];
+  for(const ty of types){
+    if(out.length >= n) break;
+    if(ty === "life" || ty === "aland"){ out.push(buildArtistQ(ty, pick(Object.keys(ARTISTS)))); continue; }
+    const cand = shuffle(WORKS.filter(w => GENS[ty].ok(w) && !used.has(w.id)));
+    if(!cand.length) continue;
+    used.add(cand[0].id); out.push(buildGen(ty, cand[0].id));
+  }
+  return out;
+}
+function startSession(mode){
+  let qs = [], title = "";
+  if(mode === "hint"){ title = "この作品なーんだ"; qs = sample(WORKS, 6).map(w => buildHint(w.id)); }
+  if(mode === "leo"){ title = "レオナルドの人生"; qs = sample(range(BANKS.leo.length), 8).map(i => buildStatic("leo", i)); }
+  if(mode === "data"){ title = "作者・美術館・年代"; qs = genPool(10); }
+  if(mode === "order"){ title = "ならべかえ"; qs = ["time","size","time","size"].map(buildOrder); }
+  if(mode === "light"){ title = "光の向きチャレンジ"; qs = range(6).map(buildLight); }
+  if(mode === "exam"){
+    title = "学芸員試験";
+    const pk = (bk, n) => sample(range(BANKS[bk].length), n).map(i => buildStatic(bk, i));
+    qs = shuffle([...pk("leo",3), ...pk("tech",3), ...pk("light",3), ...genPool(3)]);
+  }
+  if(mode.startsWith("lab:")){
+    const lab = mode.slice(4); title = "ラボのチェック問題";
+    qs = shuffle(range(BANKS.tech.length).filter(i => BANKS.tech[i].lab === lab)).slice(0, 3).map(i => buildStatic("tech", i));
+  }
+  if(mode === "review"){ title = "まちがいノート"; qs = sample(S.wrong, 10).map(fromKey).filter(Boolean); }
+  if(!qs.length) return;
+  Q = {mode, title, qs, i:0, ok:0, miss:0, combo:0, maxCombo:0, xp:0, hearts:3, lamps:qs.map(() => ""), mistakes:[], unlocked:[], answered:false, rankBefore:rankInfo(S.xp).i};
+  SFX.tap(); go("quiz");
+}
+function go(name, p){
+  closeSheet(); closeModal();
+  view = Object.assign({name}, p || {});
+  render(); window.scrollTo(0, 0);
+}
+function render(){
+  const f = {home:renderHome, quiz:renderQuiz, result:renderResult, lab:renderLab, light:renderLightLab, collection:renderCollection, notes:renderNotes}[view.name];
+  (f || renderHome)();
+}
+const cur = () => Q.qs[Q.i];
+
+/* ================= ホーム ================= */
+function roomMeta(r){
+  if(r.id === "lab"){ const n = LABS.filter(l => S.labs[l.id]).length; return `${n} / ${LABS.length} 完了`; }
+  const b = S.rooms[r.id]; return b ? `最高 ${b.best}%` : r.meta;
+}
+const doneRoom = r => r.id === "lab" ? LABS.every(l => S.labs[l.id]) : !!(S.rooms[r.id] && S.rooms[r.id].best >= 80);
+function sharePanel(){
+  return `<div class="panel share" id="share">
+    <div class="qr" id="qr" role="img" aria-label="このページのQRコード"></div>
+    <div style="display:grid;gap:10px;min-width:0">
+      <b>QRコードかリンクで、だれでもすぐに遊べます</b>
+      <div class="urlrow"><input id="share-url" value="${esc(APP_URL)}" readonly aria-label="ページのリンク"><button class="btn small" data-act="copy">${view.copied ? "コピーしました" : "リンクをコピー"}</button></div>
+      <div class="btnrow">${navigator.share ? '<button class="btn small primary" data-act="webshare">LINE などで送る</button>' : ""}${installEvt && !standalone() ? '<button class="btn small gold" data-act="install">アプリとして入れる</button>' : ""}</div>
+      <p class="howto">ホーム画面に追加するとアプリのように使えます。iPhone は Safari の共有ボタンから「ホーム画面に追加」、Android は Chrome のメニューから「アプリをインストール」。一度開けば、電波がなくても遊べます。登録やログインは要りません。記録はそれぞれの端末に保存されます。</p>
+    </div></div>`;
+}
+const APP_URL = /^https?:/.test(location.protocol) ? location.origin + location.pathname.replace(/index\.html$/, "") : "";
+let installEvt = null;
+window.addEventListener("beforeinstallprompt", e => { e.preventDefault(); installEvt = e; if(view.name === "home" && view.share) renderHome(); });
+const standalone = () => (window.matchMedia && matchMedia("(display-mode: standalone)").matches) || navigator.standalone === true;
+function drawQR(){
+  const el = document.getElementById("qr"); if(!el) return;
+  if(typeof qrcode === "undefined" || !APP_URL){ el.hidden = true; return; }
+  try{ const q = qrcode(0, "M"); q.addData(APP_URL); q.make(); el.innerHTML = q.createSvgTag({cellSize:4, margin:0, scalable:true}); const s = el.querySelector("svg"); if(s){ s.setAttribute("width","150"); s.setAttribute("height","150"); } }catch(e){ el.hidden = true; }
+}
+function renderHome(){
+  const ri = rankInfo(S.xp), got = WORKS.filter(w => S.m[w.id] > 0).length;
+  app.innerHTML = `
+  <header class="hero" id="hero">
+    <p class="kicker">中学1年 美術　鑑賞　教科書 P.110〜113</p>
+    <h1><em>光</em>とかげの<br>美術館</h1>
+    <p class="lead">レオナルド・ダ・ヴィンチと、光とかげで物語をえがいた画家たちの世界へ。ヒントクイズや実験で、作品を楽しく覚えよう。</p>
+    <div class="stats">
+      <div><small>ランク</small><b>${ri.name}</b></div>
+      <div><small>集めた作品</small><b>${got} / ${WORKS.length}</b></div>
+      <div><small>経験値</small><b>${S.xp}</b></div>
+      <div class="rankbar" aria-hidden="true"><i style="width:${ri.pct}%"></i></div>
+      <div class="ranknote">${ri.next ? `「${ri.next[1]}」まで あと ${ri.toNext} XP` : "最高ランクに到達した"}</div>
+    </div>
+  </header>
+  <h2 class="sec">ミニ展示室<small>問題に正解すると、作品が飾られる</small></h2>
+  <div class="mini">${WORKS.map(w => S.m[w.id] > 0 ? `<canvas data-work="${w.id}" role="img" aria-label="${esc(w.t)}"></canvas>` : `<div class="lk" aria-label="未公開の作品">？</div>`).join("")}</div>
+  <h2 class="sec">展示室<small>1から順に進むのがおすすめ</small></h2>
+  <div class="rooms">${ROOMS.map(r => `<button class="room ${doneRoom(r) ? "done" : ""}" data-act="room" data-id="${r.id}"><span class="plate" aria-hidden="true">${r.n}</span><div><b>${esc(r.t)}</b><small>${esc(r.d)}</small><div class="meta">${esc(roomMeta(r))}</div></div></button>`).join("")}</div>
+  <nav class="util" aria-label="メニュー">
+    <button class="ub" data-go="collection"><b>コレクション</b><small>${got} / ${WORKS.length} 点</small></button>
+    <button class="ub" data-go="notes"><b>まちがいノート</b><small>${S.wrong.length} 問</small></button>
+    ${APP_URL ? `<button class="ub" data-act="share-toggle" aria-expanded="${!!view.share}"><b>友だちに教える</b><small>QR・リンク</small></button>` : ""}
+    <button class="ub" data-act="settings-toggle" aria-expanded="${!!view.settings}"><b>せってい</b><small>${S.sound ? "音あり" : "音なし"}</small></button>
+  </nav>
+  ${view.share ? sharePanel() : ""}
+  ${view.settings ? `<div class="panel"><div class="toggle"><span>効果音</span><button class="switch" role="switch" aria-checked="${S.sound}" data-act="t-sound" aria-label="効果音"></button></div><div class="toggle"><span class="muted">記録をすべて消す</span><button class="btn small" data-act="reset">${view.resetArm ? "もう一度押すと消えます" : "リセット"}</button></div></div>` : ""}
+  <p class="foot">教科書 P.110〜113「レオナルド・ダ・ヴィンチ」「レオナルドの手稿」「明暗のドラマ」の内容にそって作ったオリジナルの問題です。作品の絵は、実物ではなく、色と光の配置をイメージで描いたものです。本物は教科書で確かめよう。</p>`;
+  paintAll(); if(view.share) drawQR();
+  const hero = document.getElementById("hero");
+  let raf = 0;
+  const move = e => { const b = hero.getBoundingClientRect(), x = e.clientX, y = e.clientY; hero.classList.add("tracking"); cancelAnimationFrame(raf); raf = requestAnimationFrame(() => { hero.style.setProperty("--lx", ((x-b.left)*100/b.width) + "%"); hero.style.setProperty("--ly", ((y-b.top)*100/b.height) + "%"); }); };
+  hero.addEventListener("pointermove", move); hero.addEventListener("pointerdown", move);
+}
+
+/* ================= クイズ画面 ================= */
+function lampsHtml(){ return Q.lamps.map((s, i) => `<span class="lamp ${s} ${i === Q.i && !s ? "now" : ""}"></span>`).join(""); }
+function renderQuiz(){
+  const q = cur(); Q.answered = false;
+  const right = Q.mode === "exam" ? `<span class="hearts" aria-label="ライフ${Q.hearts}">${"♥".repeat(Q.hearts)}<span class="off">${"♥".repeat(3-Q.hearts)}</span></span>` : `<span class="cnt">${Q.i+1} / ${Q.qs.length}</span>`;
+  let body = "";
+  if(q.kind === "choice" || q.kind === "hint"){
+    body = `<div class="prompt">${esc(q.prompt)}</div>${q.sub ? `<div class="sub">${esc(q.sub)}</div>` : ""}`;
+    if(q.kind === "hint") body += hintsHtml(q);
+    body += `<div class="opts ${q.tf ? "two" : ""}">${q.options.map((o, k) => `<button class="opt" data-act="ans" data-k="${k}"><span class="k">${KANA[k]}</span><span class="t">${esc(o)}</span></button>`).join("")}</div>`;
+  } else if(q.kind === "order") body = orderHtml(q);
+  else body = lightHtml(q);
+  app.innerHTML = `
+  <div class="bar"><button class="x" data-act="quit">${Q.quitArm ? "やめる？" : "✕"}</button><div class="lamps" aria-hidden="true">${lampsHtml()}</div>${right}</div>
+  ${Q.combo >= 2 ? `<span class="combo">${Q.combo} れんぞく正解</span>` : ""}
+  <section class="qcard" id="qcard"><span class="chip ${q.think ? "think" : ""}">${q.think ? "考えよう　" : ""}${esc(q.tag)}</span>${body}</section>`;
+  if(q.kind === "light") paintLightQ(q);
+}
+function hintsHtml(q){
+  const pts = [0,15,10,5][q.used];
+  return `<div class="hints">${q.hints.map((h, i) => i < q.used
+    ? `<div class="hint open"><span class="hn">ヒント${i+1}</span><span>${esc(h)}</span></div>`
+    : `<div class="hint shut"><span class="hn">ヒント${i+1}</span><span>まだとじている</span></div>`).join("")}</div>
+  <div class="btnrow" style="align-items:center">${q.used < 3 ? `<button class="btn small" data-act="hint-open">つぎのヒントをひらく</button>` : ""}<span class="pt">いま正解すると ${pts} XP</span></div>`;
+}
+function orderHtml(q){
+  const card = id => { const w = W[id]; return `<b>${esc(w.t)}</b><small>${esc(ARTISTS[w.a].s)}${q.mode === "size" ? `　たて${w.size[0]}×よこ${w.size[1]}cm` : ""}</small>`; };
+  return `<div class="prompt">${esc(q.prompt)}</div><div class="sub">${esc(q.sub)}</div>
+  <ol class="slots">${q.labels.map((lb, i) => { const id = q.placed[i]; return `<li class="slot"><span class="no">${i+1}</span><div class="box">${id ? `<button class="oc" data-act="o-out" data-id="${id}" aria-label="${esc(W[id].t)} をもどす">${card(id)}</button>` : `<span class="hole">${lb}</span>`}</div></li>`; }).join("")}</ol>
+  <div class="pool">${q.items.map(id => `<button class="oc ${q.placed.includes(id) ? "used" : ""}" data-act="o-in" data-id="${id}" ${q.placed.includes(id) ? 'tabindex="-1" aria-hidden="true"' : ""}>${card(id)}</button>`).join("")}</div>
+  <div class="orow"><button class="btn" data-act="o-clear">やり直す</button><button class="btn primary" data-act="o-check" ${q.placed.length === q.items.length ? "" : "disabled"}>こたえる</button></div>`;
+}
+function padHtml(cls){
+  const cells = [["左上","上","右上"],["左",null,"右"],["左下","下","右下"]];
+  return `<div class="pad">${cells.flat().map(d => d ? `<button data-act="l-ans" data-d="${d}" aria-label="${d}">${ARROW[d]}</button>` : `<div class="mid">球</div>`).join("")}</div>`;
+}
+function lightHtml(q){
+  const prompt = q.variant === "a" ? "いちばん明るい所を見て、光がどちらから当たっているか答えよう。" : "かべにできたかげを見て、光がどちらから当たっているか答えよう。";
+  return `<div class="prompt">${prompt}</div><div class="stage"><canvas id="lcv" width="340" height="340" role="img" aria-label="光を当てた球"></canvas>${padHtml()}</div>`;
+}
+function paintLightQ(q){ const cv = document.getElementById("lcv"); drawLight(cv, q.idx * Math.PI/4, q.variant === "a" ? {hi:1, sh:.25} : {hi:.2, sh:1}); }
+
+/* 光の描画。th は光が来る向き（0=右、反時計まわり） */
+function drawLight(cv, th, o){
+  const c = cv.getContext("2d"), W = cv.width, H = cv.height, cx = W/2, cy = H/2 + 8, r = W*.2;
+  const lx = Math.cos(th), ly = -Math.sin(th);
+  const g = c.createLinearGradient(cx + lx*W*.5, cy + ly*H*.5, cx - lx*W*.5, cy - ly*H*.5);
+  g.addColorStop(0, "#74679a"); g.addColorStop(1, "#1d192e"); c.fillStyle = g; c.fillRect(0,0,W,H);
+  c.save(); c.shadowColor = `rgba(6,4,14,${.7*o.sh})`; c.shadowBlur = 18;
+  c.fillStyle = `rgba(8,6,16,${.62*o.sh})`; c.beginPath(); c.arc(cx - lx*r*.95, cy - ly*r*.95, r*1.02, 0, TAU); c.fill(); c.restore();
+  const sg = c.createRadialGradient(cx + lx*r*.45, cy + ly*r*.45, r*.06, cx, cy, r*1.05);
+  sg.addColorStop(0, mix("#9a8f78","#fff3d2",o.hi)); sg.addColorStop(.55, "#9a8f78"); sg.addColorStop(1, mix("#9a8f78","#2a2438",o.hi));
+  c.fillStyle = sg; c.beginPath(); c.arc(cx, cy, r, 0, TAU); c.fill();
+  if(o.marker){
+    const mx = cx + lx*W*.4, my = cy + ly*H*.4;
+    glow(c, W, H, mx, my, 56, "#FFD36B", .85); c.fillStyle = "#FFE9A8"; c.beginPath(); c.arc(mx, my, 11, 0, TAU); c.fill();
+    c.strokeStyle = "rgba(255,255,255,.6)"; c.lineWidth = 2; c.beginPath(); c.arc(mx, my, 17, 0, TAU); c.stroke();
+  }
+}
+
+/* ================= 採点 ================= */
+function bump(wid){
+  if(!wid) return;
+  const before = S.m[wid] || 0; S.m[wid] = Math.min(3, before + 1);
+  if(before === 0 && !Q.unlocked.includes(wid)) Q.unlocked.push(wid);
+}
+function record(ok, q, given){
+  Q.answered = true;
+  if(ok){
+    Q.ok++; Q.combo++; Q.maxCombo = Math.max(Q.maxCombo, Q.combo);
+    let gain = 10 + Math.min(10, Math.max(0, Q.combo-2)*2);
+    if(q.kind === "hint") gain = [0,15,10,5][q.used];
+    if(q.kind === "order") gain = 20;
+    q._gain = gain; Q.xp += gain; Q.lamps[Q.i] = "on";
+    if(q.key.startsWith("b:") || q.key.startsWith("g:") || q.key.startsWith("h:")) S.wrong = S.wrong.filter(k => k !== q.key);
+    if(q.kind === "order") q.answer.forEach(bump); else bump(q.work);
+    SFX.ok(); setTimeout(SFX.lamp, 220);
+  } else {
+    Q.miss++; Q.combo = 0; Q.lamps[Q.i] = "bad";
+    if(Q.mode === "exam") Q.hearts--;
+    if(q.kind !== "order" && q.kind !== "light" && !S.wrong.includes(q.key)) S.wrong.push(q.key);
+    if(S.wrong.length > 60) S.wrong = S.wrong.slice(-60);
+    Q.mistakes.push({q, given}); SFX.ng();
+    const card = document.getElementById("qcard"); if(card){ card.classList.remove("shake"); void card.offsetWidth; card.classList.add("shake"); }
+  }
+  save();
+  const lamps = document.querySelector(".lamps"); if(lamps) lamps.innerHTML = lampsHtml();
+  showSheet(ok, q, given);
+}
+function answerChoice(k){
+  if(Q.answered) return;
+  const q = cur(), given = q.options[k], ok = given === q.answer;
+  document.querySelectorAll(".opt").forEach(b => { const t = q.options[+b.dataset.k]; b.disabled = true; if(t === q.answer) b.classList.add("is-ok"); else if(t === given) b.classList.add("is-ng"); });
+  record(ok, q, given);
+}
+function answerOrder(){
+  if(Q.answered) return;
+  const q = cur(), ok = q.placed.join() === q.answer.join();
+  document.querySelectorAll("#qcard button").forEach(b => b.disabled = true);
+  record(ok, q, q.placed.map(id => W[id].t).join(" → "));
+}
+function answerLight(d){
+  if(Q.answered) return;
+  const q = cur(), ans = DIRS[q.idx], ok = d === ans;
+  document.querySelectorAll(".pad button").forEach(b => { b.disabled = true; if(b.dataset.d === ans) b.classList.add("is-ok"); else if(b.dataset.d === d) b.classList.add("is-ng"); });
+  q.answer = ans; q.why = q.variant === "a" ? `いちばん明るい所が${ans}がわにあるので、光は${ans}から当たっている。` : `かげが${OPP[ans]}がわにのびているので、光は反対の${ans}から当たっている。`;
+  record(ok, q, d);
+}
+function showSheet(ok, q, given){
+  const praise = ok ? pick(["せいかい！","いいね！","さすが！","その調子！"]) : "おしい！";
+  let ans = "";
+  if(!ok){
+    if(q.kind === "order"){
+      ans = q.mode === "time" ? q.answer.map(id => `${W[id].t}（${W[id].y}）`).join(" → ") : q.answer.map(id => `${W[id].t}（${fmt(area(W[id]))}cm²）`).join(" ＞ ");
+    } else ans = q.answer;
+  } else if(q.kind === "order"){
+    ans = q.mode === "time" ? q.answer.map(id => `${W[id].t}（${W[id].y}）`).join(" → ") : q.answer.map(id => `${W[id].t}（${fmt(area(W[id]))}cm²）`).join(" ＞ ");
+  }
+  const why = q.kind === "order" ? (q.mode === "time" ? "年が小さいほど古い作品。" : "面積は、たて×よこで求める。単位は cm²。") : q.why;
+  const last = isLast();
+  sheetRoot.innerHTML = `<div class="sheet ${ok ? "ok" : "ng"}" role="status"><div class="sheet-in">
+    <h3>${praise}${ok && Q.combo >= 3 ? `　${Q.combo}れんぞく` : ""}</h3>
+    ${ans ? `<div class="ans">${ok ? "" : "正解　"}${esc(ans)}</div>` : ""}
+    <p class="why"><b>なぜ？</b>${esc(why)}</p>
+    ${q.pg ? `<div class="pg">教科書 P.${q.pg} で確かめよう</div>` : ""}
+    ${q.kind === "hint" ? `<canvas class="sheet-art" data-work="${q.work}" role="img" aria-label="${esc(W[q.work].t)}の色と光のイメージ"></canvas><div class="artcap">色と光のイメージです。実物は教科書で。</div>` : ""}
+    <div class="sheetrow"><span class="pt">${ok ? "+" + gainText(q) + " XP" : ""}</span><button class="btn ${ok ? "primary" : "gold"}" id="next" data-act="next">${last ? "結果を見る" : "つぎへ"}</button></div>
+  </div></div>`;
+  paintAll(sheetRoot);
+  app.style.paddingBottom = (sheetRoot.firstElementChild.offsetHeight + 24) + "px";
+  const nb = document.getElementById("next"); if(nb) nb.focus({preventScroll:true});
+}
+function gainText(q){ return q._gain || 0; }
+function isLast(){ return Q.mode === "exam" ? (Q.hearts <= 0 || Q.i >= Q.qs.length - 1) : Q.i >= Q.qs.length - 1; }
+function closeSheet(){ sheetRoot.innerHTML = ""; app.style.paddingBottom = ""; }
+function next(){ closeSheet(); if(isLast()) return finish(); Q.i++; Q.quitArm = false; renderQuiz(); window.scrollTo(0, 0); }
+
+/* ================= 結果 ================= */
+function finish(){
+  closeSheet();
+  const total = Q.qs.length, answered = Q.ok + Q.miss, pct = answered ? Math.round(Q.ok*100/total) : 0;
+  const win = Q.mode === "exam" ? Q.hearts > 0 : true;
+  if(Q.mode.startsWith("lab:")){ const id = Q.mode.slice(4); if(Q.ok >= 2){ if(!S.labs[id]){ Q.xp += 30; } S.labs[id] = true; } }
+  else if(Q.mode !== "review"){ const b = S.rooms[Q.mode] || {best:0, plays:0}; b.best = Math.max(b.best, pct); b.plays++; S.rooms[Q.mode] = b; }
+  if(Q.mode === "exam" && win) Q.xp += 50;
+  S.xp += Q.xp; save();
+  const R = {mode:Q.mode, title:Q.title, ok:Q.ok, total, pct, maxCombo:Q.maxCombo, xp:Q.xp, lamps:Q.lamps.slice(), mistakes:Q.mistakes, unlocked:Q.unlocked.slice(), win, rankUp:rankInfo(S.xp).i > Q.rankBefore ? rankInfo(S.xp).name : ""};
+  view = {name:"result", R}; Q = null; render(); window.scrollTo(0, 0);
+  if((R.pct >= 80 && R.win) || R.rankUp){ SFX.win(); confetti(); }
+}
+function comment(R){
+  if(R.mode === "exam" && !R.win) return "ライフがなくなった。まちがいノートで見直して、もう一度挑戦しよう。";
+  if(R.pct === 100) return "全問正解。館長もおどろく目のつけどころ。";
+  if(R.pct >= 80) return "よくできた。あとひと息で、全問正解。";
+  if(R.pct >= 50) return "半分以上は正解。まちがえた問題を見直そう。";
+  return "最初はこれでじゅうぶん。教科書を見ながら、もう一度挑戦しよう。";
+}
+function renderResult(){
+  const R = view.R;
+  const lampsH = `<div class="lamps">${R.lamps.map(s => `<span class="lamp ${s}"></span>`).join("")}</div>`;
+  app.innerHTML = `<section class="result">
+    <h2>${esc(R.title)}</h2><p class="mincho" style="margin:-8px 0 0;font-size:18px;color:var(--gold)">${R.mode === "exam" ? (R.win ? "合格！" : "もう少し") : "おつかれさま"}</p>
+    ${lampsH}
+    <p style="margin:0">${comment(R)}</p>
+    <div class="rstats"><div class="rstat"><b>${R.ok}/${R.total}</b><small>正解</small></div><div class="rstat"><b>${R.maxCombo}</b><small>最大れんぞく</small></div><div class="rstat"><b>+${R.xp}</b><small>XP</small></div></div>
+    ${R.rankUp || R.unlocked.length ? `<div class="news">${R.rankUp ? `<div class="new">ランクアップ。「${esc(R.rankUp)}」になった</div>` : ""}${R.unlocked.length ? `<div class="new">${R.unlocked.length}点の作品が展示室にかざられた</div>` : ""}</div>` : ""}
+    ${R.unlocked.length ? `<div class="ugrid">${R.unlocked.map(id => `<div class="ucard"><canvas data-work="${id}" role="img" aria-label="${esc(W[id].t)}"></canvas>${esc(W[id].t)}</div>`).join("")}</div>` : ""}
+    ${R.mistakes.length ? `<div class="mist"><h3 class="mincho" style="font-size:18px;margin-top:6px">まちがえた問題</h3>${R.mistakes.slice(0, 8).map(({q, given}) => `<div class="row"><small>${esc(q.tag)}</small><span>${esc(qText(q))}</span><span class="muted">あなたの答え　${esc(given || "")}</span><span><b>正解　${esc(q.kind === "order" ? q.answer.map(id => W[id].t).join(" → ") : q.answer)}</b></span></div>`).join("")}</div>` : ""}
+    <div class="btnrow" style="justify-content:center"><button class="btn primary" data-act="again" data-m="${esc(R.mode)}">もう一度</button><button class="btn" data-go="home">展示室へ</button></div>
+  </section>`;
+  paintAll();
+}
+
+/* ================= コレクション・ノート ================= */
+function renderCollection(){
+  const got = WORKS.filter(w => S.m[w.id] > 0).length;
+  app.innerHTML = `<div class="bar"><button class="link" data-go="home">← 展示室にもどる</button><span class="cnt">${got} / ${WORKS.length} 点</span></div>
+  <h2 class="sec" style="margin-top:6px">コレクション<small>正解した作品がかざられる。星は、正解した回数。</small></h2>
+  <div class="cgrid">${WORKS.map(w => S.m[w.id] > 0
+    ? `<button class="cc" data-act="work" data-id="${w.id}"><canvas data-work="${w.id}" role="img" aria-label="${esc(w.t)}"></canvas><b>${esc(w.t)}</b><small>${esc(ARTISTS[w.a].s)}　${esc(w.y)}</small><span class="st" aria-label="星${S.m[w.id]}個">${"★".repeat(S.m[w.id])}${"☆".repeat(3-S.m[w.id])}</span></button>`
+    : `<div class="cc lk"><div class="ph">？</div><b>まだ見つかっていない</b><small>${esc(w.k)}　P.${w.pg}</small></div>`).join("")}</div>
+  <p class="foot">絵は、色と光の配置をイメージで描いたものです。実物ではありません。</p>`;
+  paintAll();
+}
+function openWork(id){
+  const w = W[id], A = ARTISTS[w.a];
+  modalRoot.innerHTML = `<div class="modal" data-act="close-modal"><div class="mpanel" role="dialog" aria-modal="true" aria-label="${esc(w.t)}"><canvas data-work="${id}" role="img" aria-label="${esc(w.t)}の色と光のイメージ"></canvas>
+    <h3>${esc(w.t)}</h3><p style="margin:0">${esc(w.sum)}</p>
+    <dl class="dl"><dt>作者</dt><dd>${esc(A.n)}（${esc(A.yrs)}・${esc(A.land)}）</dd><dt>つくられた年</dt><dd>${esc(w.y)}</dd>${w.full ? `<dt>画材・形式</dt><dd>${esc(w.full)}</dd>` : ""}${w.size ? `<dt>大きさ</dt><dd>たて${w.size[0]}×よこ${w.size[1]}cm</dd>` : ""}<dt>ある場所</dt><dd>${esc(w.place)}（${esc(w.land)}）</dd><dt>教科書</dt><dd>P.${w.pg}</dd></dl>
+    <div class="artcap">絵は色と光のイメージです。実物は教科書で。</div>
+    <button class="btn" data-act="close-modal" id="mclose">とじる</button></div></div>`;
+  paintAll(modalRoot); const b = document.getElementById("mclose"); if(b) b.focus();
+}
+function closeModal(){ modalRoot.innerHTML = ""; }
+function renderNotes(){
+  const items = S.wrong.map(fromKey).filter(Boolean);
+  app.innerHTML = `<div class="bar"><button class="link" data-go="home">← 展示室にもどる</button></div>
+  <section class="labcard"><h3>まちがいノート</h3><p class="muted">まちがえた問題がたまる。復習して正解すると消える。</p>
+  ${items.length ? `<button class="btn primary" style="justify-self:start" data-act="review">復習する（最大10問）</button>` : ""}
+  <div class="mist">${items.length ? items.map(q => `<div class="row"><small>${esc(q.tag)}</small><span>${esc(qText(q))}</span><span class="muted">正解　<b>${esc(q.answer)}</b></span></div>`).join("") : '<p class="muted">まだありません。展示室で問題に挑戦しよう。</p>'}</div></section>`;
+}
+
+/* ================= 技法ラボ ================= */
+function renderLab(){
+  const id = view.tab || "sfu", L = LABS.find(l => l.id === id);
+  const body = {
+    sfu:`<p>輪郭線を描かずに、明暗の変化でぼかして立体感を出す技法を、スフマートという。スライダーを動かして、線がきえていく様子を見よう。</p>
+      <canvas id="lcvs" width="320" height="240" role="img" aria-label="顔の絵。スライダーで輪郭線とぼかしが変わる"></canvas>
+      <div class="range"><input id="rg" type="range" min="0" max="100" value="0" aria-label="ぼかしの強さ"><div><span>輪郭線をえがく</span><span>スフマート</span></div></div>
+      <div class="note"><b>観察しよう</b>口もとのあたりが、どう見えるかな。輪郭がぼやけるほど、顔がやわらかく、ふくらんで見える。</div>`,
+    air:`<p>遠ざかるにつれて、色調が淡く、青みを帯びて見える。この見え方を使って奥行きを表す方法を、空気遠近法という。「モナ・リザ」の背景にも使われている。</p>
+      <canvas id="lcvs" width="320" height="220" role="img" aria-label="かさなる山の絵。スライダーで遠くの山がかすむ"></canvas>
+      <div class="range"><input id="rg" type="range" min="0" max="100" value="0" aria-label="かすみの量"><div><span>すべて同じ色</span><span>遠くほど淡く青い</span></div></div>
+      <div class="note"><b>観察しよう</b>かすみの量を増やすと、いちばん遠い山はどう変わる？ 同じ形でも、奥行きが生まれる。</div>`,
+    vp:`<p>奥行きを表す線が、画面の一点に集まって見える。この点が消失点。「最後の晩餐」は、この一点透視図法で空間を表している。金色の点を動かしてみよう。</p>
+      <canvas id="lcvs" width="320" height="230" tabindex="0" role="img" aria-label="部屋の奥行きの絵。金色の点（消失点）をドラッグして動かせる"></canvas>
+      <div class="note" id="vpnote"><b>やってみよう</b>消失点を画面の中央に合わせると、「最後の晩餐」のように、見る人の視線が中心に集まる。</div>`,
+    mir:`<p>レオナルドの手稿は、左右が逆の鏡文字で書かれている。自分の言葉を入力して、レオナルド流にしてみよう。右側の鏡に映すと、ふつうの文字にもどる。</p>
+      <div class="field"><label for="mirin">ことばを入力（12文字まで）</label><input id="mirin" maxlength="12" value="ひかりとかげ" autocomplete="off"></div>
+      <div class="mirror" aria-live="polite"><span class="flipped" id="mflip">ひかりとかげ</span><i class="line" aria-hidden="true"></i><span id="mnorm">ひかりとかげ</span></div>
+      <div class="note"><b>ポイント</b>左は鏡文字、右は鏡に映した姿。数千枚もの手稿を、こうして書き残した。</div>`
+  }[id];
+  app.innerHTML = `<div class="bar"><button class="link" data-go="home">← 展示室にもどる</button></div>
+  <h2 class="sec" style="margin-top:6px">技法ラボ<small>さわって、試して、わかる</small></h2>
+  <div class="tabs" role="tablist">${LABS.map(l => `<button class="tab" role="tab" aria-selected="${l.id === id}" data-act="tab" data-id="${l.id}">${S.labs[l.id] ? '<span class="ck">済</span>' : ""}${l.n}</button>`).join("")}</div>
+  <section class="labcard"><h3>${esc(L.t)}</h3>${body}<button class="btn primary" style="justify-self:start" data-act="start" data-m="lab:${id}">チェック問題（3問）に挑戦</button></section>`;
+  initLab(id);
+}
+function initLab(id){
+  const cv = document.getElementById("lcvs"), rg = document.getElementById("rg");
+  if(id === "sfu"){ const f = () => drawSfumato(cv, rg.value/100); rg.oninput = f; f(); }
+  if(id === "air"){ const f = () => drawAir(cv, rg.value/100); rg.oninput = f; f(); }
+  if(id === "vp"){
+    const st = {x:.5, y:.46}; const f = () => { drawVP(cv, st); const mid = Math.abs(st.x - .5) < .04; const n = document.getElementById("vpnote"); if(n) n.innerHTML = mid ? "<b>中央にそろった</b>線が画面の中心に集まった。「最後の晩餐」でも、消失点は中央のイエスの頭のあたり。見る人の視線が、自然と中心の人物に向かう。" : "<b>やってみよう</b>消失点を画面の中央に合わせると、「最後の晩餐」のように、見る人の視線が中心に集まる。"; };
+    const set = e => { const b = cv.getBoundingClientRect(); st.x = Math.min(.8, Math.max(.2, (e.clientX-b.left)/b.width)); st.y = Math.min(.7, Math.max(.28, (e.clientY-b.top)/b.height)); f(); };
+    let down = false; cv.onpointerdown = e => { down = true; cv.setPointerCapture(e.pointerId); set(e); }; cv.onpointermove = e => { if(down) set(e); }; cv.onpointerup = () => { down = false; };
+    cv.onkeydown = e => { const d = {ArrowLeft:[-.03,0],ArrowRight:[.03,0],ArrowUp:[0,-.03],ArrowDown:[0,.03]}[e.key]; if(d){ e.preventDefault(); st.x = Math.min(.8, Math.max(.2, st.x+d[0])); st.y = Math.min(.7, Math.max(.28, st.y+d[1])); f(); } };
+    f();
+  }
+  if(id === "mir"){ const inp = document.getElementById("mirin"), a = document.getElementById("mflip"), b = document.getElementById("mnorm"); inp.oninput = () => { a.textContent = inp.value || "　"; b.textContent = inp.value || "　"; }; }
+}
+function drawSfumato(cv, t){
+  const c = cv.getContext("2d"), W = cv.width, H = cv.height;
+  vgrad(c, W, H, "#5d5538", "#2a2515");
+  function blob(cx, cy, rx, ry, hi, mid, dark, lx){
+    c.save(); c.translate(cx, cy); c.scale(rx, ry);
+    const e = 1 - .78*t, g = c.createRadialGradient(lx, -.3, .05, 0, 0, 1);
+    g.addColorStop(0, hi); g.addColorStop(Math.max(.05, e*.55), mid); g.addColorStop(e, dark); g.addColorStop(1, rgba(dark, 1 - t));
+    c.fillStyle = g; c.beginPath(); c.arc(0, 0, 1, 0, TAU); c.fill(); c.restore();
+    if(t < 1){ c.strokeStyle = `rgba(20,12,6,${.9*(1-t)})`; c.lineWidth = 3; c.beginPath(); c.ellipse(cx, cy, rx, ry, 0, 0, TAU); c.stroke(); }
+  }
+  blob(W*.5, H*1.02, 130, 88, "#a98652", "#7b5a34", "#3f2c18", -.3);
+  blob(W*.5, H*.3, 66, 58, "#5b3f27", "#33231a", "#1b120c", -.2);
+  blob(W*.5, H*.44, 58, 74, "#f4d9ae", "#cf9f6c", "#7a5533", -.35);
+  c.fillStyle = `rgba(40,25,14,${.8})`; [[-22,-4],[22,-4]].forEach(([dx, dy]) => { c.beginPath(); c.ellipse(W*.5+dx, H*.4+dy, 7, 3.5 + 2*t, 0, 0, TAU); c.fill(); });
+  c.strokeStyle = `rgba(60,25,15,${.9*(1-.8*t)})`; c.lineWidth = 2.2 + 1.5*t; c.lineCap = "round";
+  c.beginPath(); c.moveTo(W*.5-20, H*.56); c.quadraticCurveTo(W*.5, H*.6, W*.5+20, H*.555); c.stroke();
+}
+function drawAir(cv, t){
+  const c = cv.getContext("2d"), W = cv.width, H = cv.height, n = 5, r = rng(7);
+  const sky = c.createLinearGradient(0, 0, 0, H); sky.addColorStop(0, mix("#6f8fb5","#9ebbd8",t)); sky.addColorStop(1, "#e6ecf1"); c.fillStyle = sky; c.fillRect(0, 0, W, H);
+  for(let i = 0; i < n; i++){
+    const depth = 1 - i/(n-1), amt = t * (.12 + .88*Math.pow(depth, .8)), base = H*(.34 + i*.12), amp = 34 - i*5;
+    c.fillStyle = mix("#2f4d3a", "#a9c0dc", amt); c.beginPath(); c.moveTo(0, H);
+    for(let x = 0; x <= W; x += 20) c.lineTo(x, base - amp*(.35 + .65*r())); c.lineTo(W, H); c.fill();
+  }
+}
+function drawVP(cv, st){
+  const c = cv.getContext("2d"), W = cv.width, H = cv.height, vx = st.x*W, vy = st.y*H, ww = W*.26, wh = H*.26;
+  c.fillStyle = "#1b1830"; c.fillRect(0, 0, W, H);
+  const L = vx - ww/2, R = vx + ww/2, T = vy - wh/2, B = vy + wh/2;
+  c.fillStyle = "#312b52"; c.fillRect(L, T, ww, wh);
+  c.strokeStyle = "#8c84bd"; c.lineWidth = 2;
+  [[0,0,L,T],[W,0,R,T],[0,H,L,B],[W,H,R,B]].forEach(l => { c.beginPath(); c.moveTo(l[0], l[1]); c.lineTo(l[2], l[3]); c.stroke(); });
+  c.strokeRect(L, T, ww, wh);
+  c.strokeStyle = "rgba(140,132,189,.55)"; c.lineWidth = 1.2;
+  for(let k = 1; k <= 5; k++){ const f = Math.pow(k/6, 1.7), y = B + (H - B)*f, xl = L - L*f, xr = R + (W - R)*f; c.beginPath(); c.moveTo(xl, y); c.lineTo(xr, y); c.stroke(); }
+  for(let k = 1; k <= 5; k++){ const f = Math.pow(k/6, 1.7), y = T - T*f; c.beginPath(); c.moveTo(L - L*f, y); c.lineTo(R + (W-R)*f, y); c.stroke(); }
+  c.setLineDash([4, 5]); c.strokeStyle = "rgba(255,211,107,.55)"; c.lineWidth = 1.2;
+  for(let i = 0; i < 12; i++){ const a = i*TAU/12; c.beginPath(); c.moveTo(vx, vy); c.lineTo(vx + Math.cos(a)*W, vy + Math.sin(a)*W); c.stroke(); }
+  c.setLineDash([]);
+  glow(c, W, H, vx, vy, 40, "#FFD36B", .9); c.fillStyle = "#FFD36B"; c.beginPath(); c.arc(vx, vy, 7, 0, TAU); c.fill();
+  c.strokeStyle = "#fff"; c.lineWidth = 2; c.beginPath(); c.arc(vx, vy, 12, 0, TAU); c.stroke();
+  c.fillStyle = "#FFE9A8"; c.font = "700 13px 'Zen Maru Gothic', sans-serif"; c.fillText("消失点", Math.min(W-52, vx + 16), Math.max(16, vy - 14));
+}
+
+/* ================= 光のラボ ================= */
+function renderLightLab(){
+  app.innerHTML = `<div class="bar"><button class="link" data-go="home">← 展示室にもどる</button></div>
+  <h2 class="sec" style="margin-top:6px">光のラボ<small>光をうごかして、見え方を調べる</small></h2>
+  <section class="labcard">
+    <p>球の上の金色の光を、ドラッグして動かそう。光の向きが変わると、いちばん明るい所と、かべにできるかげの場所が変わる。レンブラントやラ・トゥールは、この光とかげを使って、見せたいものを浮かび上がらせた。</p>
+    <canvas id="lcvs" width="340" height="340" tabindex="0" role="img" aria-label="球に光を当てた絵。金色の光をドラッグして動かせる"></canvas>
+    <div class="note" id="lnote"><b>光は今</b>右上から</div>
+    <button class="btn primary" style="justify-self:start" data-act="start" data-m="light">光の向きチャレンジ（6問）</button>
+  </section>
+  <h2 class="sec">考えよう<small>教科書 P.113 の問い</small></h2>
+  <section class="labcard">
+    <p><b>「フォリー・ベルジェールのバー」の絵の中の光は、どこから照らされているのだろうか。</b></p>
+    <p class="muted">まず自分で考えて、友だちとも話してみよう。</p>
+    <button class="btn small" style="justify-self:start" data-act="think-toggle" aria-expanded="${!!view.think}">${view.think ? "ひとつの考え方をとじる" : "ひとつの考え方を見る"}</button>
+    ${view.think ? `<div class="note"><b>ひとつの考え方</b>天井のシャンデリアなど、店内の灯りが主な光と考えられる。女性の顔や胸もとが明るく、ガラスやびんが輝いている。ただし答えはひとつではない。鏡に映った灯りの位置も手がかりになる。</div>` : ""}
+  </section>`;
+  const cv = document.getElementById("lcvs"); let th = Math.PI/4;
+  const f = () => { drawLight(cv, th, {hi:1, sh:1, marker:true}); const i = Math.round(((th % TAU) + TAU) % TAU / (Math.PI/4)) % 8; document.getElementById("lnote").innerHTML = `<b>光は今</b>${DIRS[i]}から`; };
+  const set = e => { const b = cv.getBoundingClientRect(), x = (e.clientX - b.left)/b.width - .5, y = (e.clientY - b.top)/b.height - .5 - .02; th = Math.atan2(-y, x); f(); };
+  let down = false; cv.onpointerdown = e => { down = true; cv.setPointerCapture(e.pointerId); set(e); }; cv.onpointermove = e => { if(down) set(e); }; cv.onpointerup = () => { down = false; };
+  cv.onkeydown = e => { if(e.key === "ArrowLeft" || e.key === "ArrowDown"){ e.preventDefault(); th += Math.PI/16; f(); } if(e.key === "ArrowRight" || e.key === "ArrowUp"){ e.preventDefault(); th -= Math.PI/16; f(); } };
+  f();
+}
+
+/* ================= 紙ふぶき ================= */
+function confetti(){
+  if(window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const cv = document.getElementById("fx"); cv.hidden = false;
+  const c = cv.getContext("2d"), Wd = cv.width = innerWidth, Hd = cv.height = innerHeight;
+  const cols = ["#F0B33A","#FFE3A6","#7C90B6","#B23A2E","#4CC995"];
+  const ps = range(110).map(() => ({x:Wd/2 + (Math.random()-.5)*80, y:Hd*.35, vx:(Math.random()-.5)*12, vy:-Math.random()*12-4, r:Math.random()*6+4, c:pick(cols), a:Math.random()*6}));
+  const t0 = performance.now();
+  (function f(t){ c.clearRect(0,0,Wd,Hd); ps.forEach(p => { p.vy += .35; p.x += p.vx; p.y += p.vy; p.a += .2; c.save(); c.translate(p.x,p.y); c.rotate(p.a); c.fillStyle = p.c; c.fillRect(-p.r/2,-p.r/4,p.r,p.r/2); c.restore(); }); if(t - t0 < 2200) requestAnimationFrame(f); else { c.clearRect(0,0,Wd,Hd); cv.hidden = true; } })(t0);
+}
+
+/* ================= イベント ================= */
+document.addEventListener("click", e => {
+  const g = e.target.closest("[data-go]");
+  if(g){ SFX.tap(); if(view.name === "quiz") Q = null; go(g.dataset.go); return; }
+  const a = e.target.closest("[data-act]"); if(!a) return;
+  const act = a.dataset.act;
+  if(act === "close-modal"){ if(e.target === a || a.id === "mclose") closeModal(); return; }
+  if(act === "room"){
+    const id = a.dataset.id; SFX.tap();
+    if(id === "lab") go("lab", {tab:"sfu"}); else if(id === "light") go("light"); else startSession(id);
+    return;
+  }
+  if(act === "start"){ startSession(a.dataset.m); return; }
+  if(act === "again"){ const m = a.dataset.m; if(m === "review" && !S.wrong.length) return go("home"); startSession(m); return; }
+  if(act === "review"){ startSession("review"); return; }
+  if(act === "tab"){ SFX.tap(); view.tab = a.dataset.id; renderLab(); return; }
+  if(act === "think-toggle"){ view.think = !view.think; renderLightLab(); return; }
+  if(act === "work"){ openWork(a.dataset.id); return; }
+  if(act === "share-toggle"){ view.share = !view.share; view.copied = false; renderHome(); return; }
+  if(act === "settings-toggle"){ view.settings = !view.settings; view.resetArm = false; renderHome(); return; }
+  if(act === "t-sound"){ S.sound = !S.sound; save(); renderHome(); SFX.tap(); return; }
+  if(act === "reset"){ if(!view.resetArm){ view.resetArm = true; renderHome(); return; } S = defaults(); save(); view = {name:"home"}; render(); return; }
+  if(act === "copy"){ const inp = document.getElementById("share-url"); try{ navigator.clipboard.writeText(APP_URL).then(() => { view.copied = true; a.textContent = "コピーしました"; }, () => inp.select()); }catch(err){ inp.select(); } return; }
+  if(act === "webshare"){ try{ navigator.share({title:"光とかげの美術館", text:"中1美術の鑑賞を、クイズと実験で楽しく覚えよう。", url:APP_URL}).catch(() => {}); }catch(err){} return; }
+  if(act === "install"){ if(installEvt){ installEvt.prompt(); installEvt.userChoice.finally(() => { installEvt = null; renderHome(); }); } return; }
+  if(!Q) return;
+  if(act === "quit"){
+    if(!Q.quitArm){ Q.quitArm = true; a.textContent = "やめる？"; setTimeout(() => { if(Q && Q.quitArm){ Q.quitArm = false; const x = document.querySelector(".x"); if(x) x.textContent = "✕"; } }, 2500); return; }
+    const m = Q.mode; Q = null; go(m.startsWith("lab:") ? "lab" : m === "light" ? "light" : "home", m.startsWith("lab:") ? {tab:m.slice(4)} : {}); return;
+  }
+  if(act === "ans"){ answerChoice(+a.dataset.k); return; }
+  if(act === "hint-open"){ const q = cur(); if(q.used < 3){ q.used++; SFX.tap(); const sc = window.scrollY; renderQuiz(); window.scrollTo(0, sc); } return; }
+  if(act === "next"){ next(); return; }
+  if(act === "l-ans"){ answerLight(a.dataset.d); return; }
+  if(act === "o-in" || act === "o-out" || act === "o-clear"){
+    const q = cur(); if(Q.answered) return; const id = a.dataset.id;
+    if(act === "o-in" && !q.placed.includes(id)){ q.placed.push(id); SFX.tap(); }
+    if(act === "o-out") q.placed = q.placed.filter(x => x !== id);
+    if(act === "o-clear") q.placed = [];
+    const sc = window.scrollY; renderQuiz(); window.scrollTo(0, sc); return;
+  }
+  if(act === "o-check"){ answerOrder(); return; }
+});
+document.addEventListener("keydown", e => {
+  if(e.key === "Escape" && modalRoot.firstChild){ closeModal(); return; }
+  if(view.name !== "quiz" || !Q || Q.answered || e.target.tagName === "INPUT") return;
+  const q = cur();
+  if((q.kind === "choice" || q.kind === "hint") && /^[1-4]$/.test(e.key) && q.options[+e.key-1] != null) answerChoice(+e.key-1);
+});
+
+render();
+if("serviceWorker" in navigator && location.protocol === "https:"){
+  window.addEventListener("load", () => { navigator.serviceWorker.register("sw.js").catch(() => {}); });
+}
+</script>
+</body>
+</html>
